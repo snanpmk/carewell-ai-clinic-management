@@ -1,0 +1,28 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import { QueryProvider } from "@/lib/QueryProvider";
+import { ClientLayout } from "@/components/layout/ClientLayout";
+
+export const metadata: Metadata = {
+  title: "Carewell Homeo Clinic – AI Consultation Notes",
+  description:
+    "AI-assisted consultation notes system for Carewell Homeo Clinic. Patient onboarding, symptom capture, and structured medical note generation.",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className="min-h-screen bg-slate-50 flex">
+        <QueryProvider>
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </QueryProvider>
+      </body>
+    </html>
+  );
+}
