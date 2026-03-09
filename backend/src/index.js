@@ -16,31 +16,17 @@ connectDB();
 const app = express();
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
-// Dynamic CORS configuration
-const allowedOrigins = [
-  process.env.FRONTEND_URL?.replace(/\/$/, ""), // Remove trailing slash if present
-  "http://localhost:3000",
-  "http://localhost:5173", // Vite default
-].filter(Boolean);
-
+// Allow all origins for CORS to ensure connectivity
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      const normalizedOrigin = origin.replace(/\/$/, "");
-      if (allowedOrigins.includes(normalizedOrigin) || process.env.NODE_ENV === "development") {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "*",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   })
 );
 app.use(express.json());
