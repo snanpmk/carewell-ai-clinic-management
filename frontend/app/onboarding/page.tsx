@@ -55,6 +55,7 @@ export default function OnboardingPage() {
       setPatient(res.data.patientId, formData);
       router.push(`/consultation?patientId=${res.data.patientId}`);
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       setError(err?.response?.data?.message || err.message || "Failed to register patient");
     },

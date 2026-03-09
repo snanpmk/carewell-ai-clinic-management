@@ -110,7 +110,7 @@ export default function SymptomsPage() {
             <div>
               <h2 className="text-xl font-bold text-gray-900">Describe Your Symptoms</h2>
               <p className="text-sm text-gray-500 mt-1">
-                Hi{patientData?.name ? `, ${patientData.name}` : ""}. Please describe how you're feeling.
+                Hi{patientData?.name ? `, ${patientData.name}` : ""}. Please describe how you&apos;re feeling.
               </p>
             </div>
           </div>

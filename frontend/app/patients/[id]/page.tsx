@@ -33,6 +33,16 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const patient = patientRes?.data;
   const aiSummary = summaryRes?.data;
 
+  interface VisitItem {
+    _id: string;
+    consultationDate: string;
+    symptoms: string;
+    diagnosis?: string;
+    doctorEditedNotes?: string | Record<string, unknown>;
+    aiGeneratedNotes?: string;
+    additionalNotes?: string;
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
       {/* Navigation & Header */}
@@ -129,7 +139,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                     <Loader2 className="w-4 h-4 animate-spin" /> Distilling history...
                   </span>
                 ) : (
-                  `"${aiSummary}"` || "Unable to generate summary."
+                  `&quot;${aiSummary}&quot;` || "Unable to generate summary."
                 )}
               </div>
             </div>
@@ -152,17 +162,17 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                   Empty Record
                 </div>
               ) : (
-                visits.map((visit: any, idx: number) => {
+                visits.map((visit: VisitItem, idx: number) => {
                   let aiNotes = null;
                   let parsedDoctorNotes = visit.doctorEditedNotes;
                   
-                  try { if (visit.aiGeneratedNotes) aiNotes = JSON.parse(visit.aiGeneratedNotes); } catch(e) {}
+                  try { if (visit.aiGeneratedNotes) aiNotes = JSON.parse(visit.aiGeneratedNotes); } catch { }
                   try { 
-                    if (visit.doctorEditedNotes && visit.doctorEditedNotes.startsWith('{')) {
+                    if (visit.doctorEditedNotes && typeof visit.doctorEditedNotes === 'string' && visit.doctorEditedNotes.startsWith('{')) {
                       const parsed = JSON.parse(visit.doctorEditedNotes);
                       parsedDoctorNotes = parsed.advice || parsed.doctorEditedNotes || visit.doctorEditedNotes;
                     }
-                  } catch(e) {}
+                  } catch { }
 
                   return (
                     <div key={visit._id} className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
@@ -191,7 +201,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                                <Activity className="w-3 h-3 text-amber-500" /> Patient Report
                             </p>
                             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                              <p className="text-sm font-bold text-slate-700 leading-relaxed italic">"{visit.symptoms}"</p>
+                              <p className="text-sm font-bold text-slate-700 leading-relaxed italic">&quot;{visit.symptoms}&quot;</p>
                               {visit.diagnosis && (
                                 <p className="mt-2 text-xs font-black text-slate-400">Assessed: <span className="text-slate-900 uppercase">{visit.diagnosis}</span></p>
                               )}

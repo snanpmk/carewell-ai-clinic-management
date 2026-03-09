@@ -14,6 +14,17 @@ export default function AppointmentsPage() {
     queryFn: getAllConsultations,
   });
 
+  interface ConsultationRecord {
+    _id: string;
+    consultationDate: string;
+    severity?: string;
+    symptoms: string;
+    patientId?: {
+      _id: string;
+      name: string;
+    };
+  }
+
   const consultations = response?.data || [];
 
   return (
@@ -71,7 +82,7 @@ export default function AppointmentsPage() {
                 Archive is empty.
               </div>
             ) : (
-              consultations.map((apt: any) => {
+              consultations.map((apt: ConsultationRecord) => {
                 const dateObj = new Date(apt.consultationDate);
                 const dayStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -105,7 +116,7 @@ export default function AppointmentsPage() {
                             {dayStr}
                           </span>
                           <span className="text-slate-200">•</span>
-                          <span className="font-bold text-slate-500 italic pl-1">"{apt.symptoms}"</span>
+                          <span className="font-bold text-slate-500 italic pl-1">&quot;{apt.symptoms}&quot;</span>
                         </div>
                       </div>
                     </div>

@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
-import { Badge } from "@/components/ui/Badge";
 import { Stepper } from "@/components/ui/Stepper";
 
 export default function NotesPage() {
@@ -30,15 +29,20 @@ export default function NotesPage() {
   );
   const [apiError, setApiError] = useState<string | null>(null);
 
-  // Redirect if missing state
+  // Pre-fill editable notes with AI output when they become available
   useEffect(() => {
-    if (!patientId || !symptomData || !aiNotes) {
-      router.replace("/onboarding");
-      return;
+    if (aiNotes) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEditedNotes({ ...aiNotes });
     }
-    // Pre-fill editable notes with AI output
-    setEditedNotes({ ...aiNotes });
-  }, [patientId, symptomData, aiNotes, router]);
+  }, [aiNotes]);
+
+  // Handle redirection
+  useEffect(() => {
+    if (aiNotes === null && !patientId) {
+      router.replace("/onboarding");
+    }
+  }, [patientId, aiNotes, router]);
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -102,7 +106,7 @@ export default function NotesPage() {
             Consultation Saved
           </h2>
           <p className="text-sm text-gray-500 mb-6">
-            The consultation record has been saved to the patient's profile.
+            The consultation record has been saved to the patient&apos;s profile.
           </p>
           <Button onClick={handleStartNew} fullWidth>
             Start New Consultation

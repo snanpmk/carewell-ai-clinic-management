@@ -11,6 +11,15 @@ export default function PatientsPage() {
     queryFn: getAllPatients,
   });
 
+  interface PatientItem {
+    _id: string;
+    name: string;
+    age: number;
+    gender: string;
+    phone: string;
+    email?: string;
+  }
+
   const patients = response?.data || [];
 
   return (
@@ -22,7 +31,7 @@ export default function PatientsPage() {
              <div className="p-2 bg-blue-100 rounded-xl"><Users className="w-6 h-6 text-blue-600" /></div>
              Patients
           </h1>
-          <p className="text-sm text-slate-500 mt-2 font-medium">Manage and review your clinic's patient database.</p>
+          <p className="text-sm text-slate-500 mt-2 font-medium">Manage and review your clinic&apos;s patient database.</p>
         </div>
         <Link
           href="/onboarding"
@@ -77,7 +86,7 @@ export default function PatientsPage() {
                       </td>
                     </tr>
                   ) : (
-                    patients.map((patient: any) => (
+                    patients.map((patient: PatientItem) => (
                       <tr key={patient._id} className="hover:bg-blue-50/30 transition-all group">
                         <td className="px-8 py-6">
                           <div className="flex items-center gap-4">
@@ -126,7 +135,7 @@ export default function PatientsPage() {
                 Empty Database
                </div>
             ) : (
-              patients.map((patient: any) => (
+              patients.map((patient: PatientItem) => (
                 <Link 
                   key={patient._id}
                   href={`/patients/${patient._id}`}

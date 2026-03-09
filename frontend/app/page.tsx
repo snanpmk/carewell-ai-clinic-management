@@ -20,7 +20,17 @@ export default function DashboardPage() {
   const isLoading = isLoadingConsultations || isLoadingPatients;
 
   // Basic stats
-  const allConsultations = consultationsRes?.data || [];
+  interface ConsultationItem {
+    _id: string;
+    consultationDate: string;
+    symptoms: string;
+    patientId?: {
+      _id: string;
+      name: string;
+    };
+  }
+
+  const allConsultations = (consultationsRes?.data as ConsultationItem[]) || [];
   const totalConsultations = allConsultations.length;
   const totalPatients = patientsRes?.data?.length || 0;
 
@@ -29,7 +39,7 @@ export default function DashboardPage() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  allConsultations.forEach((apt: any) => {
+  allConsultations.forEach((apt: ConsultationItem) => {
     const aptDate = new Date(apt.consultationDate);
     if (aptDate >= today) {
       appointmentsToday++;
@@ -106,7 +116,7 @@ export default function DashboardPage() {
               {recentConsultations.length === 0 ? (
                  <div className="p-12 text-center text-slate-400 font-medium">No recent consultations found.</div>
               ) : (
-                recentConsultations.map((apt: any) => (
+                recentConsultations.map((apt: ConsultationItem) => (
                   <div key={apt._id} className="px-8 py-5 flex items-center justify-between hover:bg-slate-50/80 transition-all group">
                     <div className="flex items-center gap-8">
                       <div className="text-center min-w-[80px]">
@@ -120,7 +130,7 @@ export default function DashboardPage() {
                       <div className="h-10 w-px bg-slate-100" />
                       <div>
                         <p className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{apt.patientId?.name || "Unknown Patient"}</p>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-1 max-w-md italic">"{apt.symptoms}"</p>
+                        <p className="text-xs text-slate-500 mt-1 line-clamp-1 max-w-md italic">&quot;{apt.symptoms}&quot;</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">

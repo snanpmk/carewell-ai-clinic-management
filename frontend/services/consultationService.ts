@@ -66,7 +66,7 @@ export const getAllConsultations = async () => {
 /**
  * Ask AI to summarize the patient's history based on their consultation records.
  */
-export const summarizeHistory = async (consultations: any[]) => {
+export const summarizeHistory = async (consultations: unknown[]) => {
   const response = await apiClient.post("/api/ai/summarize-history", { consultations });
   return response.data;
 };

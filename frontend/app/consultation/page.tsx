@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, use, Suspense } from "react";
-import { Sparkles, Save, User, Clock, AlertCircle, FileText, Loader2, Activity } from "lucide-react";
+import { useState, Suspense } from "react";
+import { Sparkles, Save, User, AlertCircle, FileText, Loader2, Activity } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,6 +21,13 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+interface Patient {
+  _id: string;
+  name: string;
+  age: number;
+  phone: string;
+}
 
 function ConsultationForm() {
   const router = useRouter();
@@ -52,7 +59,7 @@ function ConsultationForm() {
   });
 
   const allPatients = allPatientsRes?.data || [];
-  const patient = urlPatientId ? patientRes?.data : allPatients.find((p: any) => p._id === selectedPatientId);
+  const patient = urlPatientId ? patientRes?.data : allPatients.find((p: Patient) => p._id === selectedPatientId);
 
   const queryClient = useQueryClient();
 
@@ -86,7 +93,7 @@ function ConsultationForm() {
   const onGenerate = async (data: FormData) => {
     setIsGenerating(true);
     try {
-      const result = await generateNotes(data as any);
+      const result = await generateNotes(data as FormData);
       if (result.success) {
         setAiNotes(result.data);
         setEditedNotes(result.data.advice); // Default pre-fill
@@ -180,7 +187,7 @@ function ConsultationForm() {
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50"
                   >
                     <option value="">-- Choose a patient --</option>
-                    {allPatients.map((p: any) => (
+                    {allPatients.map((p: Patient) => (
                       <option key={p._id} value={p._id}>{p.name} ({p.phone})</option>
                     ))}
                   </select>
@@ -358,7 +365,7 @@ function ConsultationForm() {
               <div className="flex-1 flex flex-col items-center justify-center text-center px-6 relative z-10 text-indigo-300">
                 <FileText className="w-16 h-16 mb-4 opacity-50" />
                 <p className="font-medium text-indigo-400">No notes generated yet.</p>
-                <p className="text-sm mt-2 max-w-xs leading-relaxed">Fill out the patient symptoms on the left and click "Generate" to create structured medical notes.</p>
+                <p className="text-sm mt-2 max-w-xs leading-relaxed">Fill out the patient symptoms on the left and click &quot;Generate&quot; to create structured medical notes.</p>
               </div>
             )}
           </div>
