@@ -22,7 +22,7 @@ const schema = z.object({
   symptoms: z.string().min(3, "Please describe your symptoms"),
   duration: z.string().min(1, "Please enter the duration"),
   severity: z.enum(["mild", "moderate", "severe"], {
-    required_error: "Please select a severity level",
+    message: "Please select a severity level",
   }),
   additionalNotes: z.string().optional(),
 });
