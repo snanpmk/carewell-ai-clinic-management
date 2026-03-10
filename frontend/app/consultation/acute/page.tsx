@@ -20,7 +20,7 @@ const formSchema = z.object({
   generals: z.string().optional(),
   mentals: z.string().optional(),
   diagnosis: z.string().optional(),
-  prescription: z.string().min(2, "Final prescription is required"),
+  prescription: z.string().optional(),
   additionalNotes: z.string().optional(),
   advice: z.string().optional(),
 });
@@ -79,9 +79,13 @@ function ConsultationForm() {
   const generateMutation = useMutation({
     mutationFn: generateNotes,
     onSuccess: (result) => {
+      console.log("AI Generation Success:", result);
       if (result.success) {
         setValue("advice", result.data.advice);
       }
+    },
+    onError: (error) => {
+      console.error("AI Generation Error:", error);
     }
   });
 
@@ -106,6 +110,7 @@ function ConsultationForm() {
   });
 
   const onGenerate = (data: FormData) => {
+    console.log("onGenerate called with data:", data);
     generateMutation.mutate(data);
   };
 
@@ -237,6 +242,14 @@ function ConsultationForm() {
               rows={2}
               placeholder="E.g. Worse in morning"
             />
+
+            {Object.keys(errors).length > 0 && !aiNotes && (
+              <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
+                <p className="text-xs font-bold text-red-600 flex items-center gap-2">
+                  <Activity className="w-3 h-3" /> Please fill required fields (Patient, Symptoms)
+                </p>
+              </div>
+            )}
 
             <button
               type="submit"

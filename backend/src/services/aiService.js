@@ -38,10 +38,10 @@ Do not include any text outside of the JSON object.`;
  */
 const generateConsultationNotes = async (symptomData) => {
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-flash-latest",
     generationConfig: {
-      maxOutputTokens: 700,
-      temperature: 0.3,
+      maxOutputTokens: 2048,
+      temperature: 0.1,
       responseMimeType: "application/json",
     },
   });
@@ -52,8 +52,9 @@ const generateConsultationNotes = async (symptomData) => {
 
   let parsed;
   try {
-    // Attempt direct parse first
-    parsed = JSON.parse(text);
+    // Standardize response by cleaning markdown blocks if present
+    const cleanedText = text.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
+    parsed = JSON.parse(cleanedText);
   } catch (parseError) {
     console.warn("AI returned malformed JSON, attempting recovery:", text);
     
@@ -91,10 +92,10 @@ const summarizePatientHistory = async (consultations) => {
   }
 
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-flash-latest",
     generationConfig: {
-      maxOutputTokens: 1000,
-      temperature: 0.3,
+      maxOutputTokens: 2048,
+      temperature: 0.1,
     },
   });
 
@@ -113,7 +114,9 @@ ${formattedVisits}
 Write a short, concise 2-3 sentence paragraph summarizing their past conditions and treatments. Ensure the summary is a complete sentence and not cut off. Do not use bullet points. Make it easy to read at a glance.`;
 
   const result = await model.generateContent(prompt);
-  return result.response.text().trim();
+  const text = result.response.text().trim();
+  // Basic cleanup: remove markdown bold/italic if they clutter summary, and code blocks
+  return text.replace(/^```[a-z]*\n?/, "").replace(/\n?```$/, "").trim();
 };
 
 /**
@@ -121,10 +124,10 @@ Write a short, concise 2-3 sentence paragraph summarizing their past conditions 
  */
 const analyzeChronicCase = async (caseData) => {
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-flash-latest",
     generationConfig: {
-      maxOutputTokens: 1500,
-      temperature: 0.3,
+      maxOutputTokens: 4096,
+      temperature: 0.1,
       responseMimeType: "application/json",
     },
   });
@@ -156,7 +159,8 @@ const analyzeChronicCase = async (caseData) => {
 
   let parsed;
   try {
-    parsed = JSON.parse(text);
+    const cleanedText = text.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
+    parsed = JSON.parse(cleanedText);
   } catch (parseError) {
     const startIdx = text.indexOf("{");
     const endIdx = text.lastIndexOf("}");
