@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 import { registerPatient, PatientFormData } from "@/services/patientService";
 import { useClinicStore } from "@/store/useClinicStore";
+import { useUIStore } from "@/store/useUIStore";
 
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -41,6 +42,7 @@ export default function OnboardingPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const setPatient = useClinicStore((s) => s.setPatient);
+  const { privacyMode } = useUIStore();
 
   const {
     register,
@@ -59,7 +61,7 @@ export default function OnboardingPage() {
       toast.success("Patient registered successfully!");
       router.push(`/consultation/acute?patientId=${res.data.patientId}`);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || "Failed to register patient");
     }
   });
@@ -99,6 +101,7 @@ export default function OnboardingPage() {
                   leftIcon={<User className="w-4 h-4" />}
                   error={errors.name?.message}
                   required
+                  privacyBlur={privacyMode}
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -131,12 +134,14 @@ export default function OnboardingPage() {
                     leftIcon={<Phone className="w-4 h-4" />}
                     error={errors.phone?.message}
                     required
+                    privacyBlur={privacyMode}
                   />
 
                   <Input
                     label="Email (Optional)"
                     {...register("email")}
                     placeholder="john@example.com"
+                    privacyBlur={privacyMode}
                   />
                 </div>
               </div>
@@ -154,7 +159,7 @@ export default function OnboardingPage() {
                   {...register("address")}
                   rows={2}
                   placeholder="Location details..."
-                  className="pl-12"
+                  privacyBlur={privacyMode}
                 />
 
                 <div className="relative">
@@ -163,7 +168,6 @@ export default function OnboardingPage() {
                     {...register("medicalConditions")}
                     rows={2}
                     placeholder="Asthma, Diabetes, Allergies..."
-                    className="pl-12"
                   />
                   <p className="text-[10px] text-slate-400 mt-2 italic ml-1">* Important for classical homeopathic evaluation.</p>
                 </div>

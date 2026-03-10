@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { Users, ChevronRight } from "lucide-react";
+import { useUIStore } from "@/store/useUIStore";
+import { clsx } from "clsx";
 
 export interface PatientItem {
   _id: string;
@@ -17,6 +19,8 @@ interface PatientsListProps {
 }
 
 export function PatientsList({ patients }: PatientsListProps) {
+  const { privacyMode } = useUIStore();
+
   return (
     <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden text-sm">
       {/* Desktop Table View */}
@@ -48,7 +52,10 @@ export function PatientsList({ patients }: PatientsListProps) {
                         {patient.name?.charAt(0).toUpperCase() || "?"}
                       </div>
                       <div>
-                        <Link href={`/patients/${patient._id}`} className="font-bold text-slate-800 tracking-tight group-hover:text-blue-600 focus:text-blue-600 transition-colors text-base">
+                        <Link href={`/patients/${patient._id}`} className={clsx(
+                          "font-bold text-slate-800 tracking-tight group-hover:text-blue-600 focus:text-blue-600 transition-all text-base",
+                          privacyMode && "blur-sm select-none"
+                        )}>
                           {patient.name}
                         </Link>
                         <p className="text-[11px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">ID: {patient._id?.substring(0, 8)}</p>
@@ -61,8 +68,8 @@ export function PatientsList({ patients }: PatientsListProps) {
                     </span>
                   </td>
                   <td className="px-5 py-5">
-                    <p className="text-slate-700 font-bold">{patient.phone}</p>
-                    {patient.email && <p className="text-xs text-slate-400 mt-0.5">{patient.email}</p>}
+                    <p className={clsx("text-slate-700 font-bold", privacyMode && "blur-sm select-none")}>{patient.phone}</p>
+                    {patient.email && <p className={clsx("text-xs text-slate-400 mt-0.5", privacyMode && "blur-sm select-none")}>{patient.email}</p>}
                   </td>
                   <td className="px-5 py-5 text-right rounded-r-2xl">
                     <Link 
@@ -99,7 +106,10 @@ export function PatientsList({ patients }: PatientsListProps) {
                   {patient.name?.charAt(0).toUpperCase() || "?"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-base font-bold text-slate-900 truncate tracking-tight group-hover:text-blue-600 transition-colors">{patient.name}</h4>
+                  <h4 className={clsx(
+                    "text-base font-bold text-slate-900 truncate tracking-tight group-hover:text-blue-600 transition-all",
+                    privacyMode && "blur-sm select-none"
+                  )}>{patient.name}</h4>
                   <div className="flex items-center gap-2 mt-1 px-2 py-0.5 w-max rounded-md bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500">
                     <span>{patient.age} yrs</span>
                     <span className="w-1 h-1 rounded-full bg-slate-300" />
@@ -109,8 +119,8 @@ export function PatientsList({ patients }: PatientsListProps) {
                 <ChevronRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-transform group-hover:text-blue-600" />
               </div>
               <div className="mt-4 md:ml-16 sm:ml-16 xs:ml-0 text-sm flex flex-col gap-1 border-t border-slate-100 pt-3">
-                <span className="font-bold text-slate-700">{patient.phone}</span>
-                {patient.email && <span className="text-xs text-slate-400 truncate">{patient.email}</span>}
+                <span className={clsx("font-bold text-slate-700", privacyMode && "blur-sm select-none")}>{patient.phone}</span>
+                {patient.email && <span className={clsx("text-xs text-slate-400 truncate", privacyMode && "blur-sm select-none")}>{patient.email}</span>}
               </div>
             </Link>
           ))

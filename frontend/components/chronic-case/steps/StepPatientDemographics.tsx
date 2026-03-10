@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { demographicsSchema } from "@/lib/validations/chronicCase";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { useUIStore } from "@/store/useUIStore";
 import StepLayout from "../StepLayout";
 
 interface Patient {
@@ -26,6 +27,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     queryFn: getAllPatients,
   });
 
+  const { privacyMode } = useUIStore();
 
   const {
     register,
@@ -111,6 +113,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
                   required
                   {...register("patient")}
                   error={errors.patient?.message as string}
+                  privacyBlur={privacyMode}
                 />
               )}
             </div>
@@ -124,6 +127,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
                 {...register("demographics.name")}
                 error={(errors.demographics as Record<string, { message?: string }> | undefined)?.name?.message}
                 required
+                privacyBlur={privacyMode}
               />
             </div>
 
@@ -161,6 +165,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
                 label="Address"
                 {...register("demographics.address")}
                 placeholder="Full address details..."
+                privacyBlur={privacyMode}
               />
             </div>
           </div>

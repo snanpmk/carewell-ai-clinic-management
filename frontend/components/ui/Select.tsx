@@ -6,10 +6,11 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   error?: string;
   options: { value: string; label: string }[];
   placeholder?: string;
+  privacyBlur?: boolean;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, id, options, placeholder, className, ...props }, ref) => {
+  ({ label, error, id, options, placeholder, className, privacyBlur, ...props }, ref) => {
     const inputId = id || label.toLowerCase().replace(/\s+/g, "-");
     return (
       <div className="flex flex-col gap-2 relative">
@@ -17,7 +18,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           {label}
           {props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
         </label>
-        <div className="relative group">
+        <div className={clsx("relative group transition-all", privacyBlur && "blur-sm select-none")}>
           <select
             id={inputId}
             ref={ref}

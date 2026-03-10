@@ -8,6 +8,13 @@ import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface Patient {
+  _id: string;
+  name: string;
+  phone: string;
+  age: number;
+}
+
 export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const router = useRouter();
@@ -18,22 +25,22 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
     enabled: isOpen,
   });
 
-  const patients = response?.data || [];
+  const patients: Patient[] = useMemo(() => response?.data || [], [response?.data]);
 
   const filteredPatients = useMemo(() => {
     if (!query) return patients.slice(0, 5);
     const q = query.toLowerCase();
-    return patients.filter((p: any) => 
+    return patients.filter((p) => 
       p.name.toLowerCase().includes(q) || 
       p.phone.includes(q)
     ).slice(0, 8);
   }, [patients, query]);
 
-  const quickActions = [
+  const quickActions = useMemo(() => [
     { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-orange-500", bg: "bg-orange-50" },
     { name: "Chronic Case Case", href: "/consultation/chronic", icon: Stethoscope, color: "text-rose-500", bg: "bg-rose-50" },
     { name: "AI Tools", href: "/ai-tools", icon: Sparkles, color: "text-indigo-500", bg: "bg-indigo-50" },
-  ].filter(action => !query || action.name.toLowerCase().includes(query.toLowerCase()));
+  ].filter(action => !query || action.name.toLowerCase().includes(query.toLowerCase())), [query]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -48,7 +55,6 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
         document.body.style.overflow = "hidden";
     } else {
         document.body.style.overflow = "unset";
-        setQuery("");
     }
   }, [isOpen]);
 
@@ -130,7 +136,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
                     <p className="text-sm font-medium text-slate-400">No patients found</p>
                   </div>
                 ) : (
-                  filteredPatients.map((patient: any) => (
+                  filteredPatients.map((patient) => (
                     <button
                       key={patient._id}
                       onClick={() => handleNavigate(`/patients/${patient._id}`)}

@@ -12,16 +12,9 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-// Invitation Schema
-const inviteSchema = z.object({
-  email: z.string().email("Invalid email address"),
-});
 
 export default function SettingsPage() {
   const { user } = useAuthStore();
-  const [email, setEmail] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const isPrimary = user?.role === "primary";

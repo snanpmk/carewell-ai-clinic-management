@@ -10,6 +10,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { generateNotes, saveConsultation } from "@/services/consultationService";
 import { getPatient, getAllPatients } from "@/services/patientService";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUIStore } from "@/store/useUIStore";
+import { clsx } from "clsx";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
@@ -39,6 +41,7 @@ function ConsultationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlPatientId = searchParams.get("patientId");
+  const { privacyMode } = useUIStore();
 
   const {
     register,
@@ -84,7 +87,7 @@ function ConsultationForm() {
         setValue("advice", result.data.advice);
       }
     },
-    onError: (error) => {
+    onError: () => {
     }
   });
 
@@ -160,7 +163,9 @@ function ConsultationForm() {
           {patientLoading || allPatientsLoading ? (
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Status: Loading...</p>
           ) : patient ? (
-            <p className="text-sm font-bold text-blue-600 mt-1 italic">Case: {patient?.name} {patient?.age ? `(${patient.age}Y)` : ""}</p>
+            <p className="text-sm font-bold text-blue-600 mt-1 italic">
+              Case: <span className={clsx("transition-all", privacyMode && "blur-sm select-none")}>{patient?.name}</span> {patient?.age ? `(${patient.age}Y)` : ""}
+            </p>
           ) : (
             <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-1">Attention: Select a patient to begin</p>
           )}
@@ -242,7 +247,7 @@ function ConsultationForm() {
             />
 
             {Object.keys(errors).length > 0 && !aiNotes && (
-              <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-xs font-bold text-red-600 flex items-center gap-2">
                   <Activity className="w-3 h-3" /> Please fill required fields (Patient, Symptoms)
                 </p>

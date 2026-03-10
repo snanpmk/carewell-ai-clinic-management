@@ -12,10 +12,13 @@ import {
   Stethoscope,
   HeartPulse,
   ChevronRight,
-  LogOut
+  LogOut,
+  Shield,
+  ShieldAlert
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useUIStore } from "@/store/useUIStore";
 import Image from "next/image";
 import { Badge } from "@/components/ui/Badge";
 
@@ -41,6 +44,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const { privacyMode, togglePrivacyMode } = useUIStore();
 
   const handleLogout = () => {
     logout();
@@ -157,6 +161,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               );
             })}
 
+            {/* Privacy Mode Toggle */}
+            <button
+              onClick={togglePrivacyMode}
+              className={clsx(
+                "w-full group flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer",
+                privacyMode
+                  ? "bg-orange-500/10 text-orange-500 border border-orange-500/20 shadow-lg shadow-orange-500/5"
+                  : "text-slate-400 hover:text-white hover:bg-slate-900/50"
+              )}
+            >
+              <div className={clsx(
+                "p-2 rounded-xl transition-colors",
+                privacyMode ? "bg-orange-500/20" : "bg-slate-900/40 group-hover:bg-slate-800"
+              )}>
+                {privacyMode ? <ShieldAlert className="w-5 h-5" /> : <Shield className="w-5 h-5" />}
+              </div>
+              <span className="flex-1 tracking-tight text-left">Privacy Mode</span>
+              {privacyMode && <Badge label="ON" variant="warning" className="px-1.5 py-0.5" />}
+            </button>
           </nav>
         </div>
       </div>
