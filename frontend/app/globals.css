@@ -1,5 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #2563EB;
+  --color-brand-secondary: #059669;
+  --color-surface-slate: #0F172A;
+
+  --animate-fade-in-up: fadeInUp 0.35s ease-out both;
+  --animate-pulse-blue: pulse-blue 1.4s ease-in-out infinite;
+}
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
@@ -12,8 +20,8 @@ html {
 }
 
 body {
-  background-color: #F8FAFC;
-  color: #1F2937;
+  background-color: var(--color-slate-50);
+  color: var(--color-slate-900);
   min-height: 100vh;
 }
 
@@ -29,16 +37,8 @@ body {
   }
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.35s ease-out both;
-}
-
 /* ── Pulse for AI loading ─────────────────────────────────────────────────── */
 @keyframes pulse-blue {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
-}
-
-.animate-pulse-blue {
-  animation: pulse-blue 1.4s ease-in-out infinite;
 }

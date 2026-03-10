@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 // Route imports
 const patientRoutes = require("./routes/patients");
 const consultationRoutes = require("./routes/consultations");
+const chronicCaseRoutes = require("./routes/chronicCases");
 const aiRoutes = require("./routes/ai");
 const authRoutes = require("./routes/auth");
 const uploadRoutes = require("./routes/upload");
@@ -53,6 +54,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/consultations", consultationRoutes);
+app.use("/api/chronicCases", chronicCaseRoutes);
 app.use("/api/ai", aiRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────

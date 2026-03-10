@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Card } from "@/components/ui/Card";
-import { UserPlus, Mail, ShieldCheck, Loader2, ArrowRight } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { UserPlus, Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2 } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import apiClient from "@/services/apiClient";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 export default function SettingsPage() {
   const { user } = useAuthStore();
@@ -14,8 +17,17 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const isPrimary = user?.role === "primary";
-  console.log(isPrimary);
-  console.log(user);
+
+  const { data: teamResponse, isLoading: isLoadingTeam } = useQuery({
+    queryKey: ["clinic-doctors"],
+    queryFn: async () => {
+      const { data } = await apiClient.get('/api/auth/clinic-doctors');
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const team = teamResponse?.data || [];
 
   const inviteMutation = useMutation({
     mutationFn: async (inviteEmail: string) => {
@@ -70,9 +82,11 @@ export default function SettingsPage() {
             <div>
               <h2 className="text-xl font-black text-slate-900 tracking-tight">{user?.name}</h2>
               <p className="text-sm font-medium text-slate-500">{user?.email}</p>
-              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full">
-                 <div className={`w-2 h-2 rounded-full ${isPrimary ? "bg-orange-500" : "bg-blue-500"}`} />
-                 <span className="text-[10px] uppercase font-black tracking-widest text-slate-600">{user?.role || "Doctor"}</span>
+              <div className="mt-2 inline-flex items-center gap-2">
+                 <Badge 
+                   label={user?.role === "primary" ? "Primary Doctor" : "Doctor"} 
+                   variant={user?.role === "primary" ? "warning" : "primary"} 
+                 />
               </div>
             </div>
           </div>
@@ -99,20 +113,15 @@ export default function SettingsPage() {
             </p>
 
             <form onSubmit={handleInvite} className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Doctor's Email Address</label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="doctor@example.com"
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                  />
-                </div>
-              </div>
+              <Input
+                label="Doctor's Email Address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="doctor@example.com"
+                leftIcon={<Mail className="w-4 h-4" />}
+              />
 
               {message && (
                 <div className={`p-4 rounded-xl text-sm font-bold flex items-center gap-3 ${
@@ -122,31 +131,60 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              <button
+              <Button
                 type="submit"
-                disabled={inviteMutation.isPending || !email}
-                className={`w-full py-4 px-8 flex items-center justify-center gap-3 rounded-2xl text-sm font-black uppercase tracking-widest text-white transition-all shadow-xl active:scale-95
-                  ${inviteMutation.isPending || !email 
-                    ? "bg-slate-300 cursor-not-allowed shadow-none" 
-                    : "bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-emerald-500/20 hover:shadow-emerald-500/40"
-                  }`}
+                variant="secondary"
+                size="lg"
+                isLoading={inviteMutation.isPending}
+                disabled={!email}
+                rightIcon={<ArrowRight className="w-5 h-5" />}
               >
-                {inviteMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Sending Invite...
-                  </>
-                ) : (
-                  <>
-                    Send Email Invitation
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
+                Send Email Invitation
+              </Button>
             </form>
           </Card>
         )}
       </div>
+
+      {/* Team List Card */}
+      <Card className="p-8 border-slate-200 rounded-3xl shadow-xl shadow-slate-200/50 bg-white relative overflow-hidden">
+        <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-3 mb-8">
+           <div className="w-8 h-px bg-slate-500 opacity-30" /> Clinic Team
+        </h3>
+
+        {isLoadingTeam ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {team.map((doc: any) => (
+              <div key={doc._id} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-slate-200 shrink-0 flex items-center justify-center">
+                  {doc.profileImage ? (
+                    <Image src={doc.profileImage} alt={doc.name} width={48} height={48} className="w-full h-full object-cover" />
+                  ) : (
+                    <UserIcon className="w-6 h-6 text-slate-400" />
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 text-sm tracking-tight">{doc.name}</h4>
+                  <p className="text-xs font-medium text-slate-500 truncate">{doc.email}</p>
+                  <div className="mt-2">
+                    <Badge 
+                      label={doc.role === "primary" ? "Primary" : "Doctor"} 
+                      variant={doc.role === "primary" ? "warning" : "primary"} 
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            {team.length === 0 && (
+               <div className="col-span-full text-center py-8 text-slate-500 text-sm font-medium">No other team members found.</div>
+            )}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

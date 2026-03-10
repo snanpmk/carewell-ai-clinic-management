@@ -312,10 +312,30 @@ const acceptInvite = async (req, res) => {
   }
 };
 
+// @desc    Get all doctors belonging to the current user's clinic
+// @route   GET /api/auth/clinic-doctors
+// @access  Private
+const getClinicDoctors = async (req, res) => {
+  try {
+    const doctors = await User.find({ clinic: req.user.clinic })
+      .select("-password")
+      .sort({ role: -1, createdAt: 1 }); // Primary first, then by creation date
+
+    res.status(200).json({
+      success: true,
+      data: doctors,
+    });
+  } catch (error) {
+    console.error("Get Clinic Doctors Error:", error);
+    res.status(500).json({ success: false, error: "Server Error" });
+  }
+};
+
 module.exports = {
   registerClinic,
   loginDoctor,
   getMe,
   inviteDoctor,
   acceptInvite,
+  getClinicDoctors,
 };

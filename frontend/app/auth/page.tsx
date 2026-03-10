@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuthStore } from "@/store/useAuthStore";
 import { HeartPulse, UploadCloud, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/Input";
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -180,51 +181,34 @@ function AuthContent() {
               
               {!isInvite && (
                 <>
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Clinic Name</label>
-                    <input
-                      type="text"
-                      value={clinicName}
-                      onChange={(e) => setClinicName(e.target.value)}
-                      placeholder="e.g. HealthFirst Clinic"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Clinic Address</label>
-                    <input
-                      type="text"
-                      value={clinicAddress}
-                      onChange={(e) => setClinicAddress(e.target.value)}
-                      placeholder="Complete Address"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
-                    />
-                  </div>
+                  <Input
+                    label="Clinic Name"
+                    value={clinicName}
+                    onChange={(e) => setClinicName(e.target.value)}
+                    placeholder="e.g. HealthFirst Clinic"
+                  />
+                  <Input
+                    label="Clinic Address"
+                    value={clinicAddress}
+                    onChange={(e) => setClinicAddress(e.target.value)}
+                    placeholder="Complete Address"
+                  />
                 </>
               )}
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Doctor Phone</label>
-                  <input
-                    type="text"
-                    value={doctorPhone}
-                    onChange={(e) => setDoctorPhone(e.target.value)}
-                    placeholder="+1 234 567 890"
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Medical License #</label>
-                  <input
-                    type="text"
-                    value={doctorLicense}
-                    onChange={(e) => setDoctorLicense(e.target.value)}
-                    placeholder="MD-12345"
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
-                  />
-                </div>
+                <Input
+                  label="Doctor Phone"
+                  value={doctorPhone}
+                  onChange={(e) => setDoctorPhone(e.target.value)}
+                  placeholder="+1 234 567 890"
+                />
+                <Input
+                  label="Medical License #"
+                  value={doctorLicense}
+                  onChange={(e) => setDoctorLicense(e.target.value)}
+                  placeholder="MD-12345"
+                />
               </div>
 
               {!isInvite && (

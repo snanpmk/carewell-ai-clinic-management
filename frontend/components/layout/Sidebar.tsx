@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -10,11 +10,13 @@ import {
   Settings, 
   Sparkles,
   HeartPulse,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
+import { Badge } from "@/components/ui/Badge";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard, color: "text-blue-500" },
@@ -35,7 +37,13 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { user } = useAuthStore();
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/auth");
+  };
 
   return (
     <>
@@ -168,11 +176,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="text-sm font-black text-white truncate tracking-tight">{user?.name || "Doctor"}</p>
-              <p className="text-[10px] text-blue-400 font-black uppercase tracking-tighter mt-0.5">
-                {user?.role === "primary" ? "Primary Doctor" : "Doctor"}
-              </p>
+              <div className="mt-1">
+                <Badge 
+                  label={user?.role === "primary" ? "Primary Doctor" : "Doctor"} 
+                  variant={user?.role === "primary" ? "warning" : "primary"} 
+                />
+              </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-white transition-colors" />
+            {/* Logout Button inside the profile hook */}
+            <button 
+              onClick={handleLogout}
+              className="p-2 rounded-xl bg-slate-800/50 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
