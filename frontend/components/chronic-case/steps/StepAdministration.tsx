@@ -7,19 +7,19 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import StepLayout from "../StepLayout";
 import { useQuery } from "@tanstack/react-query";
-import { getAllPatients } from "@/services/patientService";
+import { Patient, getAllPatients } from "@/services/patientService";
 import { getPatientChronicCases } from "@/services/chronicCaseService";
 import { useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 export default function StepAdministration({ caseData, updateCaseData, nextStep }: StepProps) {
-  const { data: allPatientsRes } = useQuery({
+  const { data: allPatientsRes } = useQuery<{ success: boolean; data: Patient[] }>({
     queryKey: ["patients"],
     queryFn: getAllPatients,
   });
 
-  const { register, handleSubmit, reset, control, formState: { isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, control, formState: { isSubmitting } } = useForm<ChronicCase>({
     defaultValues: {
       patient: caseData.patient || "",
       header: {
@@ -118,7 +118,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           management: {},
         });
 
-        const patientRecord = memoPatients.find((p: any) => p._id === selectedPatientId);
+        const patientRecord = memoPatients.find((p: Patient) => p._id === selectedPatientId);
         if (patientRecord) {
           reset({
             patient: selectedPatientId,
@@ -126,7 +126,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
             demographics: {
               name: patientRecord.name || "",
               age: patientRecord.age || 0,
-              sex: patientRecord.sex || "",
+              sex: patientRecord.sex || patientRecord.gender || "",
               religion: "",
               caste: "",
               occupation: "",
@@ -139,14 +139,14 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
     }
   }, [selectedPatientId, existingCases, memoPatients, reset, updateCaseData, caseData._id, caseData.patient]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: ChronicCase) => {
     // Merge current form data into global state before proceeding
     updateCaseData(data);
     nextStep();
   };
 
   const patientOptions = useMemo(() => 
-    (memoPatients || []).map((p: any) => ({
+    (memoPatients || []).map((p: Patient) => ({
       value: p._id,
       label: `${p.name} (${p.phone})`,
     })), [memoPatients]);
@@ -162,7 +162,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
         <div className="space-y-8">
           <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-200/80 space-y-6">
             <div className="flex items-center justify-between">
-              <p className="eyebrow !text-slate-900! flex items-center gap-2">Patient Registry Lookup</p>
+              <div className="eyebrow !text-slate-900! flex items-center gap-2">Patient Registry Lookup</div>
               {isLoadingExisting && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
             </div>
             <div className="max-w-md">
@@ -177,7 +177,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           </div>
 
           <div className="pt-6 border-t border-slate-100">
-            <p className="eyebrow text-brand-primary mb-6">Patient Identification</p>
+            <div className="eyebrow text-brand-primary mb-6">Patient Identification</div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Input label="Full Name" {...register("demographics.name")} />
               <Input label="Age" type="number" {...register("demographics.age")} />
@@ -190,7 +190,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           </div>
 
           <div className="pt-6 border-t border-slate-100">
-            <p className="eyebrow text-brand-accent mb-6">Initial Clinical Summary</p>
+            <div className="eyebrow text-brand-accent mb-6">Initial Clinical Summary</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input label="Disease Diagnosis" {...register("summaryDiagnosis.diseaseDiagnosis")} />
               <Input label="Homeopathic Diagnosis" {...register("summaryDiagnosis.homeopathicDiagnosis")} />

@@ -2,6 +2,7 @@
 
 import { useForm, Controller } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -12,10 +13,6 @@ import { User, Thermometer, Wind, Zap } from "lucide-react";
 
 const TENDENCIES = [
   "Hemorrhagic", "Suppurative", "Abscess", "Boils", "Catch cold", "Exhausted", "Spasms", "Cramps", "Sprain", "Perspire", "Growth fast", "Growth retarded", "Fatty", "Lean"
-];
-
-const FACTORS = [
-  "Time", "Thermal", "Season", "Meteorological", "Moon phases", "Noises", "Air", "Clothing", "Covering", "Bathing", "Food/Drinks", "Touch", "Posture", "Motion", "Sleep", "Sex", "Menses"
 ];
 
 export default function StepPhysicalFeatures({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
@@ -31,7 +28,7 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -47,9 +44,9 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
         <div className="space-y-12">
           {/* Appearance & Regional Snapshot */}
           <div className="space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <User className="w-4 h-4" /> Physical Appearance
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Select label="Build" options={["Obese", "Stocky", "Thin"].map(v => ({label: v, value: v}))} {...register("physicalFeatures.appearance.build")} />
               <Select label="Stature" options={["Large", "Small"].map(v => ({label: v, value: v}))} {...register("physicalFeatures.appearance.stature")} />
@@ -61,9 +58,9 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
 
           {/* Functional Generals */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <Zap className="w-4 h-4" /> Functional Generals
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Input label="Appetite" {...register("physicalFeatures.generals.appetite")} />
               <Input label="Thirst" {...register("physicalFeatures.generals.thirst")} />
@@ -76,9 +73,9 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
 
           {/* Reactions to Factors Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Wind className="w-4 h-4" /> Reactivity to Environmental Factors
-            </p>
+            </div>
             <DynamicTable 
               control={control}
               register={register}
@@ -96,9 +93,9 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
 
           {/* Constitution & Tendencies */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <Thermometer className="w-4 h-4" /> Constitutional Profile
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Select label="Physical Makeup" options={["Carbon", "Nitrogenoid", "Oxygenoid"].map(v => ({label: v, value: v}))} {...register("physicalFeatures.constitution.physicalMakeup")} />
               <Select label="Temperament" options={["Choleric", "Melancholic", "Nervous", "Sanguine", "Phlegmatic"].map(v => ({label: v, value: v}))} {...register("physicalFeatures.constitution.temperament")} />

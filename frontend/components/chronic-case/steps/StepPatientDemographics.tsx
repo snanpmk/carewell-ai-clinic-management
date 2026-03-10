@@ -21,6 +21,7 @@ interface Patient {
   age: number;
   phone: string;
   sex?: string;
+  address?: string;
 }
 
 export default function StepPatientDemographics({ caseData, updateCaseData, nextStep }: StepProps) {
@@ -103,11 +104,10 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
         presentingComplaints: [],
         historyOfPresentIllness: {},
         previousIllnessHistory: [],
-        familyHistory: {},
+        familyHistory: [],
         personalHistory: {},
         lifeSpaceInvestigation: {},
         physicalFeatures: {},
-        modalities: [],
         homeopathicDiagnosis: {},
         management: {},
       });

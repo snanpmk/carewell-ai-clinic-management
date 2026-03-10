@@ -81,11 +81,19 @@ export type SpecialHistoryFormData = z.infer<typeof specialHistorySchema>;
 
 export const treatmentSchema = z.object({
   management: z.object({
-    treatmentPlan: z.string().optional(),
+    plan: z.string().optional(),
+    restrictions: z.object({
+      diet: z.string().optional(),
+      regimen: z.string().optional(),
+      medicinal: z.string().optional(),
+    }).optional(),
     firstPrescription: z.object({
-      medicine: z.string().min(1, "Medicine is required"),
-      potency: z.string().min(1, "Potency is required"),
-      dose: z.string().min(1, "Dose is required"),
+      basis: z.string().optional(),
+      medicines: z.array(z.object({
+        medicine: z.string().min(1, "Medicine is required"),
+        potency: z.string().min(1, "Potency is required"),
+        dose: z.string().min(1, "Dose is required"),
+      })).min(1, "At least one medicine is required"),
     }),
   }),
 });

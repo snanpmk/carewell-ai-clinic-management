@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { DynamicTable } from "@/components/ui/DynamicTable";
 import StepLayout from "../StepLayout";
 import { History, Users } from "lucide-react";
@@ -14,7 +15,7 @@ export default function StepMedicalHistory({ caseData, updateCaseData, nextStep,
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };

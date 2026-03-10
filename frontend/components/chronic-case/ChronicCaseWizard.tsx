@@ -74,6 +74,11 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
     }
   };
 
+  const goToStep = (index: number) => {
+    setCurrentStepIndex(index);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const updateCaseData = (updates: Partial<ChronicCase>) => {
     setCaseData((prev) => ({ ...prev, ...updates }));
   };
@@ -89,7 +94,12 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
         </p>
       </div>
 
-      <ChronicCaseStepper steps={filteredSteps} currentStepIndex={currentStepIndex} />
+      <ChronicCaseStepper 
+        steps={filteredSteps} 
+        currentStepIndex={currentStepIndex} 
+        onStepClick={goToStep}
+        isUpdateMode={!!caseData._id}
+      />
 
       <div className="w-full">
         <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 flex flex-col relative overflow-visible">

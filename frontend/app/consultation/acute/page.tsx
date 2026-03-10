@@ -39,6 +39,13 @@ interface Patient {
 }
 
 import { Button } from "@/components/ui/Button";
+import { ConsultationNotes } from "@/services/consultationService";
+
+const emptyNotes: ConsultationNotes = {
+  chiefComplaint: "",
+  assessment: "",
+  advice: "",
+};
 
 function ConsultationForm() {
   const router = useRouter();
@@ -149,10 +156,10 @@ function ConsultationForm() {
       diagnosis: values.diagnosis,
       prescription: values.prescription,
       additionalNotes: values.additionalNotes,
-      aiGeneratedNotes: aiNotes || {},
+      aiGeneratedNotes: aiNotes || emptyNotes,
       doctorEditedNotes: { 
         chiefComplaint: aiNotes?.chiefComplaint || values.symptoms,
-        assessment: aiNotes?.assessment || values.diagnosis,
+        assessment: aiNotes?.assessment || values.diagnosis || "",
         advice: values.advice || aiNotes?.advice || ""
       }
     });

@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
 
@@ -16,7 +17,7 @@ export default function StepInitialPresentation({ caseData, updateCaseData, next
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };

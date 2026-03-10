@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // @ts-ignore
   turbopack: {},
 };
 

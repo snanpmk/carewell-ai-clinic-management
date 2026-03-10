@@ -100,9 +100,9 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                         {aiEnabled && (
                           <>
                             <div>
-                              <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
+                              <div className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
                                   <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
-                              </p>
+                              </div>
                               <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
                                 <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
                               </div>
@@ -191,9 +191,9 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-8">
                     <div>
-                      <p className="eyebrow mb-4 flex items-center gap-2">
+                      <div className="eyebrow mb-4 flex items-center gap-2">
                          <Activity className="w-4 h-4 text-brand-primary" /> Presenting Symptoms
-                      </p>
+                      </div>
                       <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 shadow-inner">
                         <p className="text-sm md:text-base font-medium text-slate-700 leading-relaxed italic">&quot;{visit.symptoms}&quot;</p>
                         {visit.diagnosis && (
@@ -208,9 +208,9 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
 
                     {aiEnabled && aiNotes && !!aiNotes["assessment"] && (
                        <div>
-                          <p className="eyebrow mb-4 flex items-center gap-2">
+                          <div className="eyebrow mb-4 flex items-center gap-2">
                              <Sparkles className="w-4 h-4 text-brand-accent" /> Clinical Reasoning
-                          </p>
+                          </div>
                           <div className="p-6 bg-brand-primary/5 rounded-3xl border border-brand-primary/10 shadow-inner">
                             <p className="text-sm font-medium text-slate-600 leading-relaxed italic border-l-4 border-brand-primary/20 pl-4">
                               {aiNotes["assessment"] as string}

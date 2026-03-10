@@ -2,6 +2,7 @@
 
 import { useForm, Controller } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -23,7 +24,7 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -39,9 +40,9 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
         <div className="space-y-12">
           {/* A. Life Situation & Family */}
           <div className="space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Users2 className="w-4 h-4" /> Life Situation & Family Status
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Select 
                 label="Family Type" 
@@ -54,9 +55,9 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
 
           {/* B. Development Milestones & Birth */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <Baby className="w-4 h-4" /> Development & Birth Archive
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Select 
                 label="Fontanella Closure" 
@@ -81,9 +82,9 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
 
           {/* C. Habits & Hobbies */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Coffee className="w-4 h-4" /> Habits & Addictions
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Select 
                 label="Food / Diet" 
@@ -107,9 +108,9 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
 
           {/* Domestic & Sexual Relations */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <p className="eyebrow text-red-500 flex items-center gap-3">
+            <div className="eyebrow text-red-500 flex items-center gap-3">
               <Heart className="w-4 h-4" /> Relational Dynamics
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Textarea label="Domestic Relations" {...register("personalHistory.domesticRelations.family")} placeholder="Family, neighbors, friends, colleagues..." />
               <div className="space-y-4">

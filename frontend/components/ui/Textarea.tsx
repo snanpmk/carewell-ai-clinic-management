@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useEffect, useRef, useImperativeHandle } from "react";
+import React, { forwardRef, useEffect, useRef, useImperativeHandle, useId } from "react";
 import { clsx } from "clsx";
 
 interface TextareaProps
@@ -14,6 +14,7 @@ interface TextareaProps
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, id, className, privacyBlur, labelClassName, ...props }, ref) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const generatedId = useId();
     
     // Merge local ref with forwarded ref
     useImperativeHandle(ref, () => textareaRef.current!);
@@ -30,7 +31,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       adjustHeight();
     }, [props.value, props.defaultValue]);
 
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : Math.random().toString(36).substring(7));
+    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
     
     return (
       <div className="flex flex-col gap-2 relative">

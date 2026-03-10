@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Card } from "@/components/ui/Card";
@@ -95,9 +96,9 @@ export default function SettingsPage() {
         {/* Profile Card */}
         <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
-          <p className="eyebrow text-brand-primary mb-10 flex items-center gap-4">
+          <div className="eyebrow text-brand-primary mb-10 flex items-center gap-4">
              <div className="w-10 h-px bg-brand-primary/30" /> Personal Identity
-          </p>
+          </div>
           
           <div className="flex items-center gap-8 mb-10">
             <div className="relative w-24 h-24 shrink-0">
@@ -134,9 +135,9 @@ export default function SettingsPage() {
           <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
             
-            <p className="eyebrow text-brand-primary mb-10 flex items-center gap-4">
+            <div className="eyebrow text-brand-primary mb-10 flex items-center gap-4">
                <div className="w-10 h-px bg-brand-primary/30" /> Intelligence & Automation
-            </p>
+            </div>
 
             <div className="flex items-center justify-between gap-6 mb-8">
               <div className="flex-1 min-w-0">
@@ -185,9 +186,9 @@ export default function SettingsPage() {
           <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-accent/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
             
-            <p className="eyebrow text-brand-accent mb-10 flex items-center gap-4">
+            <div className="eyebrow text-brand-accent mb-10 flex items-center gap-4">
                <div className="w-10 h-px bg-brand-accent/30" /> Expansion & Team
-            </p>
+            </div>
 
             <p className="text-sm font-medium text-slate-500 mb-10 leading-relaxed max-w-sm">
               Empower your clinic by inviting associate doctors. They will gain access to your shared medical registry and AI tools.
@@ -229,9 +230,9 @@ export default function SettingsPage() {
       {/* Team List Card */}
       <div className="px-4">
         <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden">
-          <p className="eyebrow text-slate-400 mb-10 flex items-center gap-4">
+          <div className="eyebrow text-slate-400 mb-10 flex items-center gap-4">
              <div className="w-10 h-px bg-slate-200" /> Active Practitioners
-          </p>
+          </div>
 
           {isLoadingTeam ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4">

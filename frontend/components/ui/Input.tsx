@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useId } from "react";
 import { clsx } from "clsx";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -11,7 +11,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, leftIcon, id, className, privacyBlur, labelClassName, ...props }, ref) => {
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : Math.random().toString(36).substring(7));
+    const generatedId = useId();
+    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : generatedId);
     return (
       <div className="flex flex-col gap-2 relative">
         {label && (

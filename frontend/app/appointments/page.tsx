@@ -1,8 +1,8 @@
 "use client";
 
 import { Calendar, Search, Filter, Loader2, FileText, ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getAllConsultations } from "@/services/consultationService";
 
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
 export default function AppointmentsPage() {
+  const router = useRouter();
   const [filter, setFilter] = useState("All");
 
   const { data: response, isLoading } = useQuery({

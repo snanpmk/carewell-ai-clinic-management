@@ -2,6 +2,7 @@
 
 import { useForm, Controller } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { BadgeSelect } from "@/components/ui/BadgeSelect";
 import { DynamicTable } from "@/components/ui/DynamicTable";
 import { Textarea } from "@/components/ui/Textarea";
@@ -17,14 +18,6 @@ const MENTAL_TRAITS = [
   "Pessimistic", "Hopeless", "Shy", "Despondent", "Apathetic"
 ];
 
-const EMOTIONAL_TRIGGERS = [
-  "Anger", "Bad news", "Displeasure", "Disappointment", "Fright", "Grief", "Joy", "Shock", "Sorrow", "Tension", "Vexation"
-];
-
-const REACTION_TRIGGERS = [
-  "Company", "Solitude", "Consolation", "Conversation", "Contradiction", "Exertion of work", "Music", "Travel"
-];
-
 export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
   const { register, handleSubmit, control, formState: { isSubmitting } } = useForm({
     defaultValues: {
@@ -37,7 +30,7 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -53,9 +46,9 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
         <div className="space-y-12">
           {/* Mental Features */}
           <div className="space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Brain className="w-4 h-4" /> Mental & Behavioural Features
-            </p>
+            </div>
             <Controller
               control={control}
               name="lifeSpaceInvestigation.mentalFeatures"
@@ -71,9 +64,9 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
 
           {/* Emotional Upsets Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <CloudRain className="w-4 h-4" /> Historical Emotional Upsets
-            </p>
+            </div>
             <DynamicTable 
               control={control}
               register={register}
@@ -90,9 +83,9 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
 
           {/* Reaction Patterns Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Zap className="w-4 h-4" /> Reaction Patterns
-            </p>
+            </div>
             <DynamicTable 
               control={control}
               register={register}

@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -19,7 +20,7 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -35,9 +36,9 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
         <div className="space-y-12">
           {/* Section 11: Menstrual History */}
           <div className="space-y-8">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Calendar className="w-4 h-4" /> Menstrual Cycle Details
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Input label="LMP Date" {...register("femaleHistory.menstrual.lmp")} placeholder="e.g. 12/05/2024" />
               <Input label="Menarche Age" {...register("femaleHistory.menstrual.menarche")} />
@@ -46,7 +47,7 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
             </div>
             
             <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-6">
-              <p className="eyebrow !text-[9px] !text-brand-accent">Flow Characteristics</p>
+              <div className="eyebrow !text-[9px] !text-brand-accent">Flow Characteristics</div>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <Input label="Quantity" {...register("femaleHistory.menstrual.flowDetails.quantity")} />
                 <Input label="Colour" {...register("femaleHistory.menstrual.flowDetails.colour")} />
@@ -74,9 +75,9 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
 
           {/* Section 12: Obstetrical History */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <Baby className="w-4 h-4" /> Obstetrical & Pregnancy Archive
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Input label="Gravida (G)" {...register("femaleHistory.obstetrical.gravida")} />
               <Input label="Para (P)" {...register("femaleHistory.obstetrical.para")} />
@@ -100,9 +101,9 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
             />
 
             <div className="p-6 bg-brand-primary/5 rounded-3xl border border-brand-primary/10">
-              <p className="eyebrow !text-[9px] !text-brand-primary mb-4 flex items-center gap-2">
+              <div className="eyebrow !text-[9px] !text-brand-primary mb-4 flex items-center gap-2">
                 <Activity className="w-3 h-3" /> Present Pregnancy Status
-              </p>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Input label="EDC" {...register("femaleHistory.obstetrical.presentPregnancy.edc")} />
                 <Input label="Morning Sickness" {...register("femaleHistory.obstetrical.presentPregnancy.morningSickness")} />

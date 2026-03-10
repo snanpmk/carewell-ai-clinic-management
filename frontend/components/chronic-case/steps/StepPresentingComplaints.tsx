@@ -2,6 +2,7 @@
 
 import { useForm, useFieldArray } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Textarea } from "@/components/ui/Textarea";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -10,7 +11,7 @@ import { Plus, Trash2, MapPin, Activity, Zap, Layers } from "lucide-react";
 import StepLayout from "../StepLayout";
 
 export default function StepPresentingComplaints({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const { register, handleSubmit, control, formState: { isSubmitting } } = useForm({
+  const { register, handleSubmit, control, formState: { isSubmitting } } = useForm<Partial<ChronicCase>>({
     defaultValues: {
       presentingComplaints: caseData.presentingComplaints || [
         { complaintType: "Chief", location: {}, modalities: {} }
@@ -31,7 +32,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
     name: "presentingComplaints"
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -48,9 +49,9 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
           {/* Section 3: Presenting Complaints */}
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <p className="eyebrow text-brand-primary flex items-center gap-3">
+              <div className="eyebrow text-brand-primary flex items-center gap-3">
                 <Activity className="w-4 h-4" /> Granular Symptom Analysis
-              </p>
+              </div>
               <Button 
                 type="button" 
                 size="sm" 
@@ -82,9 +83,9 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
                         {...register(`presentingComplaints.${index}.complaintType`)} 
                       />
                       <div className="p-5 bg-white rounded-2xl border border-slate-100 space-y-4">
-                        <p className="eyebrow !text-[9px] !text-brand-accent flex items-center gap-2">
+                        <div className="eyebrow !text-[9px] !text-brand-accent flex items-center gap-2">
                           <MapPin className="w-3 h-3" /> Anatomical Location
-                        </p>
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                           <Input label="System" {...register(`presentingComplaints.${index}.location.system`)} placeholder="e.g. Resp" />
                           <Input label="Organ" {...register(`presentingComplaints.${index}.location.organ`)} placeholder="e.g. Lungs" />
@@ -106,9 +107,9 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
                           rows={4}
                         />
                         <div className="p-5 bg-white rounded-2xl border border-slate-100 space-y-4">
-                          <p className="eyebrow !text-[9px] !text-brand-primary flex items-center gap-2">
+                          <div className="eyebrow !text-[9px] !text-brand-primary flex items-center gap-2">
                             <Zap className="w-3 h-3" /> Modalities
-                          </p>
+                          </div>
                           <Input label="Aggravation (<)" {...register(`presentingComplaints.${index}.modalities.aggravation`)} />
                           <Input label="Amelioration (>)" {...register(`presentingComplaints.${index}.modalities.amelioration`)} />
                           <Input label="Equivalent (=)" {...register(`presentingComplaints.${index}.modalities.equivalent`)} />
@@ -135,9 +136,9 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
 
           {/* Section 4: HPI */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <Layers className="w-4 h-4" /> History of Present Illness (HPI)
-            </p>
+            </div>
             <Textarea 
               label="Chronological Development" 
               {...register("historyOfPresentIllness.narrative")} 

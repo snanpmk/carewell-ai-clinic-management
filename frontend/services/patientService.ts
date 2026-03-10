@@ -1,5 +1,17 @@
 import apiClient from "./apiClient";
 
+export interface Patient {
+  _id: string;
+  name: string;
+  age: number;
+  gender: "Male" | "Female" | "Other";
+  sex?: "Male" | "Female" | "Other"; // Alias for gender used in chronic cases
+  phone: string;
+  email: string;
+  address?: string;
+  existingConditions?: string;
+}
+
 export interface PatientFormData {
   name: string;
   age: number;

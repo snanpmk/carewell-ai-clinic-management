@@ -2,6 +2,7 @@
 
 import { useForm, Controller } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { BadgeSelect } from "@/components/ui/BadgeSelect";
@@ -24,7 +25,7 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
     }
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -40,9 +41,9 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
         <div className="space-y-12">
           {/* Analysis Table */}
           <div className="space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Search className="w-4 h-4" /> Symptom Analysis
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Textarea 
                 label="Basic / Common / Pathognomonic" 
@@ -61,9 +62,9 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Laboratory Findings */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <Microscope className="w-4 h-4" /> Investigations & Labs
-            </p>
+            </div>
             <Textarea 
               label="Laboratory Summary" 
               {...register("analysisAndDiagnosis.laboratoryFindings")} 
@@ -74,9 +75,9 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Totality & Miasm */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Target className="w-4 h-4" /> Evaluation of Totality
-            </p>
+            </div>
             <Textarea 
               label="Totality of Symptoms" 
               {...register("analysisAndDiagnosis.evaluation.totalityOfSymptoms")} 
@@ -98,9 +99,9 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Repertorization Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-slate-900! flex items-center gap-3">
+            <div className="eyebrow text-slate-900! flex items-center gap-3">
               Repertorial Analysis
-            </p>
+            </div>
             <Input label="Name of Repertory" {...register("analysisAndDiagnosis.repertorization.repertoryName")} placeholder="e.g. Kent, Synthesis..." />
             <DynamicTable 
               control={control}
@@ -118,9 +119,9 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Final Diagnosis */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               Final Conclusions
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input label="Disease Diagnosis" {...register("analysisAndDiagnosis.finalDiagnosis.disease")} />
               <Input label="Hahnemannian Classification" {...register("analysisAndDiagnosis.finalDiagnosis.hahnemannianClassification")} />

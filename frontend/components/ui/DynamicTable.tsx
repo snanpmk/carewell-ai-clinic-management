@@ -1,13 +1,12 @@
 "use client";
 
-import { useFieldArray, Control, UseFormRegister, FieldValues, Path, ArrayPath } from "react-hook-form";
+import { useFieldArray, Control, UseFormRegister, FieldValues, ArrayPath, FieldArray, Path } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "./Button";
-import { Input } from "./Input";
 
 interface Column<T extends FieldValues> {
   header: string;
-  accessor: string; // e.g. "age"
+  accessor: string; 
   placeholder?: string;
   type?: string;
 }
@@ -19,7 +18,7 @@ interface DynamicTableProps<T extends FieldValues> {
   columns: Column<T>[];
   label: string;
   addLabel?: string;
-  emptyRow: any;
+  emptyRow: FieldArray<T, ArrayPath<T>>;
 }
 
 export function DynamicTable<T extends FieldValues>({
@@ -77,7 +76,7 @@ export function DynamicTable<T extends FieldValues>({
                   {columns.map((col) => (
                     <td key={col.accessor} className="px-4 py-3">
                       <input
-                        {...register(`${name}.${index}.${col.accessor}` as any)}
+                        {...register(`${name}.${index}.${col.accessor}` as Path<T>)}
                         placeholder={col.placeholder}
                         type={col.type || "text"}
                         className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 placeholder:text-slate-300 placeholder:font-normal"

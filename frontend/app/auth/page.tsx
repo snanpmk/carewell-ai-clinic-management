@@ -54,7 +54,8 @@ function AuthContent() {
   const loginMutation = useMutation({
     mutationFn: loginWithGoogle,
     onSuccess: (data) => {
-      login(data.data, data.data.token);
+      const { token, ...user } = data.data;
+      login(user, token);
       router.push("/");
     }
   });
@@ -62,7 +63,8 @@ function AuthContent() {
   const registerMutation = useMutation({
     mutationFn: registerWithGoogle,
     onSuccess: (data) => {
-      login(data.data, data.data.token);
+      const { token, ...user } = data.data;
+      login(user, token);
       router.push("/");
     }
   });
@@ -70,7 +72,8 @@ function AuthContent() {
   const acceptInviteMutation = useMutation({
     mutationFn: acceptInviteWithGoogle,
     onSuccess: (data) => {
-      login(data.data, data.data.token);
+      const { token, ...user } = data.data;
+      login(user, token);
       router.push("/");
     }
   });

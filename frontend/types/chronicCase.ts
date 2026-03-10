@@ -317,6 +317,8 @@ export interface ChronicCase {
         lmp?: string;
         conceptionDate?: string;
         edc?: string;
+        morningSickness?: string;
+        bleedingPV?: string;
         complaints?: string;
       };
     };
@@ -361,9 +363,11 @@ export interface ChronicCase {
     };
     firstPrescription?: {
       basis?: string;
-      medicine?: string;
-      potency?: string;
-      dose?: string;
+      medicines?: Array<{
+        medicine?: string;
+        potency?: string;
+        dose?: string;
+      }>;
     };
   };
 
@@ -374,4 +378,16 @@ export interface ChronicCase {
     interference?: string;
     prescription?: string;
   }>;
+
+  // AI ANALYSIS (DRAFTING)
+  homeopathicDiagnosis?: {
+    totalityOfSymptoms?: string;
+    miasmaticExpression?: string;
+    differentialConsiderations?: string;
+    repertorization?: Array<{
+      symptom?: string;
+      rubric?: string;
+      explanation?: string;
+    }>;
+  };
 }

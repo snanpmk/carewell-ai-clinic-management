@@ -4,7 +4,8 @@ import { ChronicCase } from "@/types/chronicCase";
 import { 
   User, Activity, ClipboardList, History, Brain, 
   Thermometer, ShieldCheck, Pill, Microscope, 
-  MapPin, Baby, Heart, Zap, FileText
+  MapPin, Baby, Heart, Zap, FileText, Stethoscope,
+  ShieldAlert
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -23,7 +24,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
       {/* 1. Administrative Overview */}
       <div className={sectionClass}>
         <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand-primary/10 to-transparent rounded-bl-full" />
-        <p className={eyebrowClass}><ClipboardList className="w-4 h-4" /> Administration & Registry</p>
+        <div className={eyebrowClass}><ClipboardList className="w-4 h-4" /> Administration & Registry</div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div><p className={labelClass}>OP Number</p><p className={valueClass}>{data.header?.opNumber || "N/A"}</p></div>
           <div><p className={labelClass}>Unit</p><p className={valueClass}>{data.header?.unit || "Unit I"}</p></div>
@@ -34,7 +35,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
 
       {/* 2 & 3. Clinical Presentation */}
       <div className={sectionClass}>
-        <p className={eyebrowClass}><Activity className="w-4 h-4" /> Presentation & Complaints</p>
+        <div className={eyebrowClass}><Activity className="w-4 h-4" /> Presentation & Complaints</div>
         <div className="space-y-8">
           <div>
             <p className={labelClass}>Patient Narration (Ipsisima Verba)</p>
@@ -66,7 +67,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
 
       {/* 7. Personal History & Milestones */}
       <div className={sectionClass}>
-        <p className={eyebrowClass}><Baby className="w-4 h-4" /> Personal & Developmental Archive</p>
+        <div className={eyebrowClass}><Baby className="w-4 h-4" /> Personal & Developmental Archive</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <p className={labelClass}>Life Situation</p>
@@ -104,7 +105,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
 
       {/* 8. Life Space Investigation (Mental Profile) */}
       <div className={sectionClass}>
-        <p className={eyebrowClass}><Brain className="w-4 h-4" /> Mental Profile & Disposition</p>
+        <div className={eyebrowClass}><Brain className="w-4 h-4" /> Mental Profile & Disposition</div>
         <div className="space-y-6">
           <div>
             <p className={labelClass}>Dominant Mental Traits</p>
@@ -136,7 +137,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
 
       {/* 9 & 11. Constitution & Physicals */}
       <div className={sectionClass}>
-        <p className={eyebrowClass}><Thermometer className="w-4 h-4" /> Constitutional & Physical Features</p>
+        <div className={eyebrowClass}><Thermometer className="w-4 h-4" /> Constitutional & Physical Features</div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div><p className={labelClass}>Thermal State</p><p className="text-brand-primary font-black uppercase italic">{data.physicalFeatures?.constitution?.thermal || 'Ambient'}</p></div>
           <div><p className={labelClass}>Temperament</p><p className="text-brand-accent font-black uppercase italic">{data.physicalFeatures?.constitution?.temperament || 'Not Set'}</p></div>
@@ -155,7 +156,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
 
       {/* 10. Physical Examination (Systemic) */}
       <div className={sectionClass}>
-        <p className={eyebrowClass}><Stethoscope className="w-4 h-4" /> Systemic Examination Findings</p>
+        <div className={eyebrowClass}><Stethoscope className="w-4 h-4" /> Systemic Examination Findings</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <p className={labelClass}>Respiratory & CVS</p>
@@ -180,10 +181,53 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
         </div>
       </div>
 
+      {/* 15. Management & Treatment */}
+      <div className={sectionClass}>
+        <div className={eyebrowClass}><ShieldCheck className="w-4 h-4" /> Management & Treatment Strategy</div>
+        <div className="space-y-8">
+          <div>
+            <p className={labelClass}>Clinical Management Plan</p>
+            <p className={valueClass}>{data.management?.plan || "Standard homeopathic protocol."}</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4 border-t border-white/5">
+            <div>
+              <p className={labelClass}><ShieldAlert className="w-3 h-3 inline mr-1" /> Diet Restrictions</p>
+              <p className="text-xs font-bold text-slate-300">{data.management?.restrictions?.diet || "No specific restrictions."}</p>
+            </div>
+            <div>
+              <p className={labelClass}><ShieldAlert className="w-3 h-3 inline mr-1" /> Regimen</p>
+              <p className="text-xs font-bold text-slate-300">{data.management?.restrictions?.regimen || "Standard activity."}</p>
+            </div>
+            <div>
+              <p className={labelClass}><ShieldAlert className="w-3 h-3 inline mr-1" /> Medicinal</p>
+              <p className="text-xs font-bold text-slate-300">{data.management?.restrictions?.medicinal || "Avoid antidotes."}</p>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-white/5">
+            <p className={labelClass}>Prescriptions Given</p>
+            <div className="space-y-3">
+              {data.management?.firstPrescription?.medicines?.map((m, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-brand-primary/10 rounded-2xl border border-brand-primary/20">
+                  <div className="flex items-center gap-4">
+                    <Pill className="w-5 h-5 text-brand-primary" />
+                    <div>
+                      <p className="text-base font-black text-white uppercase italic">{m.medicine}</p>
+                      <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest mt-0.5">{m.potency} • {m.dose}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 13 & 14. Diagnosis & Analysis */}
       <div className="bg-linear-to-br from-brand-secondary to-slate-950 rounded-[2.5rem] border border-white/10 p-10 shadow-2xl space-y-10">
         <div className="flex items-center justify-between border-b border-white/5 pb-6">
-          <p className={eyebrowClass}><Microscope className="w-4 h-4" /> Clinical Synthesis</p>
+          <div className={eyebrowClass}><Microscope className="w-4 h-4" /> Clinical Synthesis</div>
           <span className="px-4 py-1.5 rounded-xl bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand-primary/20">Final Eval</span>
         </div>
 

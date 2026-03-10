@@ -86,9 +86,9 @@ export default function OnboardingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
             {/* Essential Info */}
             <div className="space-y-10">
-              <p className="eyebrow text-brand-primary flex items-center gap-4">
+              <div className="eyebrow text-brand-primary flex items-center gap-4">
                  <div className="w-10 h-px bg-brand-primary/30" /> Personal Identity
-              </p>
+              </div>
               
               <div className="space-y-8">
                 <Input
@@ -151,9 +151,9 @@ export default function OnboardingPage() {
 
             {/* Background Info */}
             <div className="space-y-10">
-              <p className="eyebrow text-brand-accent flex items-center gap-4">
+              <div className="eyebrow text-brand-accent flex items-center gap-4">
                  <div className="w-10 h-px bg-brand-accent/30" /> Clinical Context
-              </p>
+              </div>
 
               <div className="space-y-8">
                 <Textarea

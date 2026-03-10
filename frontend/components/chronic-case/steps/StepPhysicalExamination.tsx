@@ -2,6 +2,7 @@
 
 import { useForm, useWatch } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
@@ -33,7 +34,7 @@ export default function StepPhysicalExamination({ caseData, updateCaseData, next
     }
   }, [height, weight, setValue]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -49,9 +50,9 @@ export default function StepPhysicalExamination({ caseData, updateCaseData, next
         <div className="space-y-12">
           {/* General Examination */}
           <div className="space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <FileSearch className="w-4 h-4" /> General Examination
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Input label="Jaundice" {...register("physicalExamination.general.jaundice")} />
               <Input label="Anemia" {...register("physicalExamination.general.anemia")} />
@@ -66,9 +67,9 @@ export default function StepPhysicalExamination({ caseData, updateCaseData, next
 
           {/* Vitals */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow text-brand-accent flex items-center gap-3">
               <Activity className="w-4 h-4" /> Vitals & Anthropometry
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Input label="Height (cm)" type="number" {...register("physicalExamination.vitals.height")} />
               <Input label="Weight (kg)" type="number" {...register("physicalExamination.vitals.weight")} />
@@ -82,9 +83,9 @@ export default function StepPhysicalExamination({ caseData, updateCaseData, next
 
           {/* Systemic Examination */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <p className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow text-brand-primary flex items-center gap-3">
               <Stethoscope className="w-4 h-4" /> Systemic Examination
-            </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Textarea label="Respiratory System" {...register("physicalExamination.systemic.respiratory")} rows={2} />
               <Textarea label="Cardiovascular" {...register("physicalExamination.systemic.cardiovascular")} rows={2} />

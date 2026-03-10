@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
 import { Stepper } from "@/components/ui/Stepper";
-import { CheckCircle2, FileText, Sparkles, ChevronLeft, Save } from "lucide-react";
+import { CheckCircle2, FileText, Sparkles, ChevronLeft, Save, Activity } from "lucide-react";
 
 export default function NotesPage() {
   const router = useRouter();

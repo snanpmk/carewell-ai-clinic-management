@@ -12,8 +12,10 @@ export interface AuthResponse {
     clinic: {
       _id: string;
       name: string;
+      address?: string;
+      aiEnabled: boolean;
       [key: string]: unknown;
-    } | string;
+    };
   };
 }
 

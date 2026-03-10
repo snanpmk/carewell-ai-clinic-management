@@ -172,9 +172,9 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
               {/* Clinical Snapshot Card */}
               <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
-                <p className="eyebrow !text-brand-primary mb-8 flex items-center gap-4">
+                <div className="eyebrow !text-brand-primary mb-8 flex items-center gap-4">
                    <div className="w-10 h-px bg-brand-primary/30" /> Clinical Snapshot
-                </p>
+                </div>
 
                 <div className="space-y-6">
                   <div>
@@ -184,15 +184,15 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                     </p>
                   </div>
 
-                  {latestChronicCase?.constitution && (
+                  {latestChronicCase?.physicalFeatures?.constitution && (
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                       <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Thermal State</p>
-                        <p className="font-black text-brand-primary uppercase italic text-sm">{latestChronicCase.constitution.thermalState || "Not set"}</p>
+                        <p className="font-black text-brand-primary uppercase italic text-sm">{latestChronicCase.physicalFeatures.constitution.thermal || "Not set"}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Temperament</p>
-                        <p className="font-black text-brand-accent uppercase italic text-sm">{latestChronicCase.constitution.temperament || "Not set"}</p>
+                        <p className="font-black text-brand-accent uppercase italic text-sm">{latestChronicCase.physicalFeatures.constitution.temperament || "Not set"}</p>
                       </div>
                     </div>
                   )}

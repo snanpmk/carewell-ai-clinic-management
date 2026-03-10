@@ -1,3 +1,5 @@
+"use client";
+
 import { Check } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -9,9 +11,16 @@ export interface Step {
 interface ChronicCaseStepperProps {
   steps: Step[];
   currentStepIndex: number;
+  onStepClick?: (index: number) => void;
+  isUpdateMode?: boolean;
 }
 
-export default function ChronicCaseStepper({ steps, currentStepIndex }: ChronicCaseStepperProps) {
+export default function ChronicCaseStepper({ 
+  steps, 
+  currentStepIndex, 
+  onStepClick,
+  isUpdateMode 
+}: ChronicCaseStepperProps) {
   return (
     <div className="w-full mb-10">
       {/* Multi-row Grid Container */}
@@ -19,23 +28,28 @@ export default function ChronicCaseStepper({ steps, currentStepIndex }: ChronicC
         {steps.map((step, index) => {
           const isActive = index === currentStepIndex;
           const isCompleted = index < currentStepIndex;
+          
+          // Clickable if: it's an update mode (all clickable) OR if it's already completed or active
+          const isClickable = isUpdateMode || isCompleted || isActive;
 
           return (
             <div 
               key={step.id} 
+              onClick={() => isClickable && onStepClick?.(index)}
               className={clsx(
-                "flex flex-col gap-2 p-3 rounded-2xl transition-all duration-500 relative border cursor-default h-full",
+                "flex flex-col gap-2 p-3 rounded-2xl transition-all duration-500 relative border h-full group",
+                isClickable ? "cursor-pointer" : "cursor-not-allowed",
                 isActive 
                   ? "bg-white border-brand-primary shadow-xl shadow-brand-primary/10 ring-4 ring-brand-primary/5 z-10" 
                   : isCompleted 
-                  ? "bg-brand-primary/5 border-brand-primary/20 text-brand-primary" 
+                  ? "bg-brand-primary/5 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/10" 
                   : "bg-slate-50 border-slate-100 text-slate-400 opacity-60"
               )}
             >
               <div className="flex items-center justify-between">
                 {/* Number/Check Indicator */}
                 <div className={clsx(
-                  "w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-500 text-[10px] font-black",
+                  "w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-500 text-[10px] font-black group-hover:scale-110",
                   isActive ? "bg-brand-primary text-white shadow-lg rotate-6" : 
                   isCompleted ? "bg-brand-primary text-white" : "bg-slate-200 text-slate-400"
                 )}>
@@ -66,7 +80,9 @@ export default function ChronicCaseStepper({ steps, currentStepIndex }: ChronicC
                 ) : isCompleted ? (
                   <p className="text-[8px] font-bold text-emerald-500 uppercase mt-1">Validated</p>
                 ) : (
-                  <p className="text-[8px] font-bold text-slate-300 uppercase mt-1">Waiting</p>
+                  <p className="text-[8px] font-bold text-slate-300 uppercase mt-1">
+                    {isUpdateMode ? "Click to Edit" : "Waiting"}
+                  </p>
                 )}
               </div>
 
