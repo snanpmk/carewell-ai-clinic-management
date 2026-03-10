@@ -1,15 +1,23 @@
+"use client";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChronicCase } from "@/types/chronicCase";
 import ChronicCaseStepper from "./ChronicCaseStepper";
 import { useAuthStore } from "@/store/useAuthStore";
-import StepPatientDemographics from "@/components/chronic-case/steps/StepPatientDemographics";
-import StepPresentingComplaints from "@/components/chronic-case/steps/StepPresentingComplaints";
-import StepLifeSpace from "@/components/chronic-case/steps/StepLifeSpace";
-import StepPhysicalFeatures from "@/components/chronic-case/steps/StepPhysicalFeatures";
-import StepSpecialHistories from "@/components/chronic-case/steps/StepSpecialHistories";
-import StepAIAnalysis from "@/components/chronic-case/steps/StepAIAnalysis";
-import StepTreatment from "@/components/chronic-case/steps/StepTreatment";
+
+import StepAdministration from "./steps/StepAdministration";
+import StepInitialPresentation from "./steps/StepInitialPresentation";
+import StepPresentingComplaints from "./steps/StepPresentingComplaints";
+import StepMedicalHistory from "./steps/StepMedicalHistory";
+import StepPersonalHistory from "./steps/StepPersonalHistory";
+import StepLifeSpace from "./steps/StepLifeSpace";
+import StepPhysicalFeatures from "./steps/StepPhysicalFeatures";
+import StepPhysicalExamination from "./steps/StepPhysicalExamination";
+import StepFemaleHistory from "./steps/StepFemaleHistory";
+import StepDiagnosisAnalysis from "./steps/StepDiagnosisAnalysis";
+import StepAIAnalysis from "./steps/StepAIAnalysis";
+import StepTreatment from "./steps/StepTreatment";
 
 export interface StepProps {
   caseData: Partial<ChronicCase>;
@@ -18,20 +26,24 @@ export interface StepProps {
   prevStep: () => void;
 }
 
-const steps = [
-  { id: "demographics", title: "Demographics", component: StepPatientDemographics },
-  { id: "complaints", title: "Complaints", component: StepPresentingComplaints },
-  { id: "lifeSpace", title: "Mental Profile", component: StepLifeSpace },
-  { id: "physical", title: "Physicals", component: StepPhysicalFeatures },
-  { id: "special", title: "Special History", component: StepSpecialHistories },
+const allSteps = [
+  { id: "header", title: "Administration", component: StepAdministration },
+  { id: "narrative", title: "Initial Presentation", component: StepInitialPresentation },
+  { id: "complaints", title: "Complaints & HPI", component: StepPresentingComplaints },
+  { id: "medical", title: "Medical History", component: StepMedicalHistory },
+  { id: "personal", title: "Personal History", component: StepPersonalHistory },
+  { id: "mental", title: "Mental Profile", component: StepLifeSpace },
+  { id: "physical_feat", title: "Physical Constitution", component: StepPhysicalFeatures },
+  { id: "physical_exam", title: "Physical Exam", component: StepPhysicalExamination },
+  { id: "female", title: "Female History", component: StepFemaleHistory },
   { id: "ai", title: "AI Analysis", component: StepAIAnalysis },
-  { id: "treatment", title: "Treatment", component: StepTreatment },
+  { id: "diagnosis", title: "Analysis & Diagnosis", component: StepDiagnosisAnalysis },
+  { id: "treatment", title: "Plan & Prescription", component: StepTreatment },
 ];
 
 export default function ChronicCaseWizard({ patientId }: { patientId?: string }) {
   const { user } = useAuthStore();
   const aiEnabled = user?.clinic?.aiEnabled ?? true;
-  const filteredSteps = aiEnabled ? steps : steps.filter(s => s.id !== "ai");
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [caseData, setCaseData] = useState<Partial<ChronicCase>>({
@@ -39,14 +51,27 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
     status: "Draft",
   });
 
+  // Filter steps based on conditions
+  const filteredSteps = allSteps.filter(step => {
+    // 1. Hide AI step if disabled
+    if (step.id === "ai" && !aiEnabled) return false;
+    // 2. Hide Female History if patient is Male
+    if (step.id === "female" && caseData.demographics?.sex === "Male") return false;
+    return true;
+  });
+
   const nextStep = () => {
-    if (currentStepIndex < filteredSteps.length - 1) setCurrentStepIndex((prev) => prev + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (currentStepIndex < filteredSteps.length - 1) {
+      setCurrentStepIndex((prev) => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const prevStep = () => {
-    if (currentStepIndex > 0) setCurrentStepIndex((prev) => prev - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex((prev) => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const updateCaseData = (updates: Partial<ChronicCase>) => {
@@ -57,23 +82,18 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
 
   return (
     <div className="flex flex-col mx-auto w-full space-y-4 animate-in fade-in duration-500 pb-8">
-      {/* Header Section - Condensed */}
       <div className="flex flex-col gap-0.5">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl">Chronic Case Builder</h1>
-        </div>
-        <p className="text-xs text-slate-500 font-medium tracking-tight ">
-          Constitutional analysis & repertorization
+        <h1 className="text-2xl">Chronic Case Builder</h1>
+        <p className="text-xs text-slate-500 font-medium tracking-tight">
+          Government-standardized clinical record repository
         </p>
       </div>
 
-      {/* Stepper Navigation */}
       <ChronicCaseStepper steps={filteredSteps} currentStepIndex={currentStepIndex} />
 
-      {/* Main Form Container */}
       <div className="w-full">
-        <div className="bg-white border border-slate-200 rounded-4xl shadow-2xl shadow-slate-200/40 flex flex-col relative overflow-visible">
-          <div className="p-6 sm:p-8">
+        <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 flex flex-col relative overflow-visible">
+          <div className="p-6 sm:p-10">
             <AnimatePresence mode="wait">
               <motion.div
                 key={filteredSteps[currentStepIndex].id}

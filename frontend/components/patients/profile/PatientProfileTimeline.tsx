@@ -1,8 +1,10 @@
 "use client";
 
-import { Activity, Clock, FileText, Sparkles } from "lucide-react";
+import { Activity, Clock, FileText, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { ChronicCase } from "@/types/chronicCase";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useState } from "react";
+import { ChronicCaseDetails } from "./ChronicCaseDetails";
 
 export interface UnifiedVisitItem {
   _id: string;
@@ -24,6 +26,11 @@ interface PatientProfileTimelineProps {
 export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) {
   const { user } = useAuthStore();
   const aiEnabled = user?.clinic?.aiEnabled ?? true;
+  const [expandedCases, setExpandedCases] = useState<Record<string, boolean>>({});
+
+  const toggleCase = (id: string) => {
+    setExpandedCases(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <>
@@ -51,19 +58,9 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
             // --- Chronic Case Rendering ---
             if (visit.isChronic && visit.chronicData) {
               const c = visit.chronicData;
-              const totality = c.homeopathicDiagnosis?.totalityOfSymptoms || "No totality extracted.";
-                // @ts-expect-error - HomeopathicDiagnosis needs updated types
-                const rubric = c.homeopathicDiagnosis?.repertorizationRubrics || "No rubrics run.";
-                
-                // @ts-expect-error - HomeopathicDiagnosis needs updated types
-                const suggestedArray = c.homeopathicDiagnosis?.suggestedRemedies || [];
-              const remedies = Array.isArray(suggestedArray) && suggestedArray.length > 0
-                ? (suggestedArray as Array<{ remedyName: string; potency: string }>).map((r) => `${r.remedyName} (${r.potency})`).join(", ")
-                : "No suggestions.";
-
-              const docPrescription = c.management?.firstPrescription?.medicine 
-                ? `${c.management.firstPrescription.medicine} ${c.management.firstPrescription.potency || ""} - ${c.management.firstPrescription.dose || ""}`
-                : "No prescription finalized.";
+              const isExpanded = !!expandedCases[visit._id];
+              const totality = c.analysisAndDiagnosis?.evaluation?.totalityOfSymptoms || "No totality extracted.";
+              const remedies = c.analysisAndDiagnosis?.finalDiagnosis?.homeopathicDiagnosis || "No prescription finalized.";
 
               return (
                 <div key={visit._id} className="bg-slate-950 border border-slate-900 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group transition-all duration-500">
@@ -82,63 +79,64 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                         </p>
                       </div>
                     </div>
-                    <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 text-brand-accent border border-white/10 shadow-inner">
-                        Depth Focus
-                    </span>
+                    <div className="flex items-center gap-4 relative z-10">
+                      <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 text-brand-accent border border-white/10 shadow-inner">
+                          Gov Spec v1.0
+                      </span>
+                      <button 
+                        onClick={() => toggleCase(visit._id)}
+                        className="p-3 bg-brand-primary/10 text-brand-primary rounded-2xl hover:bg-brand-primary hover:text-white transition-all shadow-lg border border-brand-primary/20"
+                      >
+                        {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="space-y-8">
-                      {aiEnabled && (
-                        <>
-                          <div>
-                            <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
-                                <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
-                            </p>
-                            <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
-                              <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
+                  {isExpanded ? (
+                    <ChronicCaseDetails data={c} />
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                      <div className="space-y-8">
+                        {aiEnabled && (
+                          <>
+                            <div>
+                              <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
+                                  <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
+                              </p>
+                              <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
+                                <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
+                              </div>
                             </div>
+                          </>
+                        )}
+                        
+                        {!aiEnabled && (
+                          <div className="p-10 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-center h-full">
+                             <FileText className="w-10 h-10 text-white/5 mb-4" />
+                             <p className="eyebrow !text-white/20">Clinical data archive</p>
                           </div>
-
-                          <div>
-                            <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
-                                <Sparkles className="w-4 h-4 text-brand-accent" /> Repertorization
-                            </p>
-                            <div className="p-6 bg-slate-900 rounded-3xl border border-white/5 shadow-inner">
-                              <p className="text-xs font-medium text-slate-300 leading-relaxed max-h-32 overflow-y-auto mb-4 border-b border-white/5 pb-4 custom-scrollbar">{rubric}</p>
-                              <p className="text-xs font-black text-brand-accent uppercase tracking-widest leading-snug"><span className="!text-slate-400 font-black mr-2">Suggestions:</span> {remedies}</p>
-                            </div>
-                          </div>
-                        </>
-                      )}
+                        )}
+                      </div>
                       
-                      {!aiEnabled && (
-                        <div className="p-10 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-center h-full">
-                           <FileText className="w-10 h-10 text-white/5 mb-4" />
-                           <p className="eyebrow !text-white/20">Clinical data archive</p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-8">
-                      <div className="bg-linear-to-br from-white/5 to-transparent rounded-[2rem] p-8 border border-white/10 relative shadow-2xl h-full flex flex-col justify-center">
-                         <div className="absolute top-6 right-6 text-white/5">
-                           <FileText className="w-12 h-12" />
-                         </div>
-                         <p className="eyebrow !text-brand-accent mb-6">Management Plan</p>
-                         <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-2 uppercase italic">
-                           {docPrescription}
-                         </p>
-                         {c.management?.supportiveMeasures && (
-                           <div className="mt-6 pt-6 border-t border-white/5">
-                             <p className="text-xs text-slate-300 font-medium leading-relaxed italic">
-                               <span className="eyebrow !text-brand-accent not-italic mr-2">Advice:</span> {c.management.supportiveMeasures}
-                             </p>
+                      <div className="space-y-8">
+                        <div className="bg-linear-to-br from-white/5 to-transparent rounded-[2rem] p-8 border border-white/10 relative shadow-2xl h-full flex flex-col justify-center">
+                           <div className="absolute top-6 right-6 text-white/5">
+                             <FileText className="w-12 h-12" />
                            </div>
-                         )}
+                           <p className="eyebrow !text-brand-accent mb-6">Management Plan</p>
+                           <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-2 uppercase italic">
+                             {remedies}
+                           </p>
+                           <button 
+                             onClick={() => toggleCase(visit._id)}
+                             className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:text-brand-accent transition-colors mt-4 flex items-center gap-2"
+                           >
+                             View Full Case Analysis <ChevronDown className="w-3 h-3" />
+                           </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             }

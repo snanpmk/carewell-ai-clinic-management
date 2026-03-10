@@ -1,90 +1,118 @@
 "use client";
 
+import { useForm, Controller } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
-import { ChronicCase } from "@/types/chronicCase";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { mentalProfileSchema } from "@/lib/validations/chronicCase";
+import { BadgeSelect } from "@/components/ui/BadgeSelect";
+import { DynamicTable } from "@/components/ui/DynamicTable";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
+import { Brain, CloudRain, Zap } from "lucide-react";
+
+const MENTAL_TRAITS = [
+  "Fastidious", "Lazy", "Hasty", "Changeable mood", "Careless", "Obedient", "Loquacious", "Jealous",
+  "Timid", "Imbecile", "Idiotic", "Hypochondriac", "Melancholic", "Envious", "Fearful", "Sluggish",
+  "Obstinate", "Peevish", "Introverted", "Extroverted", "Yielding", "Nervous", "Restless", "Suspicious",
+  "Religious", "Proud", "Rude", "Cruel", "Violent", "Discontented", "Gentle", "Quiet", "Cheerful",
+  "Humorous", "Sympathetic", "Affectionate", "Sentimental", "Romantic", "Gloomy", "Sad", "Optimistic",
+  "Pessimistic", "Hopeless", "Shy", "Despondent", "Apathetic"
+];
+
+const EMOTIONAL_TRIGGERS = [
+  "Anger", "Bad news", "Displeasure", "Disappointment", "Fright", "Grief", "Joy", "Shock", "Sorrow", "Tension", "Vexation"
+];
+
+const REACTION_TRIGGERS = [
+  "Company", "Solitude", "Consolation", "Conversation", "Contradiction", "Exertion of work", "Music", "Travel"
+];
 
 export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting, errors },
-  } = useForm({
-    resolver: zodResolver(mentalProfileSchema),
+  const { register, handleSubmit, control, formState: { isSubmitting } } = useForm({
     defaultValues: {
       lifeSpaceInvestigation: {
-        traits: caseData.lifeSpaceInvestigation?.traits || "",
-        emotionalUpsets: caseData.lifeSpaceInvestigation?.emotionalUpsets || "",
-        cognitiveFunctions: caseData.lifeSpaceInvestigation?.cognitiveFunctions || "",
-      },
-    },
+        mentalFeatures: caseData.lifeSpaceInvestigation?.mentalFeatures || [],
+        emotionalFactors: caseData.lifeSpaceInvestigation?.emotionalFactors || [],
+        reactionPatterns: caseData.lifeSpaceInvestigation?.reactionPatterns || [],
+        otherFeatures: caseData.lifeSpaceInvestigation?.otherFeatures || {},
+      }
+    }
   });
 
-  const onSubmit = (data: Record<string, unknown>) => {
-    updateCaseData(data as Partial<ChronicCase>);
+  const onSubmit = (data: any) => {
+    updateCaseData(data);
     nextStep();
   };
-
-  const hintClass = "text-[11px] font-bold text-slate-400 mb-3 block italic leading-relaxed";
-
-  // Debugging: Log errors if any
-  if (Object.keys(errors).length > 0) {
-    console.log("Validation Errors:", errors);
-  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
         title="Mental Profile"
-        subtitle="Disposition & Life Space"
+        subtitle="Life Space Investigation & Disposition"
         onBack={prevStep}
         isSubmitting={isSubmitting}
-        nextLabel="Physical Analysis"
-        error={Object.keys(errors).length > 0 ? "Please review the highlighted fields." : undefined}
       >
-        <div className="space-y-6 text-sm">
+        <div className="space-y-12">
+          {/* Mental Features */}
           <div className="space-y-6">
-            {/* Traits */}
-            <div>
-              <span className={hintClass}>Examples: Fastidious, timid, jealous, cheerful, optimistic.</span>
-              <Textarea
-                label="Traits & Disposition"
-                {...register("lifeSpaceInvestigation.traits")}
-                placeholder="Describe the patient's dominant mental traits..."
-                className="min-h-[100px]"
-                error={(errors.lifeSpaceInvestigation as any)?.traits?.message}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Social and Environmental */}
-              <div className="md:col-span-2">
-                <span className={hintClass}>Examples: Company, solitude, music, reprimands, consolation.</span>
-                <Textarea
-                  label="Social and environmental reaction patterns"
-                  {...register("lifeSpaceInvestigation.cognitiveFunctions")}
-                  placeholder="Social and environmental reaction patterns..."
-                  className="min-h-[120px]"
-                  error={(errors.lifeSpaceInvestigation as any)?.cognitiveFunctions?.message}
+            <p className="eyebrow text-brand-primary flex items-center gap-3">
+              <Brain className="w-4 h-4" /> Mental & Behavioural Features
+            </p>
+            <Controller
+              control={control}
+              name="lifeSpaceInvestigation.mentalFeatures"
+              render={({ field }) => (
+                <BadgeSelect 
+                  options={MENTAL_TRAITS}
+                  selectedValues={field.value || []}
+                  onChange={field.onChange}
                 />
-              </div>
+              )}
+            />
+          </div>
 
-              {/* Emotional Upsets */}
-              <div className="md:col-span-2">
-                <span className={hintClass}>Significant emotional events or triggers.</span>
-                <Textarea
-                  label="Emotional Upsets & Factors"
-                  {...register("lifeSpaceInvestigation.emotionalUpsets")}
-                  placeholder="Describe past emotional traumas or recurring triggers..."
-                  className="min-h-[100px]"
-                  error={(errors.lifeSpaceInvestigation as any)?.emotionalUpsets?.message}
-                />
-              </div>
-            </div>
+          {/* Emotional Upsets Table */}
+          <div className="pt-10 border-t border-slate-100 space-y-6">
+            <p className="eyebrow text-brand-accent flex items-center gap-3">
+              <CloudRain className="w-4 h-4" /> Historical Emotional Upsets
+            </p>
+            <DynamicTable 
+              control={control}
+              register={register}
+              name="lifeSpaceInvestigation.emotionalFactors"
+              label="Causative Factors (Ailments From)"
+              emptyRow={{ factor: "", occasion: "", duration: "" }}
+              columns={[
+                { header: "Factor (Anger, Grief, etc.)", accessor: "factor", placeholder: "e.g. Grief" },
+                { header: "Occasion/Event", accessor: "occasion" },
+                { header: "Duration", accessor: "duration" },
+              ]}
+            />
+          </div>
+
+          {/* Reaction Patterns Table */}
+          <div className="pt-10 border-t border-slate-100 space-y-6">
+            <p className="eyebrow text-brand-primary flex items-center gap-3">
+              <Zap className="w-4 h-4" /> Reaction Patterns
+            </p>
+            <DynamicTable 
+              control={control}
+              register={register}
+              name="lifeSpaceInvestigation.reactionPatterns"
+              label="Environmental & Social Reactions"
+              emptyRow={{ trigger: "", aversion: "", desire: "", aggravation: "" }}
+              columns={[
+                { header: "Trigger (Music, Company, etc.)", accessor: "trigger" },
+                { header: "Aversion", accessor: "aversion" },
+                { header: "Desire", accessor: "desire" },
+                { header: "Aggravation", accessor: "aggravation" },
+                { header: "Amelioration", accessor: "amelioration" },
+              ]}
+            />
+          </div>
+
+          {/* Other Features */}
+          <div className="pt-10 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Textarea label="Memory & Perception" {...register("lifeSpaceInvestigation.otherFeatures.memory")} placeholder="Memory loss, hallucinations, concentration..." />
+            <Textarea label="Thought & Logic" {...register("lifeSpaceInvestigation.otherFeatures.thinking")} placeholder="Thinking patterns, delusions, fantasies..." />
           </div>
         </div>
       </StepLayout>

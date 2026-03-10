@@ -1,6 +1,11 @@
 export interface ChronicCase {
   _id?: string;
-  patient: string; // Patient ID
+  patient: string;
+  status: "Draft" | "Completed";
+  createdAt?: string;
+  updatedAt?: string;
+
+  // 1. FRONT PAGE / HEADER
   header?: {
     opNumber?: string;
     unit?: string;
@@ -13,64 +18,91 @@ export interface ChronicCase {
     age?: number;
     sex?: string;
     religion?: string;
+    caste?: string;
+    education?: string;
+    training?: string;
     occupation?: string;
     spouseName?: string;
     spouseOccupation?: string;
     address?: string;
     phone?: string;
+    economicStatus?: string;
+    socialStatus?: string;
+    nutritionalStatus?: string;
+    maritalStatus?: string;
+    yearsOfMarriage?: string;
+    dwellings?: string;
+    customs?: string;
+    politicalStatus?: string;
   };
   summaryDiagnosis?: {
     diseaseDiagnosis?: string;
     homeopathicDiagnosis?: string;
-    result?: string;
+    result?: "Cured" | "Relieved" | "Referred" | "Otherwise" | "Expired" | "";
   };
+
+  // 2. INITIAL PRESENTATION
   initialPresentation?: {
     patientNarration?: string;
     physicianInterpretation?: string;
     physicianObservation?: string;
   };
+
+  // 3. PRESENTING COMPLAINTS
   presentingComplaints?: Array<{
-    complaintType?: string;
-    location?: string;
+    complaintType: "Chief" | "Associated";
+    location: {
+      system?: string;
+      organ?: string;
+      tissue?: string;
+      areas?: string;
+      direction?: string;
+      extension?: string;
+      duration?: string;
+    };
     sensation?: string;
-    modalities?: string;
+    modalities?: {
+      aggravation?: string;
+      amelioration?: string;
+      equivalent?: string;
+    };
     accompaniments?: string;
   }>;
+
+  // 4. HISTORY OF PRESENT ILLNESS
   historyOfPresentIllness?: {
+    narrative?: string;
     onset?: string;
     cause?: string;
     progression?: string;
     frequency?: string;
     previousTreatments?: string;
   };
+
+  // 5. HISTORY OF PREVIOUS ILLNESS
   previousIllnessHistory?: Array<{
     age?: string;
-    illnessEvent?: string;
+    event?: string;
     treatment?: string;
     remarks?: string;
   }>;
-  familyHistory?: {
-    relations?: string[];
-    diseases?: string[];
-    notes?: string;
-  };
+
+  // 6. HISTORY OF FAMILY ILLNESS
+  familyHistory?: Array<{
+    relation: string;
+    disease: string;
+    status: string;
+    age?: string;
+  }>;
+
+  // 7. PERSONAL HISTORY
   personalHistory?: {
-    placeOfBirth?: string;
-    religion?: string;
-    caste?: string;
-    education?: string;
-    training?: string;
-    economicStatus?: string;
-    socialStatus?: string;
-    nutritionalStatus?: string;
-    maritalStatus?: string;
-    yearsOfMarriage?: string;
-    dwelling?: string;
-    occupation?: string;
-    natureOfWork?: string;
-    familyType?: string;
+    familyStatus?: {
+      type?: "Nuclear" | "Joint" | "Extended" | "";
+      details?: string;
+    };
     developmentMilestones?: {
-      fontanelleClosure?: string;
+      fontanellaClosure?: "Early" | "Normal" | "Late" | "";
       headHolding?: string;
       crawling?: string;
       teething?: string;
@@ -79,41 +111,93 @@ export interface ChronicCase {
       walking?: string;
       talking?: string;
     };
-    maternalPregnancyHistory?: string;
-    habits?: {
-      diet?: string;
-      addictions?: string;
-      sleep?: string;
-      activities?: string;
+    birthHistory?: {
+      motherConditionDuringPregnancy?: string;
+      type?: "Normal" | "Abnormal" | "Premature" | "";
+      weightKg?: number;
+      congenitalAnomalies?: string;
+      immunization?: string;
     };
-    domesticRelations?: string;
-    sexualRelations?: string;
+    habitsHobbies?: {
+      diet?: "Vegetarian" | "Egg vegetarian" | "Non vegetarian" | "";
+      addictions?: string[];
+      sleep?: string;
+      artistic?: string;
+      sports?: string;
+    };
+    domesticRelations?: {
+      family?: string;
+      relatives?: string;
+      neighbours?: string;
+      friends?: string;
+      colleagues?: string;
+    };
+    sexualRelations?: {
+      type?: "Premarital" | "Marital" | "Extramarital" | "Others" | "";
+      details?: string;
+    };
   };
+
+  // 8. LIFE SPACE INVESTIGATION
   lifeSpaceInvestigation?: {
-    traits?: string;
-    emotionalUpsets?: string;
+    mentalFeatures?: string[];
+    emotionalFactors?: Array<{
+      factor?: string;
+      occasion?: string;
+      duration?: string;
+    }>;
     reactionPatterns?: Array<{
-      situation?: string;
+      trigger?: string;
       aversion?: string;
       desire?: string;
+      intolerance?: string;
       aggravation?: string;
       amelioration?: string;
     }>;
-    cognitiveFunctions?: string;
+    otherFeatures?: {
+      emotional?: string;
+      perception?: string;
+      memory?: string;
+      thoughtFormulation?: string;
+      thinking?: string;
+      fancies?: string;
+    };
   };
+
+  // 9. PHYSICAL FEATURES
   physicalFeatures?: {
-    generalAppearance?: {
-      build?: string;
-      stature?: string;
-      complexion?: string;
-      health?: string;
-      ageAppearance?: string;
+    appearance?: {
+      build?: "Obese" | "Stocky" | "Thin" | "";
+      stature?: "Large" | "Small" | "";
+      complexion?: "Healthy" | "Unwell" | "Ill" | "";
+      ageAppearance?: "Premature old" | "Childish" | "Young" | "Senile" | "";
       gait?: string;
-      cleanliness?: string;
+      deformity?: string;
+      cleanliness?: "Clean" | "Dirty" | "";
       swelling?: string;
     };
-    regionalExamination?: string;
-    functionalGenerals?: {
+    regionalExamination?: {
+      headScalpHair?: string;
+      eyesVision?: string;
+      earHearingWax?: string;
+      noseOlfaction?: string;
+      faceExpression?: string;
+      mouthMouthSalivaTasteBreath?: string;
+      palateGumsTongueCoating?: string;
+      teethLips?: string;
+      throatTonsilsLarynxVoice?: string;
+      gastric?: string;
+      abdomenUmbilicusPelvis?: string;
+      rectumAnusDefecation?: string;
+      urethraUrination?: string;
+      genitalia?: string;
+      chestBreast?: string;
+      backNeck?: string;
+      extremitiesUpper?: string;
+      extremitiesLower?: string;
+      skin?: string;
+    };
+    generals?: {
       appetite?: string;
       stool?: string;
       thirst?: string;
@@ -124,23 +208,37 @@ export interface ChronicCase {
       breath?: string;
       dreams?: string;
       discharges?: string;
+      abnormalSecretions?: string;
+      excretions?: string;
+    };
+    reactionsToFactors?: Array<{
+      factor?: string;
+      intolerance?: string;
+      sensitivity?: string;
+      aggravation?: string;
+      amelioration?: string;
+    }>;
+    constitution?: {
+      physicalMakeup?: "Carbon" | "Nitrogenoid" | "Oxygenoid" | "";
+      temperament?: "Choleric" | "Melancholic" | "Nervous" | "Sanguine" | "Plethoric" | "Phlegmatic" | "";
+      thermal?: "Hot" | "Ambient" | "Cold" | "";
+      sideAffinity?: "Left" | "Right" | "Alternating" | "Diagonal" | "Crosswise" | "None" | "";
+      tendencies?: string[];
     };
   };
-  modalities?: Array<{
-    factor?: string;
-    intolerance?: string;
-    aggravation?: string;
-    amelioration?: string;
-  }>;
-  constitution?: {
-    physicalMakeup?: string;
-    temperament?: string;
-    thermalState?: string;
-    sideAffinity?: string;
-    tendencies?: string[];
-  };
+
+  // 10. PHYSICAL EXAMINATION
   physicalExamination?: {
-    generalExamination?: string[];
+    general?: {
+      jaundice?: string;
+      anemia?: string;
+      oedema?: string;
+      cyanosis?: string;
+      clubbing?: string;
+      lymphadenopathy?: string;
+      skinColor?: string;
+      eruptions?: string;
+    };
     vitals?: {
       height?: string;
       weight?: string;
@@ -150,118 +248,130 @@ export interface ChronicCase {
       temperature?: string;
       bp?: string;
     };
-    systemicExamination?: string;
+    systemic?: {
+      respiratory?: string;
+      cardiovascular?: string;
+      gastrointestinal?: string;
+      neurogenic?: string;
+      musculoskeletal?: string;
+      cns?: string;
+      endocrine?: string;
+      specialSenses?: string;
+    };
   };
-  menstrualHistory?: {
-    lmp?: string;
-    amenorrhea?: string;
-    cycleTable?: Array<{
+
+  // 11 & 12. FEMALE HISTORY
+  femaleHistory?: {
+    menstrual?: {
+      lmp?: string;
+      amenorrhea?: string;
+      regularity?: string;
       duration?: string;
-      quantity?: string;
-      clots?: string;
-      colour?: string;
-      odour?: string;
-      stains?: string;
-      frequency?: string;
-    }>;
-    menstrualSymptoms?: {
-      before?: string;
-      beginning?: string;
-      during?: string;
-      after?: string;
+      flowDetails?: {
+        quantity?: string;
+        consistency?: string;
+        colour?: string;
+        odour?: string;
+        stains?: string;
+        frequency?: string;
+      };
+      quantumMaintenance?: {
+        before?: string;
+        beginning?: string;
+        during?: string;
+        after?: string;
+      };
+      menarche?: string;
+      menopause?: {
+        age?: string;
+        symptoms?: string;
+        stage?: "Pre" | "With" | "Post" | "";
+      };
+      vaginalDischarge?: Array<{
+        type?: string;
+        duration?: string;
+        colourOdour?: string;
+        stainsAcidity?: string;
+        modalities?: string;
+        accompaniments?: string;
+      }>;
     };
-    menopause?: {
-      pre?: string;
-      during?: string;
-      post?: string;
-    };
-    vaginalDischarge?: Array<{
-      type?: string;
-      onset?: string;
-      colour?: string;
-      acidity?: string;
-      modalities?: string;
-      accompaniments?: string;
-      cause?: string;
-    }>;
-  };
-  obstetricalHistory?: {
-    summary?: {
+    obstetrical?: {
       gravida?: string;
       para?: string;
-      abortions?: string;
+      abortion?: string;
       livingChildren?: string;
-    };
-    pregnancyTable?: Array<{
-      year?: string;
-      pregnancyPeriod?: string;
-      complications?: string;
-      labour?: string;
-      delivery?: string;
-      puerperium?: string;
-      sex?: string;
-      weight?: string;
-      condition?: string;
-      viability?: string;
-      causeOfDeath?: string;
-    }>;
-    contraception?: {
-      temporary?: string;
-      permanent?: string;
-    };
-    presentPregnancy?: {
-      lmp?: string;
-      dateOfConception?: string;
-      edc?: string;
-      morningSickness?: string;
-      bleedingPV?: string;
+      pregnancyTable?: Array<{
+        year?: string;
+        period?: string;
+        complications?: string;
+        labour?: string;
+        deliveryMode?: string;
+        puerperium?: string;
+        childSex?: string;
+        childWeight?: string;
+        childCondition?: string;
+      }>;
+      contraception?: string;
+      presentPregnancy?: {
+        lmp?: string;
+        conceptionDate?: string;
+        edc?: string;
+        complaints?: string;
+      };
     };
   };
-  diseaseAnalysis?: {
+
+  // 13 & 14. ANALYSIS & DIAGNOSIS
+  analysisAndDiagnosis?: {
     provisionalDiagnosis?: string;
     differentialDiagnosis?: string;
     symptomAnalysis?: {
-      common?: string;
-      characteristic?: string;
+      basicCommon?: string;
+      determinativeUncommon?: string;
     };
     laboratoryFindings?: string;
-  };
-  homeopathicDiagnosis?: {
-    totalityOfSymptoms?: string;
-    miasmaticExpression?: string;
-    differentialConsiderations?: string;
-    repertorization?: Array<{
-      symptom?: string;
-      rubric?: string;
-      explanation?: string;
-    }>;
     finalDiagnosis?: {
       disease?: string;
-      classification?: string;
+      hahnemannianClassification?: string;
       miasmDominance?: string;
       homeopathicDiagnosis?: string;
     };
+    evaluation?: {
+      totalityOfSymptoms?: string;
+      miasmaticExpression?: string[];
+    };
+    repertorization?: {
+      repertoryName?: string;
+      table?: Array<{
+        symptom?: string;
+        rubric?: string;
+        explanation?: string;
+      }>;
+    };
   };
+
+  // 15. MANAGEMENT & TREATMENT
   management?: {
-    treatmentPlan?: string;
-    supportiveMeasures?: string;
+    plan?: string;
     restrictions?: {
-      disease?: string;
+      diet?: string;
+      regimen?: string;
       medicinal?: string;
     };
     firstPrescription?: {
+      basis?: string;
       medicine?: string;
       potency?: string;
       dose?: string;
     };
   };
+
+  // 16. PROGRESS
   followUps?: Array<{
     date?: string;
     symptomChanges?: string;
     interference?: string;
     prescription?: string;
   }>;
-  status?: "Draft" | "Completed";
-  createdAt?: string;
-  updatedAt?: string;
 }

@@ -1,57 +1,9 @@
 const mongoose = require("mongoose");
 
-const CycleTableSchema = new mongoose.Schema({
-  duration: String,
-  quantity: String,
-  clots: String,
-  colour: String,
-  odour: String,
-  stains: String,
-  frequency: String,
-});
-
-const MenstrualSymptomsSchema = new mongoose.Schema({
-  before: String,
-  beginning: String,
-  during: String,
-  after: String,
-});
-
-const VaginalDischargeSchema = new mongoose.Schema({
-  type: String,
-  onset: String,
-  colour: String,
-  acidity: String,
-  modalities: String,
-  accompaniments: String,
-  cause: String,
-});
-
-const PregnancyTableSchema = new mongoose.Schema({
-  year: String,
-  pregnancyPeriod: String,
-  complications: String,
-  labour: String,
-  delivery: String,
-  puerperium: String,
-  sex: String,
-  weight: String,
-  condition: String,
-  viability: String,
-  causeOfDeath: String,
-});
-
-const FollowUpSchema = new mongoose.Schema({
-  date: { type: Date, default: Date.now },
-  symptomChanges: String,
-  interference: String,
-  prescription: String,
-});
-
-const RepertorizationSchema = new mongoose.Schema({
-  symptom: String,
-  rubric: String,
-  explanation: String,
+const DynamicRowSchema = new mongoose.Schema({
+  key: String,
+  value: String,
+  label: String,
 });
 
 const ChronicCaseSchema = new mongoose.Schema(
@@ -61,7 +13,13 @@ const ChronicCaseSchema = new mongoose.Schema(
       ref: "Patient",
       required: true,
     },
-    // 1. Case Header
+    status: {
+      type: String,
+      enum: ["Draft", "Completed"],
+      default: "Draft",
+    },
+
+    // 1. FRONT PAGE / HEADER
     header: {
       opNumber: String,
       unit: String,
@@ -74,38 +32,65 @@ const ChronicCaseSchema = new mongoose.Schema(
       age: Number,
       sex: String,
       religion: String,
+      caste: String,
+      education: String,
+      training: String,
       occupation: String,
       spouseName: String,
       spouseOccupation: String,
       address: String,
       phone: String,
+      economicStatus: String,
+      socialStatus: String,
+      nutritionalStatus: String,
+      maritalStatus: String,
+      yearsOfMarriage: String,
+      dwellings: String,
+      customs: String,
+      politicalStatus: String,
     },
     summaryDiagnosis: {
       diseaseDiagnosis: String,
       homeopathicDiagnosis: String,
-      result: String, // Cured / Relieved / Referred / Otherwise / Expired
+      result: {
+        type: String,
+        enum: ["Cured", "Relieved", "Referred", "Otherwise", "Expired", ""],
+      },
     },
 
-    // 2. Initial Presentation
+    // 2. INITIAL PRESENTATION
     initialPresentation: {
-      patientNarration: String,
+      patientNarration: String, // Ipsisima Verba
       physicianInterpretation: String,
       physicianObservation: String,
     },
 
-    // 3. Presenting Complaints
+    // 3. PRESENTING COMPLAINTS (Granular Location/Sensation/Modalities/Accompaniments)
     presentingComplaints: [
       {
-        complaintType: String, // Chief / Associated
-        location: String,
+        complaintType: { type: String, enum: ["Chief", "Associated"] },
+        location: {
+          system: String,
+          organ: String,
+          tissue: String,
+          areas: String,
+          direction: String,
+          extension: String,
+          duration: String,
+        },
         sensation: String,
-        modalities: String,
+        modalities: {
+          aggravation: String,
+          amelioration: String,
+          equivalent: String, // "=" in spec
+        },
         accompaniments: String,
       },
     ],
 
-    // 4. History of Present Illness
+    // 4. HISTORY OF PRESENT ILLNESS
     historyOfPresentIllness: {
+      narrative: String,
       onset: String,
       cause: String,
       progression: String,
@@ -113,41 +98,34 @@ const ChronicCaseSchema = new mongoose.Schema(
       previousTreatments: String,
     },
 
-    // 5. Previous Illness History
+    // 5. HISTORY OF PREVIOUS ILLNESS
     previousIllnessHistory: [
       {
         age: String,
-        illnessEvent: String,
+        event: String, // illness, trauma, fright, allergy, etc.
         treatment: String,
         remarks: String,
       },
     ],
 
-    // 6. Family History
-    familyHistory: {
-      relations: [String],
-      diseases: [String],
-      notes: String,
-    },
+    // 6. HISTORY OF FAMILY ILLNESS
+    familyHistory: [
+      {
+        relation: String,
+        disease: String,
+        status: String, // Alive/Dead
+        age: String,
+      },
+    ],
 
-    // 7. Personal History
+    // 7. PERSONAL HISTORY
     personalHistory: {
-      placeOfBirth: String,
-      religion: String,
-      caste: String,
-      education: String,
-      training: String,
-      economicStatus: String,
-      socialStatus: String,
-      nutritionalStatus: String,
-      maritalStatus: String,
-      yearsOfMarriage: String,
-      dwelling: String,
-      occupation: String,
-      natureOfWork: String,
-      familyType: String,
+      familyStatus: {
+        type: { type: String, enum: ["Nuclear", "Joint", "Extended", ""] },
+        details: String,
+      },
       developmentMilestones: {
-        fontanelleClosure: String,
+        fontanellaClosure: { type: String, enum: ["Early", "Normal", "Late", ""] },
         headHolding: String,
         crawling: String,
         teething: String,
@@ -156,47 +134,97 @@ const ChronicCaseSchema = new mongoose.Schema(
         walking: String,
         talking: String,
       },
-      maternalPregnancyHistory: String,
-      habits: {
-        diet: String,
-        addictions: String,
-        sleep: String,
-        activities: String,
+      birthHistory: {
+        motherConditionDuringPregnancy: String,
+        type: { type: String, enum: ["Normal", "Abnormal", "Premature", ""] },
+        weightKg: Number,
+        congenitalAnomalies: String,
+        immunization: String,
       },
-      domesticRelations: String,
-      sexualRelations: String,
+      habitsHobbies: {
+        diet: { type: String, enum: ["Vegetarian", "Egg vegetarian", "Non vegetarian", ""] },
+        addictions: [String], // Tea, Coffee, Smoking, etc.
+        sleep: String,
+        artistic: String,
+        sports: String,
+      },
+      domesticRelations: {
+        family: String,
+        relatives: String,
+        neighbours: String,
+        friends: String,
+        colleagues: String,
+      },
+      sexualRelations: {
+        type: { type: String, enum: ["Premarital", "Marital", "Extramarital", "Others", ""] },
+        details: String,
+      },
     },
 
-    // 8. Life Space Investigation
+    // 8. LIFE SPACE INVESTIGATION (Abstract & Mental)
     lifeSpaceInvestigation: {
-      traits: String,
-      emotionalUpsets: String,
+      mentalFeatures: [String], // The 50+ traits (Fastidious, lazy, etc.)
+      emotionalFactors: [
+        {
+          factor: String, // Anger, Grief, Shock, etc.
+          occasion: String,
+          duration: String,
+        },
+      ],
       reactionPatterns: [
         {
-          situation: String,
+          trigger: String, // Company, Consolation, Music, etc.
           aversion: String,
           desire: String,
+          intolerance: String,
           aggravation: String,
           amelioration: String,
         },
       ],
-      cognitiveFunctions: String,
+      otherFeatures: {
+        emotional: String, // Anxious on, Apprehensive about...
+        perception: String, // Acute, Hallucination, etc.
+        memory: String,
+        thoughtFormulation: String,
+        thinking: String,
+        fancies: String,
+      },
     },
 
-    // 9. Physical Features
+    // 9. PHYSICAL FEATURES
     physicalFeatures: {
-      generalAppearance: {
-        build: String,
-        stature: String,
-        complexion: String,
-        health: String,
-        ageAppearance: String,
+      appearance: {
+        build: { type: String, enum: ["Obese", "Stocky", "Thin", ""] },
+        stature: { type: String, enum: ["Large", "Small", ""] },
+        complexion: { type: String, enum: ["Healthy", "Unwell", "Ill", ""] },
+        ageAppearance: { type: String, enum: ["Premature old", "Childish", "Young", "Senile", ""] },
         gait: String,
-        cleanliness: String,
+        deformity: String,
+        cleanliness: { type: String, enum: ["Clean", "Dirty", ""] },
         swelling: String,
       },
-      regionalExamination: String,
-      functionalGenerals: {
+      regionalExamination: {
+        headScalpHair: String,
+        eyesVision: String,
+        earHearingWax: String,
+        noseOlfaction: String,
+        faceExpression: String,
+        mouthMouthSalivaTasteBreath: String,
+        palateGumsTongueCoating: String,
+        teethLips: String,
+        throatTonsilsLarynxVoice: String,
+        gastric: String,
+        abdomenUmbilicusPelvis: String,
+        rectumAnusDefecation: String,
+        urethraUrination: String,
+        genitalia: String,
+        chestBreast: String,
+        backNeck: String,
+        extremitiesUpper: String,
+        extremitiesLower: String,
+        skin: String,
+      },
+      generals: {
         appetite: String,
         stool: String,
         thirst: String,
@@ -207,31 +235,39 @@ const ChronicCaseSchema = new mongoose.Schema(
         breath: String,
         dreams: String,
         discharges: String,
+        abnormalSecretions: String,
+        excretions: String,
+      },
+      reactionsToFactors: [
+        {
+          factor: String, // Time, Thermal, Season, Moon, etc.
+          intolerance: String,
+          sensitivity: String,
+          aggravation: String,
+          amelioration: String,
+        },
+      ],
+      constitution: {
+        physicalMakeup: { type: String, enum: ["Carbon", "Nitrogenoid", "Oxygenoid", ""] },
+        temperament: { type: String, enum: ["Choleric", "Melancholic", "Nervous", "Sanguine", "Plethoric", "Phlegmatic", ""] },
+        thermal: { type: String, enum: ["Hot", "Ambient", "Cold", ""] },
+        sideAffinity: { type: String, enum: ["Left", "Right", "Alternating", "Diagonal", "Crosswise", "None", ""] },
+        tendencies: [String],
       },
     },
 
-    // 10. Modalities
-    modalities: [
-      {
-        factor: String,
-        intolerance: String,
-        aggravation: String,
-        amelioration: String,
-      },
-    ],
-
-    // 11. Constitution
-    constitution: {
-      physicalMakeup: String,
-      temperament: String,
-      thermalState: String,
-      sideAffinity: String,
-      tendencies: [String],
-    },
-
-    // 12. Physical Examination
+    // 10. PHYSICAL EXAMINATION
     physicalExamination: {
-      generalExamination: [String],
+      general: {
+        jaundice: String,
+        anemia: String,
+        oedema: String,
+        cyanosis: String,
+        clubbing: String,
+        lymphadenopathy: String,
+        skinColor: String,
+        eruptions: String,
+      },
       vitals: {
         height: String,
         weight: String,
@@ -241,93 +277,140 @@ const ChronicCaseSchema = new mongoose.Schema(
         temperature: String,
         bp: String,
       },
-      systemicExamination: String,
-    },
-
-    // 13. Menstrual History
-    menstrualHistory: {
-      lmp: String,
-      amenorrhea: String,
-      cycleTable: [CycleTableSchema],
-      menstrualSymptoms: MenstrualSymptomsSchema,
-      menopause: {
-        pre: String,
-        during: String,
-        post: String,
+      systemic: {
+        respiratory: String,
+        cardiovascular: String,
+        gastrointestinal: String,
+        neurogenic: String,
+        musculoskeletal: String,
+        cns: String,
+        endocrine: String,
+        specialSenses: String,
       },
-      vaginalDischarge: [VaginalDischargeSchema],
     },
 
-    // 14. Obstetrical History
-    obstetricalHistory: {
-      summary: {
+    // 11 & 12. FEMALE HISTORY
+    femaleHistory: {
+      menstrual: {
+        lmp: String,
+        amenorrhea: String,
+        regularity: String,
+        duration: String,
+        flowDetails: {
+          quantity: String,
+          consistency: String,
+          colour: String,
+          odour: String,
+          stains: String,
+          frequency: String,
+        },
+        quantumMaintenance: {
+          before: String,
+          beginning: String,
+          during: String,
+          after: String,
+        },
+        menarche: String,
+        menopause: {
+          age: String,
+          symptoms: String,
+          stage: { type: String, enum: ["Pre", "With", "Post", ""] },
+        },
+        vaginalDischarge: [
+          {
+            type: String,
+            duration: String,
+            colourOdour: String,
+            stainsAcidity: String,
+            modalities: String,
+            accompaniments: String,
+          },
+        ],
+      },
+      obstetrical: {
         gravida: String,
         para: String,
-        abortions: String,
+        abortion: String,
         livingChildren: String,
-      },
-      pregnancyTable: [PregnancyTableSchema],
-      contraception: {
-        temporary: String,
-        permanent: String,
-      },
-      presentPregnancy: {
-        lmp: String,
-        dateOfConception: String,
-        edc: String,
-        morningSickness: String,
-        bleedingPV: String,
+        pregnancyTable: [
+          {
+            year: String,
+            period: String,
+            complications: String,
+            labour: String,
+            deliveryMode: String,
+            puerperium: String,
+            childSex: String,
+            childWeight: String,
+            childCondition: String,
+          },
+        ],
+        contraception: String,
+        presentPregnancy: {
+          lmp: String,
+          conceptionDate: String,
+          edc: String,
+          complaints: String,
+        },
       },
     },
 
-    // 15. Disease Analysis
-    diseaseAnalysis: {
+    // 13 & 14. ANALYSIS & DIAGNOSIS
+    analysisAndDiagnosis: {
       provisionalDiagnosis: String,
       differentialDiagnosis: String,
       symptomAnalysis: {
-        common: String,
-        characteristic: String,
+        basicCommon: String,
+        determinativeUncommon: String,
       },
       laboratoryFindings: String,
-    },
-
-    // 16. Homeopathic Diagnosis
-    homeopathicDiagnosis: {
-      totalityOfSymptoms: String,
-      miasmaticExpression: String,
-      differentialConsiderations: String,
-      repertorization: [RepertorizationSchema],
       finalDiagnosis: {
         disease: String,
-        classification: String,
+        hahnemannianClassification: String,
         miasmDominance: String,
         homeopathicDiagnosis: String,
       },
+      evaluation: {
+        totalityOfSymptoms: String,
+        miasmaticExpression: [String], // Psora, Sycosis, Syphilis
+      },
+      repertorization: {
+        repertoryName: String,
+        table: [
+          {
+            symptom: String,
+            rubric: String,
+            explanation: String,
+          },
+        ],
+      },
     },
 
-    // 17. Management & Treatment
+    // 15. MANAGEMENT & TREATMENT
     management: {
-      treatmentPlan: String,
-      supportiveMeasures: String,
+      plan: String, // General, Surgical, Accessory
       restrictions: {
-        disease: String,
+        diet: String,
+        regimen: String,
         medicinal: String,
       },
       firstPrescription: {
+        basis: String,
         medicine: String,
         potency: String,
         dose: String,
       },
     },
 
-    // 18. Follow-up
-    followUps: [FollowUpSchema],
-
-    status: {
-      type: String,
-      enum: ["Draft", "Completed"],
-      default: "Draft",
-    },
+    // 16. PROGRESS (Handled by FollowUps)
+    followUps: [
+      {
+        date: { type: Date, default: Date.now },
+        symptomChanges: String,
+        interference: String,
+        prescription: String,
+      },
+    ],
   },
   { timestamps: true }
 );

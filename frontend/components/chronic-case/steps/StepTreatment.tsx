@@ -1,120 +1,99 @@
 "use client";
 
-import { useMemo } from "react";
-import { StepProps } from "../ChronicCaseWizard";
-import { ChronicCase } from "@/types/chronicCase";
-import { createChronicCase, updateChronicCase } from "@/services/chronicCaseService";
-import { useRouter } from "next/navigation";
-import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { treatmentSchema } from "@/lib/validations/chronicCase";
+import { StepProps } from "../ChronicCaseWizard";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
+import { createChronicCase, updateChronicCase } from "@/services/chronicCaseService";
+import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Pill, ShieldAlert, Save } from "lucide-react";
 
-export default function StepTreatment({ caseData, prevStep }: StepProps) {
+export default function StepTreatment({ caseData, updateCaseData, prevStep }: StepProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(treatmentSchema),
+  const { register, handleSubmit, formState: { isSubmitting } } = useForm({
     defaultValues: {
       management: {
-        treatmentPlan: caseData.management?.treatmentPlan || "",
-        firstPrescription: {
-          medicine: caseData.management?.firstPrescription?.medicine || "",
-          potency: caseData.management?.firstPrescription?.potency || "",
-          dose: caseData.management?.firstPrescription?.dose || "",
-        },
-      },
-    },
-  });
-
-  const saveMutation = useMutation({
-    mutationFn: (finalData: ChronicCase) => {
-      if (finalData._id) {
-        return updateChronicCase(finalData._id, finalData);
+        plan: caseData.management?.plan || "",
+        restrictions: caseData.management?.restrictions || {},
+        firstPrescription: caseData.management?.firstPrescription || {},
       }
-      return createChronicCase(finalData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chronicCases", caseData.patient] });
-      toast.success(caseData._id ? "Chronic case updated successfully" : "Chronic case created successfully");
-      router.push(`/patients/${caseData.patient}`);
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Failed to save chronic case");
     }
   });
 
-  const onSave = (data: Record<string, unknown>) => {
-    const finalizedCase = { ...caseData, ...data, status: "Completed" as const };
-    saveMutation.mutate(finalizedCase as unknown as ChronicCase);
+  const saveMutation = useMutation({
+    mutationFn: (finalData: any) => {
+      if (finalData._id) return updateChronicCase(finalData._id, finalData);
+      return createChronicCase(finalData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chronicCases"] });
+      toast.success(caseData._id ? "Chronic record updated" : "Chronic record committed to registry");
+      router.push(`/patients/${caseData.patient}`);
+    }
+  });
+
+  const onSubmit = (data: any) => {
+    const finalizedCase = { ...caseData, ...data, status: "Completed" };
+    saveMutation.mutate(finalizedCase);
   };
 
-  const potencyOptions = useMemo(() => [
-    { value: "Q", label: "Mother Tincture (Q)" },
-    { value: "3x/6x", label: "Trituration (3x/6x)" },
-    { value: "30c", label: "30c Centesimal" },
-    { value: "200c", label: "200c Centesimal" },
-    { value: "1M", label: "1M Centesimal" },
-    { value: "10M", label: "10M Centesimal" },
-    { value: "0/1", label: "LM/1 50-Millesimal" },
-    { value: "0/3", label: "LM/3 50-Millesimal" },
-    { value: "0/6", label: "LM/6 50-Millesimal" },
-  ], []);
-
   return (
-    <form onSubmit={handleSubmit(onSave)} className="contents">
+    <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Management & Prescription"
-        subtitle="Treatment & Remedial Plan"
+        title="Management & Treatment"
+        subtitle="Plan of Treatment & First Prescription"
         onBack={prevStep}
         isLastStep
         isSubmitting={saveMutation.isPending}
-        nextLabel={saveMutation.isPending ? "Finalizing..." : (caseData._id ? "Update Case" : "Complete Case")}
+        nextLabel={caseData._id ? "Update Case" : "Complete Case"}
         nextIcon={<Save className="w-4 h-4" />}
-        error={saveMutation.error?.message}
       >
-        <div className="space-y-4 text-sm">
-          <div className="space-y-4">
-            <Textarea
-              label="Treatment Strategy"
-              {...register("management.treatmentPlan")}
-              placeholder="Overall strategy and clinical goals..."
-              className="min-h-[80px]"
+        <div className="space-y-12">
+          {/* Plan of Treatment */}
+          <div className="space-y-6">
+            <p className="eyebrow text-brand-primary flex items-center gap-3">
+              Treatment Strategy
+            </p>
+            <Textarea 
+              label="Clinical Plan" 
+              {...register("management.plan")} 
+              placeholder="General, surgical, or accessory measures..." 
+              rows={3}
             />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="First Prescription"
-                {...register("management.firstPrescription.medicine")}
-                placeholder="Medicine name..."
-                error={errors.management?.firstPrescription?.medicine?.message as string}
-              />
-              
-              <Select
-                label="Potency"
-                options={potencyOptions}
-                placeholder="Select Potency..."
-                {...register("management.firstPrescription.potency")}
-                error={errors.management?.firstPrescription?.potency?.message as string}
-              />
+          {/* Restrictions */}
+          <div className="pt-10 border-t border-slate-100 space-y-6">
+            <p className="eyebrow text-red-500 flex items-center gap-3">
+              <ShieldAlert className="w-4 h-4" /> Dietary & Regimen Restrictions
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Input label="Dietary Restrictions" {...register("management.restrictions.diet")} />
+              <Input label="Regimen Restrictions" {...register("management.restrictions.regimen")} />
+              <Input label="Medicinal Restrictions" {...register("management.restrictions.medicinal")} />
+            </div>
+          </div>
 
-              <Input
-                label="Dose"
-                {...register("management.firstPrescription.dose")}
-                placeholder="e.g. 4 pills TDS..."
-                error={errors.management?.firstPrescription?.dose?.message as string}
-              />
+          {/* First Prescription */}
+          <div className="pt-10 border-t border-slate-100 space-y-8">
+            <p className="eyebrow text-brand-accent flex items-center gap-3">
+              <Pill className="w-4 h-4" /> Final Selection (First Prescription)
+            </p>
+            <Textarea 
+              label="Basis of Selection" 
+              {...register("management.firstPrescription.basis")} 
+              placeholder="Rationale for the selected remedy and potency..." 
+              rows={2}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-inner">
+              <Input label="Remedy / Medicine" {...register("management.firstPrescription.medicine")} required />
+              <Input label="Potency" {...register("management.firstPrescription.potency")} required />
+              <Input label="Dosage" {...register("management.firstPrescription.dose")} required />
             </div>
           </div>
         </div>
