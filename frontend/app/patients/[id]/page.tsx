@@ -70,6 +70,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
       date: new Date(v.consultationDate),
       symptoms: v.symptoms,
       diagnosis: v.diagnosis,
+      prescription: v.prescription,
       doctorEditedNotes: v.doctorEditedNotes,
       aiGeneratedNotes: v.aiGeneratedNotes,
       additionalNotes: v.additionalNotes,

@@ -14,6 +14,7 @@ export interface ConsultationNotes {
   chiefComplaint: string;
   assessment: string;
   advice: string;
+  aiSuggestions?: string;
 }
 
 export interface SaveConsultationPayload {

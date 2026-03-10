@@ -11,21 +11,20 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, id, className, ...props }, ref) => {
     const inputId = id || label.toLowerCase().replace(/\s+/g, "-");
     return (
-      <div className="flex flex-col gap-1">
-        <label htmlFor={inputId} className="text-sm font-medium text-gray-700">
+      <div className="flex flex-col gap-2 relative">
+        <label htmlFor={inputId} className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
           {label}
-          {props.required && <span className="text-red-500 ml-1">*</span>}
+          {props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
         </label>
         <textarea
           id={inputId}
           ref={ref}
           rows={props.rows || 3}
           className={clsx(
-            "w-full rounded-lg border px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 resize-y transition-colors",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+            "w-full rounded-2xl border-2 px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-300 resize-y transition-all focus:outline-none focus:bg-white",
             error
-              ? "border-red-400 bg-red-50"
-              : "border-gray-300 bg-white hover:border-gray-400",
+              ? "border-red-400 bg-red-50 focus:border-red-500"
+              : "border-slate-200 bg-white focus:border-blue-500 hover:border-slate-300",
             className
           )}
           {...props}

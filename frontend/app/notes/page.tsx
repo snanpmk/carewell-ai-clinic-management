@@ -99,7 +99,7 @@ export default function NotesPage() {
           <p className="text-sm text-gray-500 mb-6">
             The consultation record has been saved to the patient&apos;s profile.
           </p>
-          <Button onClick={handleStartNew} className="w-full">
+          <Button onClick={handleStartNew} fullWidth>
             Start New Consultation
           </Button>
         </Card>
@@ -133,7 +133,7 @@ export default function NotesPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
                   <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
-                    Chief Complaint
+                    Drafted Chief Complaint
                   </span>
                 </div>
                 <Textarea
@@ -147,7 +147,7 @@ export default function NotesPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
                   <span className="text-xs font-semibold text-amber-600 uppercase tracking-wide">
-                    Assessment
+                    Clinical Synthesis
                   </span>
                 </div>
                 <Textarea
@@ -177,14 +177,14 @@ export default function NotesPage() {
                 <Button
                   type="submit"
                   isLoading={mutation.isPending}
-                  className="w-full"
+                  fullWidth
                 >
                   Save Consultation Record
                 </Button>
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/symptoms")}
-                  className="w-full"
+                  fullWidth
                 >
                   ← Back to Symptoms
                 </Button>

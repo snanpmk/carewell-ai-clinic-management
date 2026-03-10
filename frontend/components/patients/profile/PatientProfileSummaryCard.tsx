@@ -18,7 +18,7 @@ export function PatientProfileSummaryCard({ visitsCount, summaryLoading, aiSumma
         <div className="p-2.5 bg-white/20 backdrop-blur-md rounded-xl shadow-xs border border-white/10">
           <Sparkles className="w-5 h-5 text-emerald-50" />
         </div>
-        <h3 className="text-sm font-black uppercase tracking-widest text-emerald-50">Medical Insight</h3>
+        <h3 className="text-sm font-black uppercase tracking-widest text-emerald-50">Clinical Trajectory</h3>
       </div>
       
       <div className="text-[15px] text-emerald-50 leading-relaxed font-medium relative z-10 italic">

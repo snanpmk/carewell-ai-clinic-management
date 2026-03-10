@@ -301,6 +301,7 @@ const ChronicCaseSchema = new mongoose.Schema(
     homeopathicDiagnosis: {
       totalityOfSymptoms: String,
       miasmaticExpression: String,
+      differentialConsiderations: String,
       repertorization: [RepertorizationSchema],
       finalDiagnosis: {
         disease: String,

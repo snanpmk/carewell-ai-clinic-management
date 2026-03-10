@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { initialPresentationSchema } from "@/lib/validations/chronicCase";
 import { Textarea } from "@/components/ui/Textarea";
-
 import StepLayout from "../StepLayout";
 
 export default function StepPresentingComplaints({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
@@ -34,26 +33,23 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
   };
 
   return (
-    <StepLayout
-      title="Clinical Presentation"
-      subtitle="Narrative & Observation"
-      icon={<History className="w-5 h-5" />}
-      iconVariant="amber"
-      onBack={prevStep}
-      isSubmitting={isSubmitting}
-    >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-sm">
+    <form onSubmit={handleSubmit(onSubmit)} className="contents">
+      <StepLayout
+        title="Clinical Presentation"
+        subtitle="Narrative & Observation"
+        icon={<History className="w-5 h-5" />}
+        iconVariant="amber"
+        onBack={prevStep}
+        isSubmitting={isSubmitting}
+      >
         <div className="space-y-8 text-sm">
           {/* Patient Narration */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center">
-                Patient&apos;s Narration
-              </label>
               <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-100/50 px-2.5 py-1 rounded-lg shadow-xs">Ipsisima Verba</span>
             </div>
             <Textarea
-              label=""
+              label="Patient's Narration"
               {...register("initialPresentation.patientNarration")}
               placeholder="Record the patient's exact words..."
               className="min-h-[120px]"
@@ -71,15 +67,14 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
 
             {/* Complaints Summary */}
             <Textarea
-              label="LSMA Framework"
+              label="LSMA Framework (Loc/Sens/Mod/Acc)"
               {...register("historyOfPresentIllness.progression")}
               placeholder="Location, Sensation, Modalities, Accompaniments..."
               className="min-h-[140px] border-dashed shadow-none"
             />
           </div>
         </div>
-      </form>
-    </StepLayout>
+      </StepLayout>
+    </form>
   );
 }
-

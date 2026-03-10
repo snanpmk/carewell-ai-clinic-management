@@ -53,37 +53,40 @@ export default function StepLayout({
   error,
 }: StepLayoutProps) {
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-100/80">
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col h-full animate-in fade-in duration-300">
+      {/* Section Header - More compact */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100/80 mb-6">
+        <div className="flex items-center gap-3">
           <div
-            className={`w-12 h-12 bg-linear-to-br border rounded-2xl flex items-center justify-center shadow-xs ${variantStyles[iconVariant]}`}
+            className={`w-10 h-10 bg-linear-to-br border rounded-xl flex items-center justify-center shadow-xs shrink-0 ${variantStyles[iconVariant]}`}
           >
             {icon}
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h2>
-            <p className="text-sm font-medium text-slate-500 mt-0.5">{subtitle}</p>
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">{title}</h2>
+            <p className="text-xs font-medium text-slate-500 mt-0.5">{subtitle}</p>
           </div>
         </div>
-        {headerActions && <div className="flex items-center gap-3">{headerActions}</div>}
+        {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
       </div>
 
       {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-bold shadow-xs">
-          <div className="w-5 h-5 shrink-0 flex items-center justify-center bg-red-100 rounded-full">
-            <span className="text-red-600 text-xs">!</span>
+        <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-bold shadow-xs mb-6">
+          <div className="w-4 h-4 shrink-0 flex items-center justify-center bg-red-100 rounded-full">
+            <span className="text-red-600 text-[10px]">!</span>
           </div>
           {error}
         </div>
       )}
 
-      <div>{children}</div>
+      {/* Main Content Area */}
+      <div className="flex-1 min-h-0">
+        {children}
+      </div>
 
-      {/* Navigation */}
+      {/* Navigation - Fixed/Sticky feel but in flow, with reduced padding */}
       <div
-        className={`flex items-center pt-8 border-t border-slate-100/80 ${
+        className={`flex items-center pt-6 mt-8 border-t border-slate-100/80 ${
           isFirstStep ? "justify-end" : "justify-between"
         }`}
       >
@@ -94,6 +97,7 @@ export default function StepLayout({
             variant="outline"
             leftIcon={backIcon}
             disabled={isSubmitting}
+            size="sm"
           >
             {backLabel}
           </Button>
@@ -102,10 +106,11 @@ export default function StepLayout({
           type={onNext ? "button" : "submit"}
           onClick={onNext}
           variant="primary"
+          size="sm"
           rightIcon={!isSubmitting && !isLastStep ? nextIcon : undefined}
           leftIcon={isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (isLastStep ? nextIcon : undefined)}
           isLoading={isSubmitting}
-          className={isLastStep ? "shadow-md shadow-blue-500/20" : ""}
+          className={isLastStep ? "shadow-md shadow-blue-500/20 px-6" : "px-6"}
         >
           {nextLabel}
         </Button>

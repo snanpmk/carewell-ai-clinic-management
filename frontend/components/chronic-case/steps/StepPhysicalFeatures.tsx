@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { physicalsSchema } from "@/lib/validations/chronicCase";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-
 import StepLayout from "../StepLayout";
 
 export default function StepPhysicalFeatures({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
@@ -50,62 +49,63 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
   const hintClass = "text-[11px] font-bold text-slate-400 mb-3 block italic leading-relaxed";
 
   return (
-    <StepLayout
-      title="Physical Constitution"
-      subtitle="Generals & Physical Features"
-      icon={<Activity className="w-5 h-5" />}
-      iconVariant="emerald"
-      onBack={prevStep}
-      isSubmitting={isSubmitting}
-      nextLabel="Special History"
-    >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            label="Physical Build"
-            {...register("physicalFeatures.generalAppearance.build")}
-            placeholder="Obese, Thin, Stocky..."
-          />
+    <form onSubmit={handleSubmit(onSubmit)} className="contents">
+      <StepLayout
+        title="Physical Constitution"
+        subtitle="Generals & Physical Features"
+        icon={<Activity className="w-5 h-5" />}
+        iconVariant="emerald"
+        onBack={prevStep}
+        isSubmitting={isSubmitting}
+        nextLabel="Special History"
+      >
+        <div className="space-y-6 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Physical Build"
+              {...register("physicalFeatures.generalAppearance.build")}
+              placeholder="Obese, Thin, Stocky..."
+            />
 
-          <Input
-            label="Stature"
-            {...register("physicalFeatures.generalAppearance.stature")}
-            placeholder="Tall, Short..."
-          />
+            <Input
+              label="Stature"
+              {...register("physicalFeatures.generalAppearance.stature")}
+              placeholder="Tall, Short..."
+            />
 
-          <Input
-            label="Complexion"
-            {...register("physicalFeatures.generalAppearance.complexion")}
-            placeholder="Fair, Dark..."
-          />
+            <Input
+              label="Complexion"
+              {...register("physicalFeatures.generalAppearance.complexion")}
+              placeholder="Fair, Dark..."
+            />
 
-          <Input
-            label="Health"
-            {...register("physicalFeatures.generalAppearance.health")}
-            placeholder="Good, Poor..."
-          />
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <span className={hintClass}>Record clinical generals: Sleep, Thirst, Sweat, Bowels, Appetite</span>
-            <Textarea
-              label="Functional Generals"
-              {...register("physicalFeatures.functionalGenerals.appetite")}
-              placeholder="Record patterns and irregularities..."
-              className="min-h-[100px]"
+            <Input
+              label="Health"
+              {...register("physicalFeatures.generalAppearance.health")}
+              placeholder="Good, Poor..."
             />
           </div>
 
-          <Textarea
-            label="Sleep & Dreams"
-            {...register("physicalFeatures.functionalGenerals.sleep")}
-            placeholder="Sleep patterns and significant dreams..."
-            className="min-h-[100px] border-dashed shadow-none"
-          />
+          <div className="space-y-6">
+            <div>
+              <span className={hintClass}>Record clinical generals: Sleep, Thirst, Sweat, Bowels, Appetite</span>
+              <Textarea
+                label="Functional Generals"
+                {...register("physicalFeatures.functionalGenerals.appetite")}
+                placeholder="Record patterns and irregularities..."
+                className="min-h-[100px]"
+              />
+            </div>
+
+            <Textarea
+              label="Sleep & Dreams"
+              {...register("physicalFeatures.functionalGenerals.sleep")}
+              placeholder="Sleep patterns and significant dreams..."
+              className="min-h-[100px] border-dashed shadow-none"
+            />
+          </div>
         </div>
-      </form>
-    </StepLayout>
+      </StepLayout>
+    </form>
   );
 }
-

@@ -79,13 +79,11 @@ function ConsultationForm() {
   const generateMutation = useMutation({
     mutationFn: generateNotes,
     onSuccess: (result) => {
-      console.log("AI Generation Success:", result);
       if (result.success) {
         setValue("advice", result.data.advice);
       }
     },
     onError: (error) => {
-      console.error("AI Generation Error:", error);
     }
   });
 
@@ -110,7 +108,6 @@ function ConsultationForm() {
   });
 
   const onGenerate = (data: FormData) => {
-    console.log("onGenerate called with data:", data);
     generateMutation.mutate(data);
   };
 
@@ -282,14 +279,14 @@ function ConsultationForm() {
             
             <h2 className="text-lg font-bold text-indigo-900 flex items-center gap-2 mb-6 border-b border-indigo-200/60 pb-4 relative z-10">
               <Sparkles className="w-5 h-5 text-indigo-500" />
-              AI Structured Notes
+              Clinical Drafting (Assistant)
             </h2>
 
             {aiNotes ? (
               <div className="space-y-5 flex-1 relative z-10 animate-in fade-in slide-in-from-bottom-2">
                 <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-indigo-100 shadow-sm">
                   <Textarea
-                    label="Chief Complaint"
+                    label="Drafted Chief Complaint"
                     defaultValue={aiNotes.chiefComplaint}
                     readOnly
                     rows={4}
@@ -299,7 +296,7 @@ function ConsultationForm() {
                 
                 <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-indigo-100 shadow-sm">
                   <Textarea
-                    label="Assessment"
+                    label="Clinical Synthesis"
                     defaultValue={aiNotes.assessment}
                     readOnly
                     rows={4}
@@ -310,7 +307,7 @@ function ConsultationForm() {
                 {aiNotes.aiSuggestions && (
                   <div className="bg-amber-50/80 backdrop-blur-sm p-4 rounded-lg border border-amber-200 shadow-sm">
                     <label className="flex items-center gap-1.5 text-xs font-bold text-amber-600 uppercase tracking-widest mb-2">
-                      <Sparkles className="w-3.5 h-3.5" /> Clinical Suggestions
+                      <Sparkles className="w-3.5 h-3.5" /> Analytical Considerations
                     </label>
                     <p className="text-sm font-medium text-amber-900 whitespace-pre-wrap leading-relaxed">
                       {aiNotes.aiSuggestions}
@@ -319,7 +316,7 @@ function ConsultationForm() {
                 )}
 
                 <Textarea
-                  label="Advice & Plan (Editable)"
+                  label="Physician's Plan & Advice (Required)"
                   {...register("advice")}
                   rows={8}
                   className="bg-white/80 border-indigo-100"

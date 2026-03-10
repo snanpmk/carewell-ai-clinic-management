@@ -4,7 +4,7 @@ export const demographicsSchema = z.object({
   patient: z.string().min(1, "Please select a patient"),
   demographics: z.object({
     name: z.string().min(1, "Name is required"),
-    age: z.coerce.number().min(0, "Age must be a positive number"),
+    age: z.preprocess((val) => (val === "" ? 0 : Number(val)), z.number().min(0, "Age must be a positive number")),
     sex: z.string().min(1, "Sex is required"),
     religion: z.string().optional(),
     occupation: z.string().optional(),

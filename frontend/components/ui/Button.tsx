@@ -8,10 +8,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  fullWidth?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", isLoading, leftIcon, rightIcon, children, disabled, ...props }, ref) => {
+  ({ className, variant = "primary", size = "md", isLoading, leftIcon, rightIcon, children, disabled, fullWidth = false, ...props }, ref) => {
     
     const variants = {
       primary: "bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30",
@@ -21,7 +22,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizes = {
-      sm: "h-9 px-4 text-xs rounded-xl",
+      sm: "h-9 px-4 text-[11px] rounded-lg",
       md: "h-11 px-6 text-sm rounded-xl",
       lg: "h-14 px-8 text-base rounded-2xl",
     };
@@ -31,7 +32,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={isLoading || disabled}
         className={clsx(
-          "inline-flex w-full items-center justify-center gap-2 font-black uppercase tracking-widest transition-all duration-300 active:scale-[0.98]",
+          "inline-flex items-center justify-center gap-2 font-black uppercase tracking-widest transition-all duration-300 active:scale-[0.98]",
+          fullWidth ? "w-full" : "w-auto min-w-[120px]",
           "disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 focus:outline-none focus:ring-4 focus:ring-blue-500/20",
           variants[variant],
           sizes[size],
@@ -39,7 +41,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {...props}
       >
-        {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+        {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
         {!isLoading && leftIcon}
         {children}
         {!isLoading && rightIcon}

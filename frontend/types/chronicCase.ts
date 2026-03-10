@@ -233,6 +233,7 @@ export interface ChronicCase {
   homeopathicDiagnosis?: {
     totalityOfSymptoms?: string;
     miasmaticExpression?: string;
+    differentialConsiderations?: string;
     repertorization?: Array<{
       symptom?: string;
       rubric?: string;

@@ -3,45 +3,46 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 /**
- * Builds the structured prompt for the Gemini model.
- * Keeps tokens minimal while producing reliable JSON output.
+ * Professional Scribe Prompt for Acute Consultations
  */
-const buildPrompt = ({ symptoms, modalities, generals, mentals, diagnosis, prescription, additionalNotes }) => {
-  return `You are a medical assistant and scribe for a homeopathic clinic. Your job is twofold:
-1. Format the provided consultation details into a well-structured clinical note. Convert the doctor's raw notes logically.
-2. Provide a short, helpful list of suggested questions to ask the patient, potential homeopathic remedies (Materia Medica) to consider based on symptoms+modalities+generals+mentals. DO NOT provide final diagnoses, just helpful insights for the doctor.
+const buildPrompt = ({ symptoms, modalities, generals, mentals, diagnosis, additionalNotes }) => {
+  return `You are a professional Clinical Scribe and Homeopathic Analytical Assistant. 
+Your goal is to synthesize raw consultation data into a formal medical structure.
 
-Patient Information:
-- Chief Complaint / Symptoms: ${symptoms}
-- Modalities (Better/Worse by): ${modalities || "None provided"}
-- Physical Generals (Thirst, Sleep, Thermals, Appetite): ${generals || "None provided"}
-- Mentals / Disposition: ${mentals || "None provided"}
-- Diagnosis / Assessment: ${diagnosis || "None provided"}
-- Prescription / Treatment: ${prescription || "None provided"}
-- Additional Notes: ${additionalNotes || "None"}
+### STRICT GUIDELINES:
+1. TONE: Professional, objective, and clinical. Use medical terminology.
+2. NON-PRESCRIPTIVE: NEVER tell the doctor what to do. NEVER write a "Prescription". 
+3. ROLE: You are an assistant. You suggest considerations; the doctor makes all decisions.
+4. NO FILLER: Do not say "Based on the notes..." or "I suggest...". Start directly with data.
 
-Respond ONLY with a valid JSON object in this exact structure:
+### INPUT DATA:
+- Chief Complaint: ${symptoms}
+- Modalities: ${modalities || "None provided"}
+- Physical Generals: ${generals || "None provided"}
+- Mentals/Disposition: ${mentals || "None provided"}
+- Provisional Diagnosis: ${diagnosis || "None provided"}
+- Contextual Notes: ${additionalNotes || "None"}
+
+### RESPONSE STRUCTURE (JSON):
 {
-  "chiefComplaint": "The main complaint formatted nicely.",
-  "assessment": "The diagnosis or clinical findings based ONLY on the provided notes.",
-  "advice": "The prescription and treatment plan based ONLY on what the doctor provided.",
-  "aiSuggestions": "A short, helpful string with 2-3 suggested follow-up questions or clinical considerations for the doctor to review."
+  "chiefComplaint": "A professional clinical synthesis of the symptoms, including duration and intensity if provided.",
+  "assessment": "A summary of the clinical picture. Categorize symptoms into Location, Sensation, Modality, and Accompaniment (LSMA) where possible.",
+  "advice": "Suggested clinical management, lifestyle advice, or observation points based ONLY on the doctor's notes. Do NOT suggest new medicines here.",
+  "aiSuggestions": "Clinical Considerations: List 2-3 potential homeopathic remedy profiles that share this specific symptom totality (for Materia Medica study) and 1-2 'Peculiar, Queer, Rare, and Strange' (PQRS) symptoms identified."
 }
 
-Do not include any text outside of the JSON object.`;
+Respond ONLY with valid JSON.`;
 };
 
 /**
  * Calls the Gemini API to generate structured consultation notes.
- * @param {Object} symptomData - { symptoms, duration, severity, additionalNotes }
- * @returns {Object} - { chiefComplaint, assessment, advice }
  */
 const generateConsultationNotes = async (symptomData) => {
   const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL || "gemini-flash-latest",
     generationConfig: {
       maxOutputTokens: 2048,
-      temperature: 0.1,
+      temperature: 0.1, // Low temperature for high professionalism and consistency
       responseMimeType: "application/json",
     },
   });
@@ -52,75 +53,58 @@ const generateConsultationNotes = async (symptomData) => {
 
   let parsed;
   try {
-    // Standardize response by cleaning markdown blocks if present
     const cleanedText = text.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
     parsed = JSON.parse(cleanedText);
   } catch (parseError) {
-    console.warn("AI returned malformed JSON, attempting recovery:", text);
-    
-    // Robust extraction fallback: find first '{' and last '}'
     const startIdx = text.indexOf("{");
     const endIdx = text.lastIndexOf("}");
-    
     if (startIdx !== -1 && endIdx !== -1) {
-      const extracted = text.substring(startIdx, endIdx + 1);
-      try {
-        parsed = JSON.parse(extracted);
-      } catch (innerError) {
-        console.error("Recovery failed, raw text:", text);
-        throw new SyntaxError("AI response was not valid JSON even after extraction attempt.");
-      }
+      parsed = JSON.parse(text.substring(startIdx, endIdx + 1));
     } else {
       throw new SyntaxError("AI response contained no valid JSON structure.");
     }
-  }
-
-  // Validate expected keys exist
-  if (!parsed || !parsed.chiefComplaint || !parsed.assessment || !parsed.advice) {
-    throw new Error("AI response missing required fields");
   }
 
   return parsed;
 };
 
 /**
- * Summarizes a patient's medical history based on past consultations.
+ * Professional History Summarization (Trajectory Mapping)
  */
 const summarizePatientHistory = async (consultations) => {
   if (!consultations || consultations.length === 0) {
-    return "No visit history available to summarize.";
+    return "No clinical history recorded for this patient profile.";
   }
 
   const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL || "gemini-flash-latest",
-    generationConfig: {
-      maxOutputTokens: 2048,
-      temperature: 0.1,
-    },
+    generationConfig: { maxOutputTokens: 1000, temperature: 0.1 },
   });
 
   const formattedVisits = consultations.map((v, i) => {
      let notes = null;
      try { if(v.aiGeneratedNotes) notes = JSON.parse(v.aiGeneratedNotes); } catch(e){}
-     const diag = v.diagnosis || notes?.assessment || "None recorded";
-     const rx = v.doctorEditedNotes || v.prescription || notes?.advice || "None recorded";
-     return `Visit ${i+1} (${new Date(v.consultationDate).toLocaleDateString()}): Symptoms: ${v.symptoms}. Diagnosis: ${diag}. Prescription: ${rx}`;
+     const diag = v.diagnosis || notes?.assessment || "N/A";
+     return `Visit ${i+1}: ${v.symptoms}. Assessment: ${diag}.`;
   }).join("\n");
 
-  const prompt = `You are a medical scribe summarizing a patient's clinic history.
-Here are their past visits:
+  const prompt = `You are a clinical analyst. Summarize the following patient history into a professional 'Clinical Trajectory'.
+Focus on:
+1. Recurring symptom patterns.
+2. Progression or resolution of complaints.
+3. Dominant miasmatic trends if evident.
+
+History:
 ${formattedVisits}
 
-Write a short, concise 2-3 sentence paragraph summarizing their past conditions and treatments. Ensure the summary is a complete sentence and not cut off. Do not use bullet points. Make it easy to read at a glance.`;
+Write a dense, 2-3 sentence professional summary. Avoid conversational language.`;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text().trim();
-  // Basic cleanup: remove markdown bold/italic if they clutter summary, and code blocks
-  return text.replace(/^```[a-z]*\n?/, "").replace(/\n?```$/, "").trim();
+  return result.response.text().trim().replace(/^```[a-z]*\n?/, "").replace(/\n?```$/, "").trim();
 };
 
 /**
- * Analyzes a full chronic case and extracts homeopathic observations.
+ * Expert Chronic Case Analysis (Totality & Repertorization)
  */
 const analyzeChronicCase = async (caseData) => {
   const model = genAI.getGenerativeModel({
@@ -132,27 +116,32 @@ const analyzeChronicCase = async (caseData) => {
     },
   });
 
-  const prompt = `You are an expert Homeopathic AI doctor analyzing a detailed chronic case record.
-  Your job is to identify the "Totality of Symptoms", "Miasmatic Expression", and potential "Repertorization" rubrics.
+  const prompt = `You are an expert Homeopathic Consultant Assistant. Analyze this chronic case to extract clinical insights.
 
-  Here is the raw case data (JSON format):
-  ${JSON.stringify(caseData, null, 2)}
+### GOALS:
+1. Totality: Synthesize the most striking, characteristic symptoms.
+2. Miasm: Identify the dominant miasmatic layer (Psora, Sycosis, Syphilis, Tubercular).
+3. Rubrics: Suggest classical repertory rubrics for consideration.
 
-  Respond ONLY with a valid JSON object in this exact structure:
-  {
-    "totalityOfSymptoms": "A narrative string summarizing the characteristic and striking symptoms across the whole case.",
-    "miasmaticExpression": "Psora / Sycosis / Syphilis or a combination, based on the history and symptoms, with a brief explanation.",
-    "repertorization": [
-      {
-        "symptom": "The patient's symptom",
-        "rubric": "The classical repertory rubric matching the symptom",
-        "explanation": "Why this rubric is appropriate"
-      }
-    ],
-    "suggestedRemedies": "A comma-separated list of top 3-5 homeopathic remedies to consider."
-  }
+### STRICT RULES:
+- NEVER provide a final prescription.
+- Use 'Differential Considerations' instead of 'Recommended Remedies'.
+- Focus on the 'Why' behind the analysis.
 
-  Do not include any text outside of the JSON object.`;
+Case Data (JSON):
+${JSON.stringify(caseData, null, 2)}
+
+### RESPONSE (JSON):
+{
+  "totalityOfSymptoms": "A comprehensive clinical synthesis of the case totality.",
+  "miasmaticExpression": "Analysis of the dominant miasm with clinical justification.",
+  "repertorization": [
+    { "symptom": "Original symptom", "rubric": "Suggested Repertory Rubric", "explanation": "Logic for this rubric selection" }
+  ],
+  "differentialConsiderations": "A list of 3-5 remedies whose pathogenesis matches this totality for the doctor to study."
+}
+
+Respond ONLY with valid JSON.`;
 
   const result = await model.generateContent(prompt);
   const text = result.response.text().trim();
@@ -165,10 +154,9 @@ const analyzeChronicCase = async (caseData) => {
     const startIdx = text.indexOf("{");
     const endIdx = text.lastIndexOf("}");
     if (startIdx !== -1 && endIdx !== -1) {
-      const extracted = text.substring(startIdx, endIdx + 1);
-      parsed = JSON.parse(extracted);
+      parsed = JSON.parse(text.substring(startIdx, endIdx + 1));
     } else {
-      throw new SyntaxError("AI response was not valid JSON even after extraction attempt.");
+      throw new SyntaxError("AI response contained no valid JSON structure.");
     }
   }
 

@@ -180,6 +180,7 @@ export default function OnboardingPage() {
               className="min-w-[280px]"
               isLoading={mutation.isPending}
               rightIcon={<ArrowRight className="w-5 h-5" />}
+              fullWidth
             >
               Register & Start Visit
             </Button>

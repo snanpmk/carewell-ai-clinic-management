@@ -12,7 +12,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || label.toLowerCase().replace(/\s+/g, "-");
     return (
       <div className="flex flex-col gap-2 relative">
-        <label htmlFor={inputId} className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+        <label htmlFor={inputId} className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
           {label}
         </label>
         <div className="relative group">
@@ -29,7 +29,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               leftIcon ? "pl-12" : "pl-4",
               error
                 ? "border-red-400 bg-red-50 focus:border-red-500"
-                : "border-slate-100 bg-slate-50 focus:border-blue-500 hover:border-slate-200",
+                : "border-slate-200 bg-white focus:border-blue-500 hover:border-slate-300",
               className
             )}
             {...props}

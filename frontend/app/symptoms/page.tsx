@@ -155,13 +155,14 @@ export default function SymptomsPage() {
           />
 
           <div className="pt-2 space-y-2">
-            <Button type="submit" isLoading={mutation.isPending}>
+            <Button type="submit" isLoading={mutation.isPending} fullWidth>
               ✦ Generate AI Consultation Notes
             </Button>
             <Button
               type="button"
               variant="ghost"
               onClick={() => router.push("/onboarding")}
+              fullWidth
             >
               ← Back to Registration
             </Button>

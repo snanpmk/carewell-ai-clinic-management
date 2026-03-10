@@ -9,6 +9,7 @@ export interface UnifiedVisitItem {
   date: Date;
   symptoms?: string;
   diagnosis?: string;
+  prescription?: string;
   doctorEditedNotes?: string | Record<string, unknown>;
   aiGeneratedNotes?: string | Record<string, unknown>;
   additionalNotes?: string;
@@ -123,16 +124,28 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
             }
 
             // --- Acute Case Rendering ---
-            let aiNotes = null;
-            let parsedDoctorNotes = visit.doctorEditedNotes;
-            
-            try { if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes); } catch { }
+            let aiNotes: Record<string, any> | null = null;
+            let adviceText = "";
+
             try { 
-              if (visit.doctorEditedNotes && typeof visit.doctorEditedNotes === 'string' && visit.doctorEditedNotes.startsWith('{')) {
+                if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes);
+                else if (typeof visit.aiGeneratedNotes === "object") aiNotes = visit.aiGeneratedNotes as Record<string, any>;
+            } catch { }
+
+            try { 
+              if (typeof visit.doctorEditedNotes === 'string' && visit.doctorEditedNotes.startsWith('{')) {
                 const parsed = JSON.parse(visit.doctorEditedNotes);
-                parsedDoctorNotes = parsed.advice || parsed.doctorEditedNotes || visit.doctorEditedNotes;
+                adviceText = parsed.advice || "";
+              } else if (typeof visit.doctorEditedNotes === 'object' && visit.doctorEditedNotes !== null) {
+                adviceText = (visit.doctorEditedNotes as Record<string, any>).advice || "";
+              } else if (typeof visit.doctorEditedNotes === 'string') {
+                adviceText = visit.doctorEditedNotes;
               }
             } catch { }
+
+            if (!adviceText) {
+                adviceText = aiNotes?.advice || "No advice recorded.";
+            }
 
             return (
               <div key={visit._id} className="bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 group relative overflow-hidden backdrop-blur-md">
@@ -194,8 +207,16 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                        </div>
                       <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-4">Final Prescription</p>
                       <p className="text-lg font-black text-slate-800 leading-tight mb-2 tracking-tight line-clamp-3">
-                        {parsedDoctorNotes || (aiNotes?.advice || "No advice recorded.")}
+                        {visit.prescription || "No prescription recorded."}
                       </p>
+
+                      <div className="mt-5 pt-5 border-t border-emerald-200/40">
+                         <p className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest mb-2">Physician&apos;s Plan & Advice</p>
+                         <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                           {adviceText}
+                         </p>
+                      </div>
+
                       {visit.additionalNotes && (
                         <p className="text-xs text-slate-500 font-medium italic mt-5 pt-5 border-t border-emerald-200/40">
                           <span className="text-emerald-500 not-italic font-bold mr-1">Note:</span> {visit.additionalNotes}
