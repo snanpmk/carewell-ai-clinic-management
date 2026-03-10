@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Card } from "@/components/ui/Card";
-import { Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2 } from "lucide-react";
+import { Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2, CheckCircle2 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import apiClient from "@/services/apiClient";
@@ -12,12 +12,33 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
 import { useForm } from "react-hook-form";
+import { Sparkles, Power } from "lucide-react";
+import clsx from "clsx";
 
 export default function SettingsPage() {
-  const { user } = useAuthStore();
+  const { user, updateClinic } = useAuthStore();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const isPrimary = user?.role === "primary";
+  const aiEnabled = user?.clinic?.aiEnabled ?? true;
+
+  const toggleAIMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const { data } = await apiClient.put(`/api/auth/toggle-ai`, { aiEnabled: enabled });
+      return data;
+    },
+    onSuccess: (res) => {
+      updateClinic(res.data);
+      toast.success(`AI Tools ${res.data.aiEnabled ? 'enabled' : 'disabled'} successfully.`);
+    },
+    onError: () => {
+      toast.error("Failed to update AI settings.");
+    }
+  });
+
+  const handleToggleAI = () => {
+    toggleAIMutation.mutate(!aiEnabled);
+  };
 
   const { data: teamResponse, isLoading: isLoadingTeam } = useQuery({
     queryKey: ["clinic-doctors"],
@@ -107,6 +128,57 @@ export default function SettingsPage() {
              <p className="text-lg font-black text-slate-900 tracking-tight uppercase italic">{typeof user?.clinic === 'object' ? (user.clinic.name as React.ReactNode) : 'Carewell Clinic'}</p>
           </div>
         </Card>
+
+        {/* AI Control Card - Only for Primary Doctors */}
+        {isPrimary && (
+          <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+            
+            <p className="eyebrow text-brand-primary mb-10 flex items-center gap-4">
+               <div className="w-10 h-px bg-brand-primary/30" /> Intelligence & Automation
+            </p>
+
+            <div className="flex items-center justify-between gap-6 mb-8">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic">AI Clinical Assistance</h2>
+                <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed">
+                  Toggle AI features including smart symptom analysis, clinical drafting, and automated history summarization for all practitioners.
+                </p>
+              </div>
+              <div 
+                onClick={handleToggleAI}
+                className={clsx(
+                  "w-20 h-10 rounded-full p-1 cursor-pointer transition-all duration-500 relative shrink-0",
+                  aiEnabled ? "bg-brand-primary shadow-lg shadow-brand-primary/30" : "bg-slate-200"
+                )}
+              >
+                <div className={clsx(
+                  "w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center transition-all duration-500 transform",
+                  aiEnabled ? "translate-x-10" : "translate-x-0"
+                )}>
+                  <Power className={clsx("w-4 h-4", aiEnabled ? "text-brand-primary" : "text-slate-400")} />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+              <div className={clsx(
+                "p-3 rounded-2xl",
+                aiEnabled ? "bg-brand-primary/10 text-brand-primary" : "bg-slate-200/50 text-slate-400"
+              )}>
+                <Sparkles className={clsx("w-6 h-6", aiEnabled && "animate-pulse")} />
+              </div>
+              <div>
+                <p className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                  Status: {aiEnabled ? "Active & Synthesizing" : "Disabled"}
+                </p>
+                <p className="text-xs font-medium text-slate-500">
+                  {aiEnabled ? "Practitioners can use AI insights." : "AI analysis is currently restricted."}
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Invite Card - Only for Primary Doctors */}
         {isPrimary && (

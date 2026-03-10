@@ -169,14 +169,8 @@ const ChronicCaseSchema = new mongoose.Schema(
 
     // 8. Life Space Investigation
     lifeSpaceInvestigation: {
-      traits: [String],
-      emotionalUpsets: [
-        {
-          factor: String,
-          duration: String,
-          remarks: String,
-        },
-      ],
+      traits: String,
+      emotionalUpsets: String,
       reactionPatterns: [
         {
           situation: String,

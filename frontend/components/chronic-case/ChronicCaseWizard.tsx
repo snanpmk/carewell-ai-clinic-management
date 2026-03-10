@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import { ChronicCase } from "@/types/chronicCase";
 import ChronicCaseStepper from "./ChronicCaseStepper";
+import { useAuthStore } from "@/store/useAuthStore";
 import StepPatientDemographics from "@/components/chronic-case/steps/StepPatientDemographics";
 import StepPresentingComplaints from "@/components/chronic-case/steps/StepPresentingComplaints";
 import StepLifeSpace from "@/components/chronic-case/steps/StepLifeSpace";
@@ -29,6 +29,10 @@ const steps = [
 ];
 
 export default function ChronicCaseWizard({ patientId }: { patientId?: string }) {
+  const { user } = useAuthStore();
+  const aiEnabled = user?.clinic?.aiEnabled ?? true;
+  const filteredSteps = aiEnabled ? steps : steps.filter(s => s.id !== "ai");
+
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [caseData, setCaseData] = useState<Partial<ChronicCase>>({
     patient: patientId || "",
@@ -36,7 +40,7 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
   });
 
   const nextStep = () => {
-    if (currentStepIndex < steps.length - 1) setCurrentStepIndex((prev) => prev + 1);
+    if (currentStepIndex < filteredSteps.length - 1) setCurrentStepIndex((prev) => prev + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -49,7 +53,7 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
     setCaseData((prev) => ({ ...prev, ...updates }));
   };
 
-  const ActiveStep = steps[currentStepIndex].component;
+  const ActiveStep = filteredSteps[currentStepIndex].component;
 
   return (
     <div className="flex flex-col mx-auto w-full space-y-4 animate-in fade-in duration-500 pb-8">
@@ -64,7 +68,7 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
       </div>
 
       {/* Stepper Navigation */}
-      <ChronicCaseStepper steps={steps} currentStepIndex={currentStepIndex} />
+      <ChronicCaseStepper steps={filteredSteps} currentStepIndex={currentStepIndex} />
 
       {/* Main Form Container */}
       <div className="w-full">
@@ -72,7 +76,7 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
           <div className="p-6 sm:p-8">
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentStepIndex}
+                key={filteredSteps[currentStepIndex].id}
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}

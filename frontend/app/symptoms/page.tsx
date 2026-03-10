@@ -29,6 +29,8 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+import { Sparkles, ArrowRight, ChevronLeft, Loader2 } from "lucide-react";
+
 export default function SymptomsPage() {
   const router = useRouter();
   const { patientData, patientId, setSymptomData, setAiNotes } = useClinicStore();
@@ -61,110 +63,107 @@ export default function SymptomsPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 animate-fade-in-up">
+    <div className="max-w-2xl mx-auto px-4 py-12 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both pb-24">
       {/* Stepper */}
-      <div className="mb-8">
+      <div className="mb-12">
         <Stepper currentStep={2} />
       </div>
 
       {/* AI Generating overlay */}
       {mutation.isPending && (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-blue-600 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v8H4z"
-              />
-            </svg>
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex flex-col items-center justify-center gap-6 p-8">
+          <div className="relative">
+            <div className="absolute -inset-4 bg-brand-primary/20 rounded-full blur-2xl animate-pulse" />
+            <div className="relative w-24 h-24 rounded-3xl bg-white border border-brand-primary/20 shadow-2xl flex items-center justify-center">
+              <Sparkles className="w-12 h-12 text-brand-primary animate-pulse" />
+            </div>
           </div>
-          <p className="text-gray-700 font-semibold animate-pulse-blue">
-            AI is generating consultation notes…
-          </p>
-          <p className="text-sm text-gray-400">This usually takes 1–3 seconds</p>
+          <div className="text-center">
+            <p className="text-xl font-black text-white uppercase italic tracking-tight">AI Clinical Synthesis</p>
+            <p className="text-sm text-slate-300 font-medium mt-2">Distilling symptoms into clinical drafts...</p>
+          </div>
         </div>
       )}
 
-      <Card>
-        <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Describe Your Symptoms</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Hi{patientData?.name ? `, ${patientData.name}` : ""}. Please describe how you&apos;re feeling.
-              </p>
-            </div>
-          </div>
+      <div className="flex flex-col items-center text-center mb-10">
+        <div className="p-3 bg-brand-primary/10 rounded-2xl text-brand-primary mb-4 border border-brand-primary/20">
+          <Sparkles className="w-6 h-6 animate-pulse" />
         </div>
+        <h1>Symptom Capture</h1>
+        <p className="text-slate-500 font-medium mt-2">
+          Hi{patientData?.name ? `, ${patientData.name}` : ""}. Let&apos;s map out the clinical presentation.
+        </p>
+      </div>
 
+      <Card className="p-8 sm:p-10 shadow-2xl shadow-slate-200/40 border border-slate-200">
         {mutation.error && (
-          <div className="mb-4">
+          <div className="mb-8">
             <Alert type="error" message={mutation.error.message} />
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-8">
           <Textarea
-            label="Symptoms"
-            placeholder="e.g. migraine, nausea, sensitivity to light"
+            label="Clinical Narrative"
+            placeholder="Describe the primary symptoms, modalities, and general observations..."
             required
-            rows={3}
+            rows={4}
             {...register("symptoms")}
             error={errors.symptoms?.message}
+            className="h-auto"
           />
 
-          <Input
-            label="Duration"
-            placeholder="e.g. 2 days, 1 week"
-            required
-            {...register("duration")}
-            error={errors.duration?.message}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <Input
+              label="Chronology / Duration"
+              placeholder="e.g. 3 days, since yesterday"
+              required
+              {...register("duration")}
+              error={errors.duration?.message}
+              className="h-14"
+            />
 
-          <Select
-            label="Severity Level"
-            required
-            options={[
-              { value: "mild", label: "Mild – Manageable, not affecting daily life" },
-              { value: "moderate", label: "Moderate – Noticeable, affects activities" },
-              { value: "severe", label: "Severe – Significant disruption" },
-            ]}
-            {...register("severity")}
-            error={errors.severity?.message}
-          />
+            <Select
+              label="Perceived Severity"
+              required
+              options={[
+                { value: "mild", label: "Mild" },
+                { value: "moderate", label: "Moderate" },
+                { value: "severe", label: "Severe" },
+              ]}
+              {...register("severity")}
+              error={errors.severity?.message}
+              className="h-14"
+            />
+          </div>
 
           <Textarea
-            label="Additional Notes"
-            placeholder="e.g. pain is worse in the morning, started after travel"
+            label="Extended Context (Optional)"
+            placeholder="Known triggers, family history connections, etc."
             rows={2}
             {...register("additionalNotes")}
           />
 
-          <div className="pt-2 space-y-2">
-            <Button type="submit" isLoading={mutation.isPending} fullWidth>
-              ✦ Generate AI Consultation Notes
+          <div className="flex flex-col sm:flex-row gap-4 pt-6">
+            <Button 
+              type="submit" 
+              isLoading={mutation.isPending} 
+              fullWidth
+              variant="primary"
+              className="h-16"
+              rightIcon={<ArrowRight className="w-5 h-5" />}
+            >
+              Analyze & Draft
             </Button>
             <Button
               type="button"
               variant="ghost"
               onClick={() => router.push("/onboarding")}
               fullWidth
+              leftIcon={<ChevronLeft className="w-5 h-5" />}
+              className="h-16"
             >
-              ← Back to Registration
+              Back
             </Button>
           </div>
         </form>

@@ -1,13 +1,20 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+interface Clinic {
+  _id: string;
+  name: string;
+  address?: string;
+  aiEnabled: boolean;
+}
+
 interface User {
   _id: string;
   name: string;
   email: string;
   profileImage?: string;
   role?: string;
-  clinic: string | Record<string, unknown>;
+  clinic: Clinic;
 }
 
 interface AuthState {
@@ -16,6 +23,7 @@ interface AuthState {
   isAuthenticated: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
+  updateClinic: (clinic: Clinic) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -26,6 +34,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       login: (user, token) => set({ user, token, isAuthenticated: true }),
       logout: () => set({ user: null, token: null, isAuthenticated: false }),
+      updateClinic: (clinic) => set((state) => ({
+        user: state.user ? { ...state.user, clinic } : null
+      })),
     }),
     {
       name: "auth-storage",

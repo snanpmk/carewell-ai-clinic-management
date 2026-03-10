@@ -72,13 +72,13 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                         <Sparkles className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Chronic Evaluation</h3>
-                        <p className="eyebrow text-brand-accent mt-1.5 opacity-80">
+                        <h3 className="text-xl  text-white! tracking-tight uppercase italic">Chronic Evaluation</h3>
+                        <p className="eyebrow text-brand-accent! mt-1.5 opacity-100">
                            {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                       </div>
                     </div>
-                    <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 text-brand-accent border border-white/10 shadow-inner">
+                    <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 text-brand-accent border border-white/10 shadow-inner">
                         Depth Focus
                     </span>
                   </div>
@@ -86,21 +86,21 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-8">
                       <div>
-                         <p className="eyebrow mb-4 flex items-center gap-2 text-slate-400">
+                         <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
                             <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
                          </p>
                          <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
-                           <p className="text-sm md:text-base font-medium text-slate-300 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
+                           <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
                          </div>
                       </div>
 
                       <div>
-                         <p className="eyebrow mb-4 flex items-center gap-2 text-slate-400">
+                         <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
                             <Sparkles className="w-4 h-4 text-brand-accent" /> Repertorization
                          </p>
                          <div className="p-6 bg-slate-900 rounded-3xl border border-white/5 shadow-inner">
-                           <p className="text-xs font-medium text-slate-400 leading-relaxed max-h-32 overflow-y-auto mb-4 border-b border-white/5 pb-4 custom-scrollbar">{rubric}</p>
-                           <p className="text-xs font-black text-brand-accent uppercase tracking-widest leading-snug"><span className="text-slate-500 font-black mr-2">Suggestions:</span> {remedies}</p>
+                           <p className="text-xs font-medium text-slate-300 leading-relaxed max-h-32 overflow-y-auto mb-4 border-b border-white/5 pb-4 custom-scrollbar">{rubric}</p>
+                           <p className="text-xs font-black text-brand-accent uppercase tracking-widest leading-snug"><span className="!text-slate-400 font-black mr-2">Suggestions:</span> {remedies}</p>
                          </div>
                       </div>
                     </div>
@@ -110,14 +110,14 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                          <div className="absolute top-6 right-6 text-white/5">
                            <FileText className="w-12 h-12" />
                          </div>
-                         <p className="eyebrow text-brand-primary mb-6">Management Plan</p>
+                         <p className="eyebrow !text-brand-accent mb-6">Management Plan</p>
                          <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-2 uppercase italic">
                            {docPrescription}
                          </p>
                          {c.management?.supportiveMeasures && (
                            <div className="mt-6 pt-6 border-t border-white/5">
-                             <p className="text-xs text-slate-400 font-medium leading-relaxed italic">
-                               <span className="eyebrow text-brand-accent not-italic mr-2">Advice:</span> {c.management.supportiveMeasures}
+                             <p className="text-xs text-slate-300 font-medium leading-relaxed italic">
+                               <span className="eyebrow !text-brand-accent not-italic mr-2">Advice:</span> {c.management.supportiveMeasures}
                              </p>
                            </div>
                          )}
@@ -212,22 +212,22 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                        <div className="absolute top-6 right-6 text-white/5">
                          <FileText className="w-12 h-12" />
                        </div>
-                      <p className="eyebrow text-brand-accent mb-6">Prescription</p>
+                      <p className="eyebrow !text-brand-accent mb-6">Prescription</p>
                       <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-3 uppercase italic">
                         {visit.prescription || "No prescription recorded."}
                       </p>
 
                       <div className="mt-6 pt-6 border-t border-white/5">
-                         <p className="eyebrow text-slate-500 mb-3">Advice & Follow-up</p>
-                         <p className="text-sm text-slate-400 font-medium leading-relaxed italic">
+                         <p className="eyebrow !text-slate-400 mb-3">Advice & Follow-up</p>
+                         <p className="text-sm text-slate-200 font-medium leading-relaxed italic">
                            {adviceText}
                          </p>
                       </div>
 
                       {visit.additionalNotes && (
                         <div className="mt-6 pt-6 border-t border-white/5">
-                          <p className="text-xs text-slate-500 font-medium italic">
-                            <span className="eyebrow text-slate-600 not-italic mr-2">Note:</span> {visit.additionalNotes}
+                          <p className="text-xs text-slate-300 font-medium italic">
+                            <span className="eyebrow !text-slate-400 not-italic mr-2">Note:</span> {visit.additionalNotes}
                           </p>
                         </div>
                       )}

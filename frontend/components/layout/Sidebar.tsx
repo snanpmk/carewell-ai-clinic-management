@@ -28,7 +28,6 @@ const navItems = [
   { name: "Patients", href: "/patients", icon: Users, color: "text-brand-primary" },
   { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-brand-accent" },
   { name: "Chronic Case", href: "/consultation/chronic", icon: Stethoscope, color: "text-brand-primary" },
-  { name: "AI Tools", href: "/ai-tools", icon: Sparkles, color: "text-brand-accent" },
 ];
 
 const secondaryItems = [

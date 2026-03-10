@@ -29,12 +29,8 @@ export type InitialPresentationFormData = z.infer<typeof initialPresentationSche
 
 export const mentalProfileSchema = z.object({
   lifeSpaceInvestigation: z.object({
-    traits: z.array(z.string()).optional(),
-    emotionalUpsets: z.array(z.object({
-      factor: z.string().optional(),
-      duration: z.string().optional(),
-      remarks: z.string().optional(),
-    })).optional(),
+    traits: z.string().optional(),
+    emotionalUpsets: z.string().optional(),
     cognitiveFunctions: z.string().optional(),
   }),
 });

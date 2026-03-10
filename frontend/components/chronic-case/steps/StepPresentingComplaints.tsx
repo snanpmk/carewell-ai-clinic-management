@@ -50,7 +50,8 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
               label="Patient's Narration"
               {...register("initialPresentation.patientNarration")}
               placeholder="Record the patient's exact words..."
-              className="min-h-[100px]"
+              // className="min-h-[150px]"
+              rows={5}
             />
           </div>
 

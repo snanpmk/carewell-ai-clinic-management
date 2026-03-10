@@ -7,6 +7,7 @@ import { getPatient } from "@/services/patientService";
 import { getConsultationsByPatient, summarizeHistory } from "@/services/consultationService";
 import { getPatientChronicCases } from "@/services/chronicCaseService";
 import { ChronicCase } from "@/types/chronicCase";
+import { useAuthStore } from "@/store/useAuthStore";
 
 import { PatientProfileHeader } from "@/components/patients/profile/PatientProfileHeader";
 import { PatientProfileInfoCard } from "@/components/patients/profile/PatientProfileInfoCard";
@@ -16,6 +17,8 @@ import { PatientProfileTimeline, UnifiedVisitItem } from "@/components/patients/
 export default function PatientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const patientId = unwrappedParams.id;
+  const { user } = useAuthStore();
+  const aiEnabled = user?.clinic?.aiEnabled ?? true;
   
   const { data: patientRes, isLoading: patientLoading } = useQuery({
     queryKey: ["patient", patientId],
@@ -45,7 +48,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const { data: summaryRes, isLoading: summaryLoading } = useQuery({
     queryKey: ["patient-summary", patientId],
     queryFn: () => summarizeHistory(visits),
-    enabled: visits.length > 0,
+    enabled: visits.length > 0 && aiEnabled,
   });
 
   const isLoading = patientLoading || consultLoading || chronicLoading;
@@ -93,11 +96,13 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
           {/* Left Column - Info & AI Summary */}
           <div className="xl:col-span-4 space-y-6">
             <PatientProfileInfoCard patient={patient} />
-            <PatientProfileSummaryCard 
-              visitsCount={visits.length}
-              summaryLoading={summaryLoading}
-              aiSummary={aiSummary}
-            />
+            {aiEnabled && (
+              <PatientProfileSummaryCard 
+                visitsCount={visits.length}
+                summaryLoading={summaryLoading}
+                aiSummary={aiSummary}
+              />
+            )}
           </div>
 
           {/* Right Column - Visit History */}

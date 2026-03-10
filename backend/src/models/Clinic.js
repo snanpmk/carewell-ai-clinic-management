@@ -15,6 +15,10 @@ const clinicSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    aiEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

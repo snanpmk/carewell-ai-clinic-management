@@ -331,6 +331,37 @@ const getClinicDoctors = async (req, res) => {
   }
 };
 
+// @desc    Toggle AI features for the clinic
+// @route   PUT /api/auth/toggle-ai
+// @access  Private (Primary Doctor only)
+const toggleAI = async (req, res) => {
+  try {
+    const { aiEnabled } = req.body;
+
+    if (req.user.role !== "primary") {
+      return res.status(403).json({ success: false, error: "Only primary doctors can toggle AI features." });
+    }
+
+    const clinic = await Clinic.findByIdAndUpdate(
+      req.user.clinic,
+      { aiEnabled },
+      { new: true }
+    );
+
+    if (!clinic) {
+      return res.status(404).json({ success: false, error: "Clinic not found." });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: clinic,
+    });
+  } catch (error) {
+    console.error("Toggle AI Error:", error);
+    res.status(500).json({ success: false, error: "Server Error during AI toggle" });
+  }
+};
+
 module.exports = {
   registerClinic,
   loginDoctor,
@@ -338,4 +369,5 @@ module.exports = {
   inviteDoctor,
   acceptInvite,
   getClinicDoctors,
+  toggleAI,
 };

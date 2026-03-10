@@ -20,20 +20,20 @@ export function PatientProfileSummaryCard({ visitsCount, summaryLoading, aiSumma
           <Sparkles className="w-6 h-6 text-brand-accent animate-pulse" />
         </div>
         <div>
-          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-brand-accent/80 leading-none mb-1.5">AI Insights</h3>
+          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-brand-accent! leading-none mb-1.5">AI Insights</h3>
           <p className="text-lg font-black text-white tracking-tight uppercase italic">Clinical Trajectory</p>
         </div>
       </div>
       
       <div className="relative z-10 italic">
         {visitsCount === 0 ? (
-          <p className="text-sm font-medium text-slate-400 leading-relaxed uppercase tracking-wide">
+          <p className="text-sm font-medium !text-slate-300 leading-relaxed uppercase tracking-wide">
             No visits recorded yet. Summary will generate after the first consultation.
           </p>
         ) : summaryLoading ? (
           <div className="flex items-center gap-3 bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-md">
             <Loader2 className="w-5 h-5 animate-spin text-brand-accent" /> 
-            <span className="text-sm font-black uppercase tracking-widest text-brand-accent/70">Distilling history...</span>
+            <span className="text-sm font-black uppercase tracking-widest text-brand-accent/90">Distilling history...</span>
           </div>
         ) : aiSummary ? (
           <div className="relative px-4">
@@ -44,7 +44,7 @@ export function PatientProfileSummaryCard({ visitsCount, summaryLoading, aiSumma
             <span className="absolute -bottom-10 -right-2 text-6xl text-brand-primary/20 font-serif leading-none select-none">&rdquo;</span>
           </div>
         ) : (
-          <p className="text-sm font-medium text-slate-400 uppercase tracking-wide">
+          <p className="text-sm font-medium !text-slate-300 uppercase tracking-wide">
             Unable to generate insight summary.
           </p>
         )}
