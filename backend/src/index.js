@@ -9,6 +9,8 @@ const connectDB = require("./config/db");
 const patientRoutes = require("./routes/patients");
 const consultationRoutes = require("./routes/consultations");
 const aiRoutes = require("./routes/ai");
+const authRoutes = require("./routes/auth");
+const uploadRoutes = require("./routes/upload");
 
 // Connect to MongoDB
 connectDB();
@@ -47,6 +49,8 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
+app.use("/api/auth", authRoutes);
+app.use("/api/upload", uploadRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/consultations", consultationRoutes);
 app.use("/api/ai", aiRoutes);

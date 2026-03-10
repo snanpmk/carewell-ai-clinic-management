@@ -5,14 +5,16 @@ const {
   getConsultationsByPatient,
   getAllConsultations,
 } = require("../controllers/consultationController");
+const { protect } = require("../middleware/auth");
 
 // POST /api/consultations – save a consultation record
-router.post("/", saveConsultation);
+router.post("/", protect, saveConsultation);
 
 // GET /api/consultations/all – get all recent consultations
-router.get("/all", getAllConsultations);
+router.get("/all", protect, getAllConsultations);
 
 // GET /api/consultations/:patientId – get all consultations for a patient
-router.get("/:patientId", getConsultationsByPatient);
+router.get("/:patientId", protect, getConsultationsByPatient);
 
 module.exports = router;
+

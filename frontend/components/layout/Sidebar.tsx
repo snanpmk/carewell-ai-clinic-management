@@ -13,6 +13,8 @@ import {
   ChevronRight
 } from "lucide-react";
 import { clsx } from "clsx";
+import { useAuthStore } from "@/store/useAuthStore";
+import Image from "next/image";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard, color: "text-blue-500" },
@@ -33,6 +35,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuthStore();
 
   return (
     <>
@@ -152,16 +155,22 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="absolute top-0 left-0 w-full h-full bg-linear-to-r from-blue-600/0 via-blue-600/5 to-blue-600/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           
           <div className="flex items-center gap-3 relative z-10">
-            <div className="relative shrink-0">
+            <div className="relative shrink-0 w-11 h-11">
               <div className="absolute -inset-0.5 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full opacity-75 blur-[2px]" />
               <div className="relative w-11 h-11 rounded-full bg-slate-950 flex items-center justify-center border border-white/10 overflow-hidden">
-                <span className="text-sm font-black text-white italic">SP</span>
+                {user?.profileImage ? (
+                  <Image src={user.profileImage} alt={user.name || "User"} width={44} height={44} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-sm font-black text-white italic">{user?.name ? user.name.charAt(0) : "D"}</span>
+                )}
               </div>
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full" />
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-black text-white truncate tracking-tight">Dr. Sahla P</p>
-              <p className="text-[10px] text-blue-400 font-black uppercase tracking-tighter mt-0.5">Chief Homeopath</p>
+              <p className="text-sm font-black text-white truncate tracking-tight">{user?.name || "Doctor"}</p>
+              <p className="text-[10px] text-blue-400 font-black uppercase tracking-tighter mt-0.5">
+                {user?.role === "primary" ? "Primary Doctor" : "Doctor"}
+              </p>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-white transition-colors" />
           </div>

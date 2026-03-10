@@ -1,11 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { HeartPulse, Menu } from "lucide-react";
+import { HeartPulse, Menu, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      if (!isAuthenticated && pathname !== "/auth") {
+        router.push("/auth");
+      } else if (isAuthenticated && pathname === "/auth") {
+        router.push("/");
+      }
+    }
+  }, [isAuthenticated, pathname, router, mounted]);
+
+  if (!mounted) {
+    return (
+      <div className="flex w-full h-screen items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  // If unauthenticated or accessing auth page, just render children (the auth page)
+  if (!isAuthenticated || pathname === "/auth") {
+     return <div className="flex-1 flex flex-col min-h-screen">{children}</div>;
+  }
 
   return (
     <div className="flex-1 flex flex-col min-h-screen">

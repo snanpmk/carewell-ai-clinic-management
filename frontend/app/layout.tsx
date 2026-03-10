@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/lib/QueryProvider";
 import { ClientLayout } from "@/components/layout/ClientLayout";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata: Metadata = {
   title: "Carewell Homeo Clinic – AI Consultation Notes",
@@ -18,9 +19,11 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-slate-50 flex">
         <QueryProvider>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+          </GoogleOAuthProvider>
         </QueryProvider>
       </body>
     </html>
