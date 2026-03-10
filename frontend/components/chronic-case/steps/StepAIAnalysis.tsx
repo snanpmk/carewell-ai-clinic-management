@@ -1,14 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StepProps } from "../ChronicCaseWizard";
 import { analyzeChronicCaseWithAI } from "@/services/chronicCaseService";
-import { Sparkles, Brain, FlaskConical, ListChecks, ChevronLeft, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { Sparkles, ChevronLeft, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useForm } from "react-hook-form";
 
 export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { register, handleSubmit, setValue } = useForm({
+    defaultValues: {
+      homeopathicDiagnosis: {
+        totalityOfSymptoms: caseData.homeopathicDiagnosis?.totalityOfSymptoms || "",
+        miasmaticExpression: caseData.homeopathicDiagnosis?.miasmaticExpression || "",
+        repertorization: caseData.homeopathicDiagnosis?.repertorization || [],
+      }
+    }
+  });
 
   const runAnalysis = async () => {
     setLoading(true);
@@ -16,16 +27,16 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
     try {
       const result = await analyzeChronicCaseWithAI(caseData);
       
+      setValue("homeopathicDiagnosis.totalityOfSymptoms", result.totalityOfSymptoms || "");
+      setValue("homeopathicDiagnosis.miasmaticExpression", result.miasmaticExpression || "");
+      setValue("homeopathicDiagnosis.repertorization", result.repertorization || []);
+
       updateCaseData({
         homeopathicDiagnosis: {
           ...caseData.homeopathicDiagnosis,
           totalityOfSymptoms: result.totalityOfSymptoms,
           miasmaticExpression: result.miasmaticExpression,
           repertorization: result.repertorization,
-        },
-        management: {
-          ...caseData.management,
-          treatmentPlan: "AI Suggestions: " + (Array.isArray(result.suggestedRemedies) ? result.suggestedRemedies.map((r: any) => `${r.remedyName} (${r.potency})`).join(", ") : result.suggestedRemedies)
         }
       });
     } catch (err: unknown) {
@@ -35,8 +46,8 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
     }
   };
 
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (data: any) => {
+    updateCaseData(data);
     nextStep();
   };
 
@@ -75,7 +86,7 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
         </div>
       )}
 
-      <form onSubmit={handleNext} className="space-y-6 text-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-sm">
         <div className="space-y-6">
           {/* Totality */}
           <div>
@@ -83,54 +94,22 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
               Totality of Symptoms
             </label>
             <textarea
+              {...register("homeopathicDiagnosis.totalityOfSymptoms")}
               placeholder="Waiting for AI synthesis..."
               className={`${textareaClass} min-h-[100px]`}
-              value={caseData.homeopathicDiagnosis?.totalityOfSymptoms || ""}
-              onChange={(e) =>
-                updateCaseData({ 
-                  homeopathicDiagnosis: { ...caseData.homeopathicDiagnosis, totalityOfSymptoms: e.target.value } 
-                })
-              }
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
             {/* Miasm */}
-            <div>
-              <label className={labelClass}>
-                Miasmatic Expression
-              </label>
-              <textarea
-                placeholder="Psora, Sycosis, Syphilis dominant..."
-                className={`${textareaClass} min-h-[140px]`}
-                value={caseData.homeopathicDiagnosis?.miasmaticExpression || ""}
-                onChange={(e) =>
-                  updateCaseData({ 
-                    homeopathicDiagnosis: { ...caseData.homeopathicDiagnosis, miasmaticExpression: e.target.value } 
-                  })
-                }
-              />
-            </div>
-
-            {/* Repertorial Rubrics */}
-            <div>
-              <label className={labelClass}>
-                Repertorial Analysis
-              </label>
-              <textarea
-                placeholder="Rubrics data will appear here..."
-                className={`${textareaClass} min-h-[140px] font-mono text-[13px] border-dashed shadow-none`}
-                value={caseData.homeopathicDiagnosis?.repertorization ? JSON.stringify(caseData.homeopathicDiagnosis.repertorization, null, 2) : ""}
-                onChange={(e) => {
-                  try {
-                    const arr = JSON.parse(e.target.value);
-                    updateCaseData({ 
-                      homeopathicDiagnosis: { ...caseData.homeopathicDiagnosis, repertorization: arr } 
-                    })
-                  } catch { /* ignore */ }
-                }}
-              />
-            </div>
+            <label className={labelClass}>
+              Miasmatic Expression
+            </label>
+            <textarea
+              {...register("homeopathicDiagnosis.miasmaticExpression")}
+              placeholder="Psora, Sycosis, Syphilis dominant..."
+              className={`${textareaClass} min-h-[140px]`}
+            />
           </div>
         </div>
 

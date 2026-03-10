@@ -3,10 +3,44 @@
 import { StepProps } from "../ChronicCaseWizard";
 import { Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { physicalsSchema, PhysicalsFormData } from "@/lib/validations/chronicCase";
 
 export default function StepPhysicalFeatures({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm({
+    resolver: zodResolver(physicalsSchema),
+    defaultValues: {
+      physicalFeatures: {
+        generalAppearance: {
+          build: caseData.physicalFeatures?.generalAppearance?.build || "",
+          stature: caseData.physicalFeatures?.generalAppearance?.stature || "",
+          complexion: caseData.physicalFeatures?.generalAppearance?.complexion || "",
+          health: caseData.physicalFeatures?.generalAppearance?.health || "",
+          ageAppearance: caseData.physicalFeatures?.generalAppearance?.ageAppearance || "",
+          gait: caseData.physicalFeatures?.generalAppearance?.gait || "",
+          cleanliness: caseData.physicalFeatures?.generalAppearance?.cleanliness || "",
+          swelling: caseData.physicalFeatures?.generalAppearance?.swelling || "",
+        },
+        functionalGenerals: {
+          appetite: caseData.physicalFeatures?.functionalGenerals?.appetite || "",
+          stool: caseData.physicalFeatures?.functionalGenerals?.stool || "",
+          thirst: caseData.physicalFeatures?.functionalGenerals?.thirst || "",
+          urine: caseData.physicalFeatures?.functionalGenerals?.urine || "",
+          sweat: caseData.physicalFeatures?.functionalGenerals?.sweat || "",
+          sleep: caseData.physicalFeatures?.functionalGenerals?.sleep || "",
+          dreams: caseData.physicalFeatures?.functionalGenerals?.dreams || "",
+        },
+      },
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    updateCaseData(data);
     nextStep();
   };
 
@@ -28,7 +62,7 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
         </div>
       </div>
 
-      <form onSubmit={handleNext} className="space-y-6 text-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1.5">
             <label className={labelClass}>
@@ -36,69 +70,46 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
             </label>
             <input
               type="text"
+              {...register("physicalFeatures.generalAppearance.build")}
               placeholder="Obese, Thin, Stocky..."
               className={inputClass}
-              value={caseData.physicalFeatures?.generalAppearance?.build || ""}
-              onChange={(e) =>
-                updateCaseData({ 
-                  physicalFeatures: { 
-                    ...caseData.physicalFeatures, 
-                    generalAppearance: { ...caseData.physicalFeatures?.generalAppearance, build: e.target.value } 
-                  } 
-                })
-              }
             />
           </div>
 
           <div className="space-y-1.5">
             <label className={labelClass}>
-              Thermal State
-            </label>
-            <select
-              className={`${inputClass} appearance-none`}
-              value={caseData.constitution?.thermalState || ""}
-              onChange={(e) =>
-                updateCaseData({ constitution: { ...caseData.constitution, thermalState: e.target.value } })
-              }
-            >
-              <option value="">Select Thermal...</option>
-              <option value="Hot">Hot</option>
-              <option value="Cold">Cold</option>
-              <option value="Ambithermal">Ambithermal</option>
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className={labelClass}>
-              Temperament
+              Stature
             </label>
             <input
               type="text"
-              placeholder="Choleric, Melancholic..."
+              {...register("physicalFeatures.generalAppearance.stature")}
+              placeholder="Tall, Short..."
               className={inputClass}
-              value={caseData.constitution?.temperament || ""}
-              onChange={(e) =>
-                updateCaseData({ constitution: { ...caseData.constitution, temperament: e.target.value } })
-              }
             />
           </div>
 
           <div className="space-y-1.5">
             <label className={labelClass}>
-              Side Affinity
+              Complexion
             </label>
-            <select
-              className={`${inputClass} appearance-none`}
-              value={caseData.constitution?.sideAffinity || ""}
-              onChange={(e) =>
-                updateCaseData({ constitution: { ...caseData.constitution, sideAffinity: e.target.value } })
-              }
-            >
-              <option value="">Select Side...</option>
-              <option value="Left">Left</option>
-              <option value="Right">Right</option>
-              <option value="Alternating">Alternating</option>
-            </select>
+            <input
+              type="text"
+              {...register("physicalFeatures.generalAppearance.complexion")}
+              placeholder="Fair, Dark..."
+              className={inputClass}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className={labelClass}>
+              Health
+            </label>
+            <input
+              type="text"
+              {...register("physicalFeatures.generalAppearance.health")}
+              placeholder="Good, Poor..."
+              className={inputClass}
+            />
           </div>
         </div>
 
@@ -109,32 +120,20 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
             </label>
             <span className={hintClass}>Record clinical generals: Sleep, Thirst, Sweat, Bowels, Appetite</span>
             <textarea
+              {...register("physicalFeatures.functionalGenerals.appetite")}
               placeholder="Record patterns and irregularities..."
               className={`${textareaClass} min-h-[100px]`}
-              value={caseData.physicalFeatures?.functionalGenerals?.appetite || ""}
-              onChange={(e) =>
-                updateCaseData({ 
-                  physicalFeatures: { 
-                    ...caseData.physicalFeatures, 
-                    functionalGenerals: { ...caseData.physicalFeatures?.functionalGenerals, appetite: e.target.value } 
-                  } 
-                })
-              }
             />
           </div>
 
           <div>
             <label className={labelClass}>
-              Clinical Examination
+              Sleep & Dreams
             </label>
-            <span className={hintClass}>Systemic examination findings & vitals</span>
             <textarea
-              placeholder="Observations..."
+              {...register("physicalFeatures.functionalGenerals.sleep")}
+              placeholder="Sleep patterns and significant dreams..."
               className={`${textareaClass} min-h-[100px] border-dashed shadow-none`}
-              value={caseData.physicalExamination?.systemicExamination || ""}
-              onChange={(e) =>
-                updateCaseData({ physicalExamination: { ...caseData.physicalExamination, systemicExamination: e.target.value } })
-              }
             />
           </div>
         </div>
@@ -153,6 +152,7 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
             type="submit"
             variant="primary"
             rightIcon={<ChevronRight className="w-4 h-4" />}
+            isLoading={isSubmitting}
           >
             Special History
           </Button>

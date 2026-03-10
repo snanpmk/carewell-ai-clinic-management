@@ -53,7 +53,7 @@ export default function OnboardingPage() {
     onSuccess: (res, formData) => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
       setPatient(res.data.patientId, formData);
-      router.push(`/consultation?patientId=${res.data.patientId}`);
+      router.push(`/consultation/acute?patientId=${res.data.patientId}`);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {

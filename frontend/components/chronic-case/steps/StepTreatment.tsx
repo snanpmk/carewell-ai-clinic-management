@@ -4,21 +4,41 @@ import { useState } from "react";
 import { StepProps } from "../ChronicCaseWizard";
 import { createChronicCase } from "@/services/chronicCaseService";
 import { useRouter } from "next/navigation";
-import { ClipboardList, Pill, ListChecks, ShieldCheck, ChevronLeft, Save, Loader2, AlertCircle } from "lucide-react";
+import { ClipboardList, ChevronLeft, Save, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { treatmentSchema, TreatmentFormData } from "@/lib/validations/chronicCase";
 
 export default function StepTreatment({ caseData, updateCaseData, prevStep }: StepProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(treatmentSchema),
+    defaultValues: {
+      management: {
+        treatmentPlan: caseData.management?.treatmentPlan || "",
+        firstPrescription: {
+          medicine: caseData.management?.firstPrescription?.medicine || "",
+          potency: caseData.management?.firstPrescription?.potency || "",
+          dose: caseData.management?.firstPrescription?.dose || "",
+        },
+      },
+    },
+  });
+
+  const onSave = async (data: any) => {
     setLoading(true);
     setError("");
 
     try {
-      const finalizedCase = { ...caseData, status: "Completed" as const };
+      const finalizedCase = { ...caseData, ...data, status: "Completed" as const };
       await createChronicCase(finalizedCase);
       router.push(`/patients/${caseData.patient}`);
     } catch (err: unknown) {
@@ -46,7 +66,7 @@ export default function StepTreatment({ caseData, updateCaseData, prevStep }: St
         </div>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6 text-sm">
+      <form onSubmit={handleSubmit(onSave)} className="space-y-6 text-sm">
         <div className="space-y-6">
           {/* Plan */}
           <div>
@@ -54,53 +74,34 @@ export default function StepTreatment({ caseData, updateCaseData, prevStep }: St
               Treatment Strategy
             </label>
             <textarea
+              {...register("management.treatmentPlan")}
               placeholder="Overall strategy and clinical goals..."
               className={`${textareaClass} min-h-[100px]`}
-              value={caseData.management?.treatmentPlan || ""}
-              onChange={(e) =>
-                updateCaseData({ 
-                  management: { ...caseData.management, treatmentPlan: e.target.value } 
-                })
-              }
             />
           </div>
 
           {/* Prescription Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div>
+            <div className="space-y-1">
               <label className={labelClass}>
                 First Prescription
               </label>
               <input
                 type="text"
+                {...register("management.firstPrescription.medicine")}
                 placeholder="Medicine name..."
-                required
-                className={inputClass}
-                value={caseData.management?.firstPrescription?.medicine || ""}
-                onChange={(e) =>
-                  updateCaseData({ 
-                    management: { 
-                      ...caseData.management, 
-                      firstPrescription: { ...caseData.management?.firstPrescription, medicine: e.target.value } 
-                    } 
-                  })
-                }
+                className={`${inputClass} ${errors.management?.firstPrescription?.medicine ? "border-red-500" : ""}`}
               />
+              {errors.management?.firstPrescription?.medicine && (
+                <p className="text-[10px] text-red-500 font-bold">{errors.management.firstPrescription.medicine.message}</p>
+              )}
             </div>
             
-            <div>
+            <div className="space-y-1">
               <label className={labelClass}>Potency</label>
               <select
-                className={`${inputClass} appearance-none`}
-                value={caseData.management?.firstPrescription?.potency || ""}
-                onChange={(e) =>
-                  updateCaseData({ 
-                    management: { 
-                      ...caseData.management, 
-                      firstPrescription: { ...caseData.management?.firstPrescription, potency: e.target.value } 
-                    } 
-                  })
-                }
+                {...register("management.firstPrescription.potency")}
+                className={`${inputClass} appearance-none ${errors.management?.firstPrescription?.potency ? "border-red-500" : ""}`}
               >
                 <option value="">Select Potency...</option>
                 <option value="30 CH">30 CH</option>
@@ -110,43 +111,23 @@ export default function StepTreatment({ caseData, updateCaseData, prevStep }: St
                 <option value="0/1">0/1 (LM)</option>
                 <option value="Q">Mother Tincture (Q)</option>
               </select>
+              {errors.management?.firstPrescription?.potency && (
+                <p className="text-[10px] text-red-500 font-bold">{errors.management.firstPrescription.potency.message}</p>
+              )}
             </div>
 
-            <div>
+            <div className="space-y-1">
               <label className={labelClass}>Dose</label>
               <input
                 type="text"
+                {...register("management.firstPrescription.dose")}
                 placeholder="e.g. 4 pills TDS..."
-                className={inputClass}
-                value={caseData.management?.firstPrescription?.dose || ""}
-                onChange={(e) =>
-                  updateCaseData({ 
-                    management: { 
-                      ...caseData.management, 
-                      firstPrescription: { ...caseData.management?.firstPrescription, dose: e.target.value } 
-                    } 
-                  })
-                }
+                className={`${inputClass} ${errors.management?.firstPrescription?.dose ? "border-red-500" : ""}`}
               />
+              {errors.management?.firstPrescription?.dose && (
+                <p className="text-[10px] text-red-500 font-bold">{errors.management.firstPrescription.dose.message}</p>
+              )}
             </div>
-          </div>
-
-          {/* Advice */}
-          <div>
-            <label className={labelClass}>
-              Restrictions & Supportive Advice
-            </label>
-            <span className={hintClass}>Diet, lifestyle, and medicinal restrictions...</span>
-            <textarea
-              placeholder="Record advice..."
-              className={`${textareaClass} min-h-[100px] border-dashed shadow-none`}
-              value={caseData.management?.supportiveMeasures || ""}
-              onChange={(e) =>
-                updateCaseData({ 
-                  management: { ...caseData.management, supportiveMeasures: e.target.value } 
-                })
-              }
-            />
           </div>
         </div>
 

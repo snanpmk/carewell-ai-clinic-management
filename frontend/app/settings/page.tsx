@@ -11,6 +11,14 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const inviteSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
 export default function SettingsPage() {
   const { user } = useAuthStore();
   const [email, setEmail] = useState("");
@@ -29,6 +37,15 @@ export default function SettingsPage() {
 
   const team = teamResponse?.data || [];
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: { email: "" },
+  });
+
   const inviteMutation = useMutation({
     mutationFn: async (inviteEmail: string) => {
       const { data } = await apiClient.post(`/api/auth/invite`, { email: inviteEmail });
@@ -36,19 +53,16 @@ export default function SettingsPage() {
     },
     onSuccess: () => {
       setMessage({ type: "success", text: "Invitation sent successfully!" });
-      setEmail("");
+      reset();
     },
     onError: (err: any) => {
       setMessage({ type: "error", text: err?.response?.data?.error || "Failed to send invite." });
     }
   });
 
-  const handleInvite = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
+  const onSubmit = (data: { email: string }) => {
     setMessage(null);
-    inviteMutation.mutate(email);
+    inviteMutation.mutate(data.email);
   };
 
   return (
@@ -112,16 +126,17 @@ export default function SettingsPage() {
               As the primary doctor, you can invite associate doctors to join this clinic. They will receive an email linking them to this clinic's workspace.
             </p>
 
-            <form onSubmit={handleInvite} className="space-y-6">
-              <Input
-                label="Doctor's Email Address"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="doctor@example.com"
-                leftIcon={<Mail className="w-4 h-4" />}
-              />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-1">
+                <Input
+                  label="Doctor's Email Address"
+                  type="email"
+                  {...register("email")}
+                  placeholder="doctor@example.com"
+                  leftIcon={<Mail className="w-4 h-4" />}
+                  error={errors.email?.message}
+                />
+              </div>
 
               {message && (
                 <div className={`p-4 rounded-xl text-sm font-bold flex items-center gap-3 ${
@@ -136,7 +151,6 @@ export default function SettingsPage() {
                 variant="secondary"
                 size="lg"
                 isLoading={inviteMutation.isPending}
-                disabled={!email}
                 rightIcon={<ArrowRight className="w-5 h-5" />}
               >
                 Send Email Invitation

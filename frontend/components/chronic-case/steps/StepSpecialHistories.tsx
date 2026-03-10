@@ -3,10 +3,27 @@
 import { StepProps } from "../ChronicCaseWizard";
 import { History, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { specialHistorySchema, SpecialHistoryFormData } from "@/lib/validations/chronicCase";
 
 export default function StepSpecialHistories({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm({
+    resolver: zodResolver(specialHistorySchema),
+    defaultValues: {
+      previousIllnessHistory: caseData.previousIllnessHistory || [],
+      familyHistory: {
+        notes: caseData.familyHistory?.notes || "",
+      },
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    updateCaseData(data);
     nextStep();
   };
 
@@ -27,54 +44,32 @@ export default function StepSpecialHistories({ caseData, updateCaseData, nextSte
         </div>
       </div>
 
-      <form onSubmit={handleNext} className="space-y-6 text-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-sm">
         <div className="space-y-6">
           {/* Previous Illness */}
           <div>
             <label className={labelClass}>
               Past Clinical History
             </label>
-            <span className={hintClass}>List major past illnesses, surgery, or prolonged treatments</span>
+            <span className={hintClass}>Identified past illnesses, surgery, or prolonged treatments</span>
             <textarea
+              {...register("familyHistory.notes")}
               placeholder="Record any significant medical history..."
               className={`${textareaClass} min-h-[100px]`}
-              value={caseData.historyOfPresentIllness?.previousTreatments || ""}
-              onChange={(e) =>
-                updateCaseData({ historyOfPresentIllness: { ...caseData.historyOfPresentIllness, previousTreatments: e.target.value } })
-              }
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Family History */}
-            <div>
+            <div className="md:col-span-2">
               <label className={labelClass}>
-                Family Background
+                Family Background & Hereditary Patterns
               </label>
               <span className={hintClass}>Examples: Father, Mother, Siblings - Diabetes, Hypertension, etc.</span>
               <textarea
+                {...register("familyHistory.notes")}
                 placeholder="Identify hereditary disease patterns..."
                 className={`${textareaClass} min-h-[120px]`}
-                value={caseData.familyHistory?.notes || ""}
-                onChange={(e) =>
-                  updateCaseData({ familyHistory: { ...caseData.familyHistory, notes: e.target.value } })
-                }
-              />
-            </div>
-
-            {/* Menstrual History */}
-            <div>
-              <label className={labelClass}>
-                Biological Cycles
-              </label>
-              <span className={hintClass}>If applicable: LMP, Cycle details, pregnancies, etc.</span>
-              <textarea
-                placeholder="Record menstrual or obstetrical history..."
-                className={`${textareaClass} min-h-[120px] border-dashed shadow-none`}
-                value={caseData.menstrualHistory?.lmp || ""}
-                onChange={(e) =>
-                  updateCaseData({ menstrualHistory: { ...caseData.menstrualHistory, lmp: e.target.value } })
-                }
               />
             </div>
           </div>
@@ -94,6 +89,7 @@ export default function StepSpecialHistories({ caseData, updateCaseData, nextSte
             type="submit"
             variant="primary"
             rightIcon={<ChevronRight className="w-4 h-4" />}
+            isLoading={isSubmitting}
           >
             Review AI Analysis
           </Button>

@@ -3,10 +3,31 @@
 import { StepProps } from "../ChronicCaseWizard";
 import { History, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { initialPresentationSchema, InitialPresentationFormData } from "@/lib/validations/chronicCase";
 
 export default function StepPresentingComplaints({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm({
+    resolver: zodResolver(initialPresentationSchema),
+    defaultValues: {
+      initialPresentation: {
+        patientNarration: caseData.initialPresentation?.patientNarration || "",
+        physicianObservation: caseData.initialPresentation?.physicianObservation || "",
+        physicianInterpretation: caseData.initialPresentation?.physicianInterpretation || "",
+      },
+      historyOfPresentIllness: {
+        progression: caseData.historyOfPresentIllness?.progression || "",
+      },
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    updateCaseData(data);
     nextStep();
   };
 
@@ -26,7 +47,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
         </div>
       </div>
 
-      <form onSubmit={handleNext} className="space-y-6 text-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-sm">
         <div className="space-y-8 text-sm">
           {/* Patient Narration */}
           <div>
@@ -37,12 +58,9 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
               <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-100/50 px-2.5 py-1 rounded-lg shadow-xs">Ipsisima Verba</span>
             </div>
             <textarea
+              {...register("initialPresentation.patientNarration")}
               placeholder="Record the patient's exact words..."
               className={`${textareaClass} min-h-[120px]`}
-              value={caseData.initialPresentation?.patientNarration || ""}
-              onChange={(e) =>
-                updateCaseData({ initialPresentation: { ...caseData.initialPresentation, patientNarration: e.target.value } })
-              }
             />
           </div>
 
@@ -53,12 +71,9 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
                 Objective Observation
               </label>
               <textarea
+                {...register("initialPresentation.physicianObservation")}
                 placeholder="Facial expression, gait, posture, eye contact..."
                 className={`${textareaClass} min-h-[140px]`}
-                value={caseData.initialPresentation?.physicianObservation || ""}
-                onChange={(e) =>
-                  updateCaseData({ initialPresentation: { ...caseData.initialPresentation, physicianObservation: e.target.value } })
-                }
               />
             </div>
 
@@ -68,12 +83,9 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
                 LSMA Framework
               </label>
               <textarea
+                {...register("historyOfPresentIllness.progression")}
                 placeholder="Location, Sensation, Modalities, Accompaniments..."
                 className={`${textareaClass} min-h-[140px] border-dashed shadow-none`}
-                value={caseData.historyOfPresentIllness?.progression || ""}
-                onChange={(e) =>
-                  updateCaseData({ historyOfPresentIllness: { ...caseData.historyOfPresentIllness, progression: e.target.value } })
-                }
               />
             </div>
           </div>
@@ -93,6 +105,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
             type="submit"
             variant="primary"
             rightIcon={<ChevronRight className="w-4 h-4" />}
+            isLoading={isSubmitting}
           >
             Continue
           </Button>

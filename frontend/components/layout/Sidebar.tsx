@@ -23,7 +23,7 @@ const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard, color: "text-blue-500" },
   { name: "Appointments", href: "/appointments", icon: Calendar, color: "text-purple-500" },
   { name: "Patients", href: "/patients", icon: Users, color: "text-emerald-500" },
-  { name: "Acute Consultation", href: "/consultation", icon: FilePlus, color: "text-orange-500" },
+  { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-orange-500" },
   { name: "Chronic Case", href: "/consultation/chronic", icon: Stethoscope, color: "text-rose-500" },
   { name: "AI Tools", href: "/ai-tools", icon: Sparkles, color: "text-indigo-500" },
 ];
@@ -95,9 +95,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <nav className="space-y-1.5">
             {navItems.map((item) => {
               // Exact match for acute consultation, broad match for others to prevent "Chronic" highlighting "Acute"
-              const isActive = item.href === "/consultation" 
-                ? pathname === "/consultation" 
-                : pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
+              const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
                 
               return (
                 <Link

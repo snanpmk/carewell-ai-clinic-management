@@ -12,7 +12,7 @@ export default function AIToolsPage() {
       color: "text-blue-600",
       bg: "bg-blue-50",
       border: "border-blue-100",
-      link: "/consultation"
+      link: "/consultation/acute"
     },
     {
       title: "Patient History Summarizer",

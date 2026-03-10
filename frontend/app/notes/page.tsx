@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 
 import { saveConsultation, ConsultationNotes } from "@/services/consultationService";
 import { useClinicStore } from "@/store/useClinicStore";
@@ -15,13 +16,19 @@ import { Stepper } from "@/components/ui/Stepper";
 
 export default function NotesPage() {
   const router = useRouter();
-  const { patientId, symptomData, aiNotes, reset } = useClinicStore();
+  const { patientId, symptomData, aiNotes, reset: resetClinicStore } = useClinicStore();
 
-  // Doctor-editable state, pre-filled with AI output
-  const [editedNotes, setEditedNotes] = useState<ConsultationNotes>({
-    chiefComplaint: "",
-    assessment: "",
-    advice: "",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<ConsultationNotes>({
+    defaultValues: {
+      chiefComplaint: "",
+      assessment: "",
+      advice: "",
+    },
   });
 
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
@@ -32,10 +39,9 @@ export default function NotesPage() {
   // Pre-fill editable notes with AI output when they become available
   useEffect(() => {
     if (aiNotes) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setEditedNotes({ ...aiNotes });
+      reset(aiNotes);
     }
-  }, [aiNotes]);
+  }, [aiNotes, reset]);
 
   // Handle redirection
   useEffect(() => {
@@ -45,7 +51,7 @@ export default function NotesPage() {
   }, [patientId, aiNotes, router]);
 
   const mutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (data: ConsultationNotes) =>
       saveConsultation({
         patientId: patientId!,
         symptoms: symptomData!.symptoms,
@@ -53,7 +59,7 @@ export default function NotesPage() {
         prescription: symptomData!.prescription,
         additionalNotes: symptomData!.additionalNotes,
         aiGeneratedNotes: aiNotes!,
-        doctorEditedNotes: editedNotes,
+        doctorEditedNotes: data,
       }),
     onSuccess: () => {
       setSaveStatus("success");
@@ -64,14 +70,14 @@ export default function NotesPage() {
     },
   });
 
-  const handleSave = () => {
+  const onSubmit = (data: ConsultationNotes) => {
     setApiError(null);
     setSaveStatus("idle");
-    mutation.mutate();
+    mutation.mutate(data);
   };
 
   const handleStartNew = () => {
-    reset();
+    resetClinicStore();
     router.push("/onboarding");
   };
 
@@ -108,7 +114,7 @@ export default function NotesPage() {
           <p className="text-sm text-gray-500 mb-6">
             The consultation record has been saved to the patient&apos;s profile.
           </p>
-          <Button onClick={handleStartNew} fullWidth>
+          <Button onClick={handleStartNew} className="w-full">
             Start New Consultation
           </Button>
         </Card>
@@ -137,7 +143,7 @@ export default function NotesPage() {
               )}
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
@@ -146,15 +152,9 @@ export default function NotesPage() {
                   </span>
                 </div>
                 <Textarea
+                  {...register("chiefComplaint")}
                   label=""
                   rows={2}
-                  value={editedNotes.chiefComplaint}
-                  onChange={(e) =>
-                    setEditedNotes((n) => ({
-                      ...n,
-                      chiefComplaint: e.target.value,
-                    }))
-                  }
                 />
               </div>
 
@@ -166,15 +166,9 @@ export default function NotesPage() {
                   </span>
                 </div>
                 <Textarea
+                  {...register("assessment")}
                   label=""
                   rows={2}
-                  value={editedNotes.assessment}
-                  onChange={(e) =>
-                    setEditedNotes((n) => ({
-                      ...n,
-                      assessment: e.target.value,
-                    }))
-                  }
                 />
               </div>
 
@@ -186,38 +180,32 @@ export default function NotesPage() {
                   </span>
                 </div>
                 <Textarea
+                  {...register("advice")}
                   label=""
                   rows={2}
-                  value={editedNotes.advice}
-                  onChange={(e) =>
-                    setEditedNotes((n) => ({
-                      ...n,
-                      advice: e.target.value,
-                    }))
-                  }
                 />
               </div>
-            </div>
+
+              {apiError && <Alert type="error" message={apiError} />}
+
+              <div className="space-y-2 pt-4">
+                <Button
+                  type="submit"
+                  isLoading={mutation.isPending}
+                  className="w-full"
+                >
+                  Save Consultation Record
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push("/symptoms")}
+                  className="w-full"
+                >
+                  ← Back to Symptoms
+                </Button>
+              </div>
+            </form>
           </Card>
-
-          {apiError && <Alert type="error" message={apiError} />}
-
-          <div className="space-y-2">
-            <Button
-              onClick={handleSave}
-              loading={mutation.isPending}
-              fullWidth
-            >
-              Save Consultation Record
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/symptoms")}
-              fullWidth
-            >
-              ← Back to Symptoms
-            </Button>
-          </div>
         </div>
       )}
     </div>

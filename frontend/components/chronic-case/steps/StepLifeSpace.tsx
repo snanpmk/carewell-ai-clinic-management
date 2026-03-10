@@ -3,10 +3,28 @@
 import { StepProps } from "../ChronicCaseWizard";
 import { Brain, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { mentalProfileSchema, MentalProfileFormData } from "@/lib/validations/chronicCase";
 
 export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm({
+    resolver: zodResolver(mentalProfileSchema),
+    defaultValues: {
+      lifeSpaceInvestigation: {
+        traits: caseData.lifeSpaceInvestigation?.traits || [],
+        emotionalUpsets: caseData.lifeSpaceInvestigation?.emotionalUpsets || [],
+        cognitiveFunctions: caseData.lifeSpaceInvestigation?.cognitiveFunctions || "",
+      },
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    updateCaseData(data);
     nextStep();
   };
 
@@ -27,7 +45,7 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
         </div>
       </div>
 
-      <form onSubmit={handleNext} className="space-y-6 text-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 text-sm">
         <div className="space-y-6">
           {/* Traits */}
           <div>
@@ -36,45 +54,23 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
             </label>
             <span className={hintClass}>Examples: Fastidious, timid, jealous, cheerful, optimistic.</span>
             <textarea
+              {...register("lifeSpaceInvestigation.cognitiveFunctions")}
               placeholder="Describe the patient's dominant mental traits..."
               className={`${textareaClass} min-h-[100px]`}
-              value={caseData.lifeSpaceInvestigation?.cognitiveFunctions || ""}
-              onChange={(e) =>
-                updateCaseData({ lifeSpaceInvestigation: { ...caseData.lifeSpaceInvestigation, cognitiveFunctions: e.target.value } })
-              }
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Emotional Upsets */}
-            <div>
+            <div className="md:col-span-2">
               <label className={labelClass}>
-                Emotional Reactions
-              </label>
-              <span className={hintClass}>Examples: Grief, anger, fright, shock, disappointment.</span>
-              <textarea
-                placeholder="How does the patient react to emotional triggers?"
-                className={`${textareaClass} min-h-[120px]`}
-                value={caseData.personalHistory?.domesticRelations || ""}
-                onChange={(e) =>
-                  updateCaseData({ personalHistory: { ...caseData.personalHistory, domesticRelations: e.target.value } })
-                }
-              />
-            </div>
-
-            {/* Reaction Patterns */}
-            <div>
-              <label className={labelClass}>
-                Environmental Sensitivities
+                Social and environmental reaction patterns
               </label>
               <span className={hintClass}>Examples: Company, solitude, music, reprimands, consolation.</span>
               <textarea
+                {...register("lifeSpaceInvestigation.cognitiveFunctions")}
                 placeholder="Social and environmental reaction patterns..."
-                className={`${textareaClass} min-h-[120px] border-dashed shadow-none`}
-                value={caseData.personalHistory?.sexualRelations || ""}
-                onChange={(e) =>
-                  updateCaseData({ personalHistory: { ...caseData.personalHistory, sexualRelations: e.target.value } })
-                }
+                className={`${textareaClass} min-h-[120px]`}
               />
             </div>
           </div>
@@ -94,6 +90,7 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
             type="submit"
             variant="primary"
             rightIcon={<ChevronRight className="w-4 h-4" />}
+            isLoading={isSubmitting}
           >
             Physical Analysis
           </Button>

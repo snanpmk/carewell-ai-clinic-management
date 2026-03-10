@@ -29,7 +29,7 @@ export function PatientProfileHeader({ patientId }: PatientProfileHeaderProps) {
       
       <div className="flex w-full sm:w-auto mt-2 sm:mt-0">
         <Button
-          onClick={() => router.push(`/consultation?patientId=${patientId}`)}
+          onClick={() => router.push(`/consultation/acute?patientId=${patientId}`)}
           variant="primary"
           className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-500/20 capitalize text-sm font-semibold text-white transition-colors"
           leftIcon={<Plus className="w-4 h-4 shrink-0" />}
