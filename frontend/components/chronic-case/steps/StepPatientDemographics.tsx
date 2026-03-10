@@ -33,9 +33,9 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
           patient: patient._id,
           demographics: {
             ...caseData.demographics,
-            name: caseData.demographics?.name || patient.name,
-            age: caseData.demographics?.age || patient.age,
-            sex: caseData.demographics?.sex || patient.sex || "",
+            name: patient.name,
+            age: patient.age,
+            sex: patient.sex || "",
           }
         });
       }
@@ -96,20 +96,6 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
-          {/* OP Number */}
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500">
-              OP Number
-            </label>
-            <input
-              type="text"
-              className="w-full bg-slate-50/50 border border-slate-200/80 text-slate-900 rounded-xl px-4 py-2.5 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium placeholder:text-slate-400 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)]"
-              placeholder="OP-2024-001"
-              value={caseData.header?.opNumber || ""}
-              onChange={(e) => updateCaseData({ header: { ...caseData.header, opNumber: e.target.value } })}
-            />
-          </div>
-
           {/* Full Name */}
           <div className="space-y-2 md:col-span-2">
             <label className="text-xs font-black uppercase tracking-widest text-slate-500">
