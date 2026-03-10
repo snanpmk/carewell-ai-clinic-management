@@ -4,6 +4,7 @@ import { useState } from "react";
 import { StepProps } from "../ChronicCaseWizard";
 import { analyzeChronicCaseWithAI } from "@/services/chronicCaseService";
 import { Sparkles, Brain, FlaskConical, ListChecks, ChevronLeft, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
   const [loading, setLoading] = useState(false);
@@ -39,41 +40,38 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
     nextStep();
   };
 
-  const labelClass = "block font-medium text-slate-700 mb-1.5";
-  const textareaClass = "w-full bg-white border border-slate-200 text-slate-900 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400 resize-none text-sm";
+  const labelClass = "text-xs font-black uppercase tracking-widest text-slate-500 mb-2 flex items-center";
+  const textareaClass = "w-full bg-slate-50/50 border border-slate-200/80 text-slate-900 rounded-xl p-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all placeholder:text-slate-400 resize-none font-medium shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)]";
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-100/80">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 shadow-sm">
+          <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-purple-600 border border-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-medium text-slate-900">Miasmatic Analysis</h2>
-            <p className="text-sm text-slate-500 mt-0.5">Totality & Miasmatic Expression</p>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Miasmatic Analysis</h2>
+            <p className="text-sm font-medium text-slate-500 mt-0.5">AI Totality & Expression</p>
           </div>
         </div>
         
-        <button
+        <Button
           type="button"
           onClick={runAnalysis}
           disabled={loading}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
+          variant="primary"
+          className="shadow-md shadow-indigo-500/20 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 border-none px-6"
+          leftIcon={loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
         >
-          {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Sparkles className="w-4 h-4" />
-          )}
           {loading ? "Analyzing..." : "Generate Analysis"}
-        </button>
+        </Button>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm font-medium">
-          <AlertCircle className="w-4 h-4" /> {error}
+        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-bold shadow-xs">
+          <AlertCircle className="w-5 h-5 shrink-0" /> {error}
         </div>
       )}
 
@@ -137,22 +135,22 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center pt-6 border-t border-slate-100">
-          <button
+        <div className="flex justify-between items-center pt-8 border-t border-slate-100/80">
+          <Button
             type="button"
             onClick={prevStep}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 rounded-md transition-colors"
+            variant="outline"
+            leftIcon={<ChevronLeft className="w-4 h-4" />}
           >
-            <ChevronLeft className="w-4 h-4" />
             Back
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-md text-sm font-medium transition-colors active:scale-[0.98]"
+            variant="primary"
+            rightIcon={<ChevronRight className="w-4 h-4" />}
           >
             Final Management
-            <ChevronRight className="w-4 h-4 text-slate-400" />
-          </button>
+          </Button>
         </div>
       </form>
     </div>

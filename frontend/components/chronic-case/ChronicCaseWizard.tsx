@@ -53,15 +53,16 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
   return (
     <div className="flex flex-col h-full mx-auto w-full space-y-6 animate-in fade-in duration-500 pb-12">
       {/* Header Section */}
-      <div className="flex items-center justify-between px-2">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
-            Chronic Case Builder
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Comprehensive constitutional analysis
-          </p>
-        </div>
+      <div className="flex flex-col gap-1 px-2">
+        <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+          <div className="p-2.5 bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100/50 shadow-xs shadow-blue-100">
+            <Sparkles className="w-5 h-5 text-blue-600" />
+          </div>
+          Chronic Case Builder
+        </h1>
+        <p className="text-sm text-slate-500 font-medium">
+          Comprehensive constitutional analysis and repertorization
+        </p>
       </div>
 
       {/* Stepper Navigation */}
@@ -69,9 +70,9 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
 
       {/* Main Form Container */}
       <div className="flex-1 min-h-[500px]">
-        <div className="h-full bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+        <div className="h-full bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden flex flex-col relative">
           {/* Animated Transition for Steps */}
-          <div className="flex-1 p-6 sm:p-8 overflow-y-auto">
+          <div className="flex-1 p-6 sm:p-10 overflow-y-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStepIndex}

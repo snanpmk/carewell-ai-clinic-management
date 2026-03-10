@@ -27,18 +27,18 @@ export default function ChronicCaseStepper({ steps, currentStepIndex }: ChronicC
                 {/* Step Item */}
                 <div 
                   className={clsx(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-300",
-                    isActive ? "bg-slate-900 text-white shadow-sm" : 
-                    isCompleted ? "bg-transparent text-slate-700 hover:bg-slate-50" : 
+                    "flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-300",
+                    isActive ? "bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30" : 
+                    isCompleted ? "bg-white border border-slate-200 text-slate-700 shadow-xs hover:bg-slate-50" : 
                     "bg-transparent text-slate-400"
                   )}
                 >
                   {/* Icon/Number indicator */}
                   <div className={clsx(
-                    "flex items-center justify-center w-5 h-5 rounded shrink-0 text-[11px] font-medium transition-colors duration-300",
-                    isActive ? "bg-white/20 text-white" : 
-                    isCompleted ? "bg-slate-100 text-slate-700" : 
-                    "border border-slate-200 text-slate-400"
+                    "flex items-center justify-center w-6 h-6 rounded-lg shrink-0 text-xs font-black transition-colors duration-300",
+                    isActive ? "bg-white/20 text-white shadow-xs" : 
+                    isCompleted ? "bg-blue-50 text-blue-600 border border-blue-100" : 
+                    "border border-slate-200 text-slate-300"
                   )}>
                     {isCompleted ? <Check className="w-3 h-3" /> : index + 1}
                   </div>
@@ -51,11 +51,11 @@ export default function ChronicCaseStepper({ steps, currentStepIndex }: ChronicC
 
                 {/* Connector Line */}
                 {!isLast && (
-                  <div className="w-6 sm:w-8 md:w-12 h-px mx-1 sm:mx-2 shrink-0 transition-colors duration-300 bg-slate-200">
+                  <div className="w-6 sm:w-8 md:w-12 h-1 mx-1 sm:mx-2 shrink-0 transition-colors duration-300 bg-slate-100 rounded-full overflow-hidden">
                     <div 
                       className={clsx(
-                        "h-full transition-all duration-500",
-                        isCompleted ? "bg-slate-900 w-full" : "bg-transparent w-0"
+                        "h-full transition-all duration-500 rounded-full",
+                        isCompleted ? "bg-linear-to-r from-blue-500 to-indigo-500 w-full" : "bg-transparent w-0"
                       )}
                     />
                   </div>

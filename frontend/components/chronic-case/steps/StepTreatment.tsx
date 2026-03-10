@@ -5,6 +5,7 @@ import { StepProps } from "../ChronicCaseWizard";
 import { createChronicCase } from "@/services/chronicCaseService";
 import { useRouter } from "next/navigation";
 import { ClipboardList, Pill, ListChecks, ShieldCheck, ChevronLeft, Save, Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 export default function StepTreatment({ caseData, updateCaseData, prevStep }: StepProps) {
   const [loading, setLoading] = useState(false);
@@ -27,21 +28,21 @@ export default function StepTreatment({ caseData, updateCaseData, prevStep }: St
     }
   };
 
-  const labelClass = "block font-medium text-slate-700 mb-1.5";
-  const inputClass = "w-full bg-white border border-slate-200 text-slate-900 rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400";
-  const textareaClass = "w-full bg-white border border-slate-200 text-slate-900 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400 resize-none text-sm";
-  const hintClass = "text-xs text-slate-500 mb-2 block";
+  const labelClass = "text-xs font-black uppercase tracking-widest text-slate-500 mb-2 flex items-center";
+  const inputClass = "w-full bg-slate-50/50 border border-slate-200/80 text-slate-900 rounded-xl px-4 py-2.5 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium placeholder:text-slate-400 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)]";
+  const textareaClass = "w-full bg-slate-50/50 border border-slate-200/80 text-slate-900 rounded-xl p-4 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all placeholder:text-slate-400 resize-none font-medium shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)]";
+  const hintClass = "text-[11px] font-bold text-slate-400 mb-3 block italic leading-relaxed";
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Section Header */}
-      <div className="flex items-center gap-4 pb-4 border-b border-slate-100">
-        <div className="w-10 h-10 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 shadow-sm">
+      <div className="flex items-center gap-4 pb-6 border-b border-slate-100/80">
+        <div className="w-12 h-12 bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100/50 rounded-2xl flex items-center justify-center text-blue-600 shadow-xs shadow-blue-100">
           <ClipboardList className="w-5 h-5" />
         </div>
         <div>
-          <h2 className="text-lg font-medium text-slate-900">Management & Prescription</h2>
-          <p className="text-sm text-slate-500 mt-0.5">Treatment & Remedial Plan</p>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Management & Prescription</h2>
+          <p className="text-sm font-medium text-slate-500 mt-0.5">Treatment & Remedial Plan</p>
         </div>
       </div>
 
@@ -150,33 +151,30 @@ export default function StepTreatment({ caseData, updateCaseData, prevStep }: St
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm font-medium">
-            <AlertCircle className="w-4 h-4" /> {error}
+          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-bold shadow-xs">
+            <AlertCircle className="w-5 h-5 shrink-0" /> {error}
           </div>
         )}
 
         {/* Navigation */}
-        <div className="flex justify-between items-center pt-6 border-t border-slate-100">
-          <button
+        <div className="flex justify-between items-center pt-8 border-t border-slate-100/80">
+          <Button
             type="button"
             onClick={prevStep}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 rounded-md transition-colors"
+            variant="outline"
+            leftIcon={<ChevronLeft className="w-4 h-4" />}
           >
-            <ChevronLeft className="w-4 h-4" />
             Back
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
+            variant="primary"
+            className="shadow-md shadow-blue-500/20"
+            leftIcon={loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           >
-            {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
             {loading ? "Finalizing..." : "Complete Case"}
-          </button>
+          </Button>
         </div>
       </form>
     </div>
