@@ -1,9 +1,10 @@
 "use client";
 
 import { StepProps } from "../ChronicCaseWizard";
-import { User } from "lucide-react";
+import { User, Loader2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { getAllPatients } from "@/services/patientService";
+import { getPatientChronicCases } from "@/services/chronicCaseService";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { useUIStore } from "@/store/useUIStore";
 import StepLayout from "../StepLayout";
+import { toast } from "sonner";
 
 interface Patient {
   _id: string;
@@ -33,6 +35,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     register,
     handleSubmit,
     setValue,
+    reset,
     control,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -55,10 +58,78 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     name: "patient" as const,
   });
 
+  // Fetch existing chronic cases for the selected patient
+  const { data: existingCases, isFetching: isLoadingExisting } = useQuery({
+    queryKey: ["chronicCases", selectedPatientId],
+    queryFn: () => getPatientChronicCases(selectedPatientId as string),
+    enabled: !!selectedPatientId && selectedPatientId !== caseData.patient, 
+  });
+
   const memoPatients = useMemo(() => allPatientsRes?.data || [], [allPatientsRes?.data]);
 
+  // Handle case auto-population
   useEffect(() => {
-    if (selectedPatientId) {
+    // 1. If we have existing chronic cases for the NEWLY selected patient
+    if (selectedPatientId && existingCases && existingCases.length > 0 && selectedPatientId !== caseData.patient) {
+      const latestCase = existingCases[0];
+      
+      // Update parent wizard state with EVERYTHING from the existing case
+      updateCaseData(latestCase);
+      
+      // Update local form fields for this step specifically
+      reset({
+        patient: selectedPatientId,
+        demographics: {
+          name: latestCase.demographics?.name || "",
+          age: latestCase.demographics?.age || 0,
+          sex: latestCase.demographics?.sex || "",
+          religion: latestCase.demographics?.religion || "",
+          occupation: latestCase.demographics?.occupation || "",
+          address: latestCase.demographics?.address || "",
+        }
+      });
+      
+      toast.success("Existing chronic case found and loaded for update.");
+    } 
+    // 2. If patient changed but NO existing chronic case found
+    else if (selectedPatientId && existingCases && existingCases.length === 0 && selectedPatientId !== caseData.patient) {
+      // Clear previous case data but keep current patient ID
+      updateCaseData({
+        patient: selectedPatientId,
+        status: "Draft",
+        // Reset major objects to empty
+        demographics: {},
+        initialPresentation: {},
+        presentingComplaints: [],
+        historyOfPresentIllness: {},
+        previousIllnessHistory: [],
+        familyHistory: {},
+        personalHistory: {},
+        lifeSpaceInvestigation: {},
+        physicalFeatures: {},
+        modalities: [],
+        homeopathicDiagnosis: {},
+        management: {},
+      });
+
+      // Sync demographics from patient record
+      const patient = (memoPatients as Patient[]).find((p: Patient) => p._id === selectedPatientId);
+      if (patient) {
+        reset({
+          patient: selectedPatientId,
+          demographics: {
+            name: patient.name || "",
+            age: patient.age || 0,
+            sex: patient.sex || "",
+            religion: "",
+            occupation: "",
+            address: patient.address || "",
+          }
+        });
+      }
+    }
+    // 3. Fallback for initial sync from patient record (if no cases fetch happened yet)
+    else if (selectedPatientId && !existingCases) {
       const patient = (memoPatients as Patient[]).find((p: Patient) => p._id === selectedPatientId);
       if (patient) {
         setValue("demographics.name", patient.name);
@@ -66,7 +137,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
         setValue("demographics.sex", patient.sex || "");
       }
     }
-  }, [selectedPatientId, memoPatients, setValue]);
+  }, [selectedPatientId, existingCases, memoPatients, setValue, reset, updateCaseData, caseData.patient]);
 
   const onSubmit = (data: Record<string, unknown>) => {
     updateCaseData(data);
@@ -100,19 +171,26 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
             <h3 className="eyebrow text-slate-900! flex items-center gap-2 mb-4">
               <User className="w-4 h-4 text-blue-500" /> Choose Registered Patient
             </h3>
-            <div className="max-w-md">
+            <div className="max-w-md relative">
               {allPatientsLoading ? (
                 <div className="h-10 w-full bg-slate-100 animate-pulse rounded-lg" />
               ) : (
-                <Select
-                  label="Select Patient"
-                  options={patientOptions}
-                  placeholder="Select Patient"
-                  required
-                  {...register("patient")}
-                  error={errors.patient?.message as string}
-                  privacyBlur={privacyMode}
-                />
+                <>
+                  <Select
+                    label="Select Patient"
+                    options={patientOptions}
+                    placeholder="Select Patient"
+                    required
+                    {...register("patient")}
+                    error={errors.patient?.message as string}
+                    privacyBlur={privacyMode}
+                  />
+                  {isLoadingExisting && (
+                    <div className="absolute right-10 top-[38px]">
+                      <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

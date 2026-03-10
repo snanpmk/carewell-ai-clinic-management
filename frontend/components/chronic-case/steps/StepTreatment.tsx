@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { StepProps } from "../ChronicCaseWizard";
 import { ChronicCase } from "@/types/chronicCase";
-import { createChronicCase } from "@/services/chronicCaseService";
+import { createChronicCase, updateChronicCase } from "@/services/chronicCaseService";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -13,10 +13,12 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function StepTreatment({ caseData, prevStep }: StepProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -37,9 +39,19 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
   });
 
   const saveMutation = useMutation({
-    mutationFn: createChronicCase,
+    mutationFn: (finalData: ChronicCase) => {
+      if (finalData._id) {
+        return updateChronicCase(finalData._id, finalData);
+      }
+      return createChronicCase(finalData);
+    },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chronicCases", caseData.patient] });
+      toast.success(caseData._id ? "Chronic case updated successfully" : "Chronic case created successfully");
       router.push(`/patients/${caseData.patient}`);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.error || "Failed to save chronic case");
     }
   });
 
@@ -68,7 +80,7 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
         onBack={prevStep}
         isLastStep
         isSubmitting={saveMutation.isPending}
-        nextLabel={saveMutation.isPending ? "Finalizing..." : "Complete Case"}
+        nextLabel={saveMutation.isPending ? "Finalizing..." : (caseData._id ? "Update Case" : "Complete Case")}
         nextIcon={<Save className="w-4 h-4" />}
         error={saveMutation.error?.message}
       >
@@ -86,7 +98,7 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
                 label="First Prescription"
                 {...register("management.firstPrescription.medicine")}
                 placeholder="Medicine name..."
-                error={errors.management?.firstPrescription?.medicine?.message}
+                error={errors.management?.firstPrescription?.medicine?.message as string}
               />
               
               <Select
@@ -94,14 +106,14 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
                 options={potencyOptions}
                 placeholder="Select Potency..."
                 {...register("management.firstPrescription.potency")}
-                error={errors.management?.firstPrescription?.potency?.message}
+                error={errors.management?.firstPrescription?.potency?.message as string}
               />
 
               <Input
                 label="Dose"
                 {...register("management.firstPrescription.dose")}
                 placeholder="e.g. 4 pills TDS..."
-                error={errors.management?.firstPrescription?.dose?.message}
+                error={errors.management?.firstPrescription?.dose?.message as string}
               />
             </div>
           </div>

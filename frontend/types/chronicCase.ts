@@ -90,12 +90,8 @@ export interface ChronicCase {
     sexualRelations?: string;
   };
   lifeSpaceInvestigation?: {
-    traits?: string[];
-    emotionalUpsets?: Array<{
-      factor?: string;
-      duration?: string;
-      remarks?: string;
-    }>;
+    traits?: string;
+    emotionalUpsets?: string;
     reactionPatterns?: Array<{
       situation?: string;
       aversion?: string;

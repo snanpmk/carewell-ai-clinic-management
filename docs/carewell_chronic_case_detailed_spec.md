@@ -1,602 +1,922 @@
-# CareWell AI Clinic Management
+CAREWELL HOMEOPATHIC AI CLINIC MANAGEMENT
+CHRONIC CASE RECORD – COMPLETE STRUCTURE
 
-## Chronic Case Record -- Detailed Developer Specification
+1. FRONT PAGE – CHRONIC CASE RECORD
 
-This document defines the **complete digital structure for a Homeopathic
-Chronic Case Record** used in the CareWell AI‑assisted clinic management
-system.
+Heading: Chronic Case Record
 
-Purpose: - Standardize chronic case-taking workflow - Provide developers
-with a clear schema for database + UI - Enable AI-assisted analysis and
-remedy suggestion
+Fields included:
 
-------------------------------------------------------------------------
+OP number
+Unit
+Date
+Name of the patient
+Age
+Sex
+Religion
+Occupation
+Name of the spouse
+Occupation
+Address
+Phone number
 
-# 1. Case Header (Front Page)
+Front page also includes:
 
-## Administrative Fields
+Final diagnosis
 
-  Field                  Description
-  ---------------------- ------------------------------
-  OP Number              Unique outpatient identifier
-  Unit                   OPD / IPD / Clinic Unit
-  Date                   Date of consultation
-  Case Taken By          Student / Practitioner
-  Clinic / Institution   Optional clinic identifier
+Homeopathic – one row
+Disease – another row
 
-## Patient Demographics
+Result:
 
-  Field               Description
-  ------------------- -----------------------
-  Name                Full patient name
-  Age                 Age at consultation
-  Sex                 Male / Female / Other
-  Religion            Religious background
-  Occupation          Patient occupation
-  Spouse Name         Husband/Wife name
-  Spouse Occupation   Occupation of spouse
-  Address             Full address
-  Phone               Contact number
+Cured
+Relieved
+Referred
+Otherwise
+Expired
 
-## Summary Diagnosis Section
+Name of the student / person doing the case record.
 
-  Field                   Description
-  ----------------------- ---------------------------------------------------
-  Disease Diagnosis       Conventional pathology diagnosis
-  Homeopathic Diagnosis   Remedy or miasmatic interpretation
-  Result                  Cured / Relieved / Referred / Otherwise / Expired
+---
 
-------------------------------------------------------------------------
+2. INITIAL PRESENTATION OF ILLNESS
 
-# 2. Initial Presentation of Illness
+Two columns:
 
-Captures **how the patient narrates the complaint**.
+Patient’s narration in the very expressions used by him
+Physician’s interpretation, interrogation
 
-  Field                      Description
-  -------------------------- ---------------------------------
-  Patient Narration          Exact words spoken by patient
-  Physician Interpretation   Clinical translation
-  Physician Observation      Behaviour, appearance, gestures
+Another column:
 
-------------------------------------------------------------------------
+Physician’s observation
 
-# 3. Presenting Complaints
+---
 
-Structured description of complaints.
+3. PRESENTING COMPLAINTS
 
-  Field            Description
-  ---------------- -------------------------
-  Complaint Type   Chief / Associated
-  Location         Organ / system / area
-  Sensation        Pain quality or symptom
-  Modalities       Better/Worse factors
-  Accompaniments   Associated symptoms
+Four columns:
 
-### Location Attributes
+Location
+Sensation
+Modalities
+Accompaniments
 
--   System
--   Organ
--   Tissue
--   Area
--   Direction / extension
--   Duration
+Location column includes:
 
-### Modalities
+System
+Organ
+Tissue
+Areas
+Direction
+Extension
+Duration
 
-  Symbol   Meaning
-  -------- -----------
-  \>       Better
-  \<       Worse
-  =        No change
+Location includes:
 
-------------------------------------------------------------------------
+Chief complaint
+Associated complaint
 
-# 4. History of Present Illness
+Modalities:
 
-Tracks evolution of disease.
+=
+<
 
-  Field                 Description
-  --------------------- -------------------------------
-  Onset                 When symptoms started
-  Cause                 Triggering factor
-  Progression           Acute / gradual / progressive
-  Frequency             Episodic / continuous
-  Previous Treatments   Drugs or therapies taken
+>
 
-------------------------------------------------------------------------
+---
 
-# 5. Previous Illness History
+4. HISTORY OF PRESENT ILLNESS
 
-  Age   Illness/Event   Treatment   Remarks
-  ----- --------------- ----------- ---------
+History of how the illness developed.
 
-Possible events:
+---
 
--   Trauma
--   Fracture
--   Burns
--   Drug allergy
--   Operations
--   Exposure
--   Vaccinations
+5. HISTORY OF PREVIOUS ILLNESS
 
-------------------------------------------------------------------------
+Four columns:
 
-# 6. Family History
+Age
 
-Tracks hereditary diseases.
+Illness, trauma, fright, burns, drug allergy, operations, exposure, vaccinations etc.
 
-## Relations
+Treatment adopted
 
--   Father
--   Mother
--   Brother
--   Sister
--   Son
--   Daughter
--   Grandparents
--   Maternal relatives
--   Paternal relatives
+Remarks
 
-## Diseases
+---
 
--   Diabetes
--   Hypertension
--   Cancer
--   Tuberculosis
--   Epilepsy
--   Skin disease
--   Mental illness
--   Autoimmune disease
+6. HISTORY OF FAMILY ILLNESS
 
-------------------------------------------------------------------------
+Detailed table including family members and diseases.
 
-# 7. Personal History
+---
 
-## Life Situation
+7. PERSONAL HISTORY
 
-  Field                Description
-  -------------------- ------------------------------
-  Place of birth       Birth location
-  Religion             Religious background
-  Caste                Cultural classification
-  Education            Highest education
-  Training             Professional training
-  Economic Status      Poor / middle / rich
-  Social Status        Community standing
-  Nutritional Status   Underweight / normal / obese
-  Marital Status       Married / unmarried
-  Years of Marriage    Duration
-  Dwelling             Living environment
-  Occupation           Job
-  Nature of Work       Physical / sedentary
-  Family Type          Nuclear / joint / extended
+A. Life situation
 
-## Development Milestones
+Place of birth
+Religion
+Caste
+Education
+Training
+Economic status
+Social status
+Nutritional status
+Marital status
+Years of marriage
+Dwellings
+Customs
+Occupation
+Nature of work
+Political status
 
-  Milestone            Values
-  -------------------- -----------------------
-  Fontanelle Closure   Early / Normal / Late
-  Head Holding         Early / Normal / Late
-  Crawling             Early / Normal / Late
-  Teething             Early / Normal / Late
-  Sitting              Early / Normal / Late
-  Standing             Early / Normal / Late
-  Walking              Early / Normal / Late
-  Talking              Early / Normal / Late
+Family status:
 
-## Maternal Pregnancy History
+Nuclear
+Joint
+Extended
 
--   Normal / abnormal pregnancy
--   Premature birth
--   Birth weight
--   Congenital anomalies
--   Immunization
+Father
+Mother
+Siblings
+Male
+Female
+Children
 
-## Habits and Hobbies
+---
 
-  Category     Examples
-  ------------ ----------------------------------
-  Diet         Vegetarian / Egg / Non‑veg
-  Addictions   Tea / Coffee / Smoking / Alcohol
-  Sleep        Normal / disturbed
-  Activities   Arts / sports / music
+B. Development milestones
 
-## Domestic Relations
+Fontanella closure
+(E – early, N – normal, L – late)
 
--   Family members
--   Relatives
--   Neighbours
--   Friends
--   Colleagues
+Head holding
+Crawling
+Teething
+Sitting
+Standing
+Walking
+Talking
 
-## Sexual Relations
+---
 
--   Premarital
--   Marital
--   Extramarital
+Condition of mother during pregnancy
 
-------------------------------------------------------------------------
+Birth
 
-# 8. Life Space Investigation (Mental Profile)
+Normal
+Abnormal
+Premature
 
-Mental characteristics of the patient.
+Birth weight (kg)
 
-Examples:
+Congenital anomalies
 
--   Fastidious
--   Jealous
--   Timid
--   Hypochondriac
--   Melancholic
--   Obstinate
--   Suspicious
--   Cheerful
--   Gloomy
--   Optimistic
--   Pessimistic
--   Hopeless
--   Despondent
+Immunization
 
-## Emotional Upsets
+---
 
-  Factor   Duration   Remarks
-  -------- ---------- ---------
+C. Habits and hobbies
+
+Food:
+
+Vegetarian
+Egg vegetarian
+Non vegetarian
+
+Addictions:
+
+Tea
+Coffee
+Smoking
+Chewing
+Drinking
+Drugging
+
+Sleep
+
+Artistic
+
+Games or sports
+
+---
+
+Domestic relations
+
+With family members
+With other relatives
+With neighbours
+Friends
+Colleagues
+
+---
+
+Sexual relations
+
+Premarital
+Marital
+Extramarital
+Others
+
+---
+
+8. LIFE SPACE INVESTIGATION (ABSTRACT)
+
+Factors of biographical account relating to present complaints or effects on mind and disposition of the patient.
+
+---
+
+A. Mental / behavioural features
+
+Fastidious
+Lazy
+Hasty
+Changeable mood
+Careless
+Obedient or cooperative
+Loquacious
+Jealous
+Dull or foolish behaviour
+Timid
+Imbecile
+Idiotic
+Hypochondriac
+Melancholic
+Envious
+Fearful
+Sluggish
+Obstinate
+Peevish
+Introverted
+Extroverted
+Averse to anxiety
+Yielding
+Nervous or excited
+Restless
+Suspicious
+Irresolute
+Religious
+Proud
+Rude
+Cruel
+Violent
+Discontented
+Mischievous
+Gentle
+Quiet
+Cheerful
+Humorous
+Sympathetic
+Affectionate
+Sentimental
+Romantic
+Gloomy
+Sad
+Optimistic
+Pessimistic
+Hopeless
+Shy
+Despondent
+Apathetic
+
+---
+
+B. Historical emotional upset
 
 Factors:
 
--   Anger
--   Fright
--   Shock
--   Grief
--   Joy
--   Disappointment
-
-## Reaction Patterns
-
-  Situation   Aversion   Desire   Aggravation   Amelioration
-  ----------- ---------- -------- ------------- --------------
-
-Examples:
-
--   Company
--   Solitude
--   Consolation
--   Conversation
--   Work
--   Music
--   Travel
-
-## Cognitive Functions
-
--   Perception
--   Concentration
--   Memory
--   Delusions
--   Fantasies
--   Thought patterns
-
-------------------------------------------------------------------------
-
-# 9. Physical Features
-
-## General Appearance
-
-  Feature          Examples
-  ---------------- --------------------------
-  Build            Obese / thin / stocky
-  Stature          Tall / short
-  Complexion       Fair / dark
-  Health           Healthy / ill
-  Age appearance   Premature old / childish
-  Gait             Normal / abnormal
-  Cleanliness      Clean / dirty
-  Swelling         Present / absent
-
-## Regional Examination
-
-Head‑to‑toe observation.
-
--   Head
--   Scalp
--   Hair
--   Eyes
--   Ears
--   Nose
--   Face
--   Mouth
--   Tongue
--   Teeth
--   Throat
--   Thyroid
--   Abdomen
--   Pelvis
--   Rectum
--   Urethra
--   Chest
--   Back
--   Neck
--   Extremities
--   Skin
-
-## Functional Generals
-
-  ------------------------------------------------------------------------------------------
-  Appetite   Stool   Thirst   Urine   Sex     Sweat   Sleep   Breath   Dreams   Discharges
-  ---------- ------- -------- ------- ------- ------- ------- -------- -------- ------------
-
-  ------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
-# 10. Modalities (Reactions To)
-
-  Factor   Intolerance   Aggravation   Amelioration
-  -------- ------------- ------------- --------------
-
-Examples:
-
--   Time
--   Thermal changes
--   Seasons
--   Weather changes
--   Moon phases
--   Noise
--   Air
--   Clothing
--   Bathing
--   Food
--   Motion
--   Posture
--   Sleep
--   Sex
--   Eliminations
--   Menses
+Anger
+Bad news
+Displeasure
+Disappointment
+Fright
+Grief
+Joy
+Shock
+Sorrow
+Tension
+Vexation
+
+Columns:
+
+Factor
+Occasion
+Duration
+
+---
 
-------------------------------------------------------------------------
+Reactions to
 
-# 11. Constitution
+Company or solitude
+Consolation
+Conversation
+Spoken to
+Contradiction
+Rifles
+Exertion of work
+Life
+Home
+Husband or wife
+Children
+Pleasure or music
+Magnetised
+Travel
 
-## Physical Makeup
+Columns:
 
--   Carbon
--   Nitrogenoid
--   Oxygenoid
+Aversion
+Desire
+Intolerance
+Aggravation
+Amelioration
 
-## Temperament
+---
 
--   Choleric
--   Melancholic
--   Nervous
--   Sanguine
--   Plethoric
--   Phlegmatic
+Other features
 
-## Thermal State
+Emotional
 
--   Hot patient
--   Cold patient
--   Ambient
+Anxious on
+Apprehensive about
+Despair of
+Fear of
+Suspicious of
 
-## Side Affinity
+Perception
 
--   Left
--   Right
--   Alternating
--   Crosswise
+Acute
+Ecstasy
+Queer
+Confused
+Lack of concentration
+Dull
+Difficult
 
-## Tendencies
+Altered
 
--   Hemorrhagic
--   Suppurative
--   Spasmodic
--   Catch cold easily
--   Exhaustion
--   Rapid growth
--   Retarded growth
+Hallucination
+Illusion
 
-------------------------------------------------------------------------
+Memory
 
-# 12. Physical Examination
+Loss
+Sudden
+Weak
+Acute
+Sharp
+Difficult
+Absent minded
 
-## General Examination
+Forget recent events but remember past events
 
--   Jaundice
--   Anemia
--   Oedema
--   Cyanosis
--   Clubbing
--   Lymphadenopathy
+Forget names
+Titles
+Places
+Thoughts
 
-## Vitals
+---
 
-  Height   Weight   BMI   Pulse   Respiration   Temperature   BP
-  -------- -------- ----- ------- ------------- ------------- ----
+Formulation
 
-## Systemic Examination
+Thoughts
+Ideas
 
--   Respiratory system
--   Cardiovascular system
--   Gastrointestinal system
--   Nervous system
--   Musculoskeletal system
--   Endocrine system
--   Skin
--   Eye / ENT
+Active
+Fixed
+Changeable
 
-------------------------------------------------------------------------
+Thinking
 
-# 13. Menstrual History
+Logical
+Emotional
+Systematic
+Unreal
 
-Fields:
+Fancies
 
--   LMP
--   Amenorrhea (primary / secondary)
+Fantasy
+Daydreams
+Reverie
+Delusions
 
-## Cycle Table
+---
 
-  ------------------------------------------------------------------------------
-  Cycle    Duration   Quantity   Clots    Colour   Odour    Stains   Frequency
-  -------- ---------- ---------- -------- -------- -------- -------- -----------
+9. PHYSICAL FEATURES
 
-  ------------------------------------------------------------------------------
+Appearance
 
-## Menstrual Symptoms
+Build:
 
-  Before   Beginning   During   After
-  -------- ----------- -------- -------
+Obese
+Stocky
+Thin
 
-## Menopause
+Stature
 
-  Pre   During   Post
-  ----- -------- ------
+Large
+Small
 
-## Vaginal Discharge
+Complexion
 
-  ------------------------------------------------------------------------------------
-  Type       Onset      Colour     Acidity    Modalities   Accompaniments   Cause
-  ---------- ---------- ---------- ---------- ------------ ---------------- ----------
+Healthy
+Unwell
+Ill
 
-  ------------------------------------------------------------------------------------
+Premature old
+Childish
+Young
+Senile
 
-------------------------------------------------------------------------
+Gait
 
-# 14. Obstetrical History
+Deformity
 
-## Pregnancy Summary
+Clean
+Dirty
 
--   Gravida
--   Para
--   Abortions
--   Living children
+Swelling
 
-## Pregnancy Table
+---
 
-  -------------------------------------------------------------------------------------------------------------------
-  Year   Pregnancy   Complications   Labour   Delivery   Puerperium   Sex    Weight   Condition   Viability   Cause
-         Period                                                                                               of
-                                                                                                              Death
-  ------ ----------- --------------- -------- ---------- ------------ ------ -------- ----------- ----------- -------
+Regional examination
 
-  -------------------------------------------------------------------------------------------------------------------
+Head
+Scalp
+Hair
+Hair falling
+Perspiration
 
-## Contraception
+Eyes
+Vision
 
--   Temporary
--   Permanent
+Ear
+Hearing
+Earwax
 
-## Present Pregnancy
+Nose
+Olfaction
 
--   LMP
--   Date of conception
--   EDC
--   Morning sickness
--   Bleeding PV
+Face
+Configuration
+Expression
 
-------------------------------------------------------------------------
+Chin
+Jaw
+Perspiration
 
-# 15. Disease Analysis
+Mouth
+Salivation
+Taste
+Breath
+Odor
 
-## Provisional Diagnosis
+Palate
+Gums
+Tongue
+Coating
 
-Working clinical diagnosis.
+Teeth
+Lips
 
-## Differential Diagnosis
+Throat
+Tonsils
+Larynx
+Voice
 
-Possible alternative diseases.
+Deglutition
+Thyroid
 
-## Symptom Analysis
+Gastric
 
-  Common / Pathognomonic   Characteristic / Determinative
-  ------------------------ --------------------------------
+Abdomen
+Umbilicus
+Pelvis
 
-## Laboratory Findings
+Rectum
+Anus
+Defecation
 
--   Urine
--   Stool
--   Blood
--   Sputum
--   Imaging
--   ECG
--   Other tests
+Urethra
+Urination
 
-------------------------------------------------------------------------
+Extragenitalia
 
-# 16. Homeopathic Diagnosis
+Chest
+Breast
 
-## Totality of Symptoms
+Back
+Neck
 
-Characteristic symptoms selected for remedy choice.
+Extremities
 
-## Miasmatic Expression
+Upper
 
--   Psora
--   Sycosis
--   Syphilis
+Hand
+Fingers
+Palm
+Perspiration
 
-## Repertorization
+Joints
+Knees
 
-  Symptom   Rubric   Explanation
-  --------- -------- -------------
+Lower
 
-## Final Diagnosis
+Sole
+Toes
+Perspiration
 
--   Disease
--   Hahnemannian classification
--   Miasm dominance
--   Homeopathic diagnosis
+Joints
+Knees
 
-------------------------------------------------------------------------
+Skin
 
-# 17. Management & Treatment
+Perspiration
+Discoloration
+Warts
+Keloids
+Moles
+Cysts
 
-## Treatment Plan
+---
 
-Overall strategy.
+Generals – functional and eliminations
 
-## Supportive Measures
+Appetite
+Stool
+Thirst
+Urine
+Sex
+Sweat
+Sleep
+Breath
+Dreams
+Discharges
+Abnormal secretions
+Excretions
 
--   General
--   Surgical
--   Accessory
+---
 
-## Restrictions
+Reactions to
 
-  Disease   Medicinal
-  --------- -----------
+Diversion
+Intolerance
+Sensitive to
+Aggravation
+Amelioration
 
-## First Prescription
+Factors:
 
--   Medicine
--   Potency
--   Dose
+Time
+Thermal
+Season
+Meteorological
+Moon phases
+Noises
+Air or fanning
+Clothing
+Covering
+Bathing or washing
+Food or drinks
+Undigested food
+Touch or pressure
+Posture
+Motion
+Sleep
+Sex
+Special senses
+Eliminations
+Menses
 
-------------------------------------------------------------------------
+---
 
-# 18. Follow‑Up
+Constitution
 
-  Date   Symptom Changes   Interference   Prescription
-  ------ ----------------- -------------- --------------
+Physical makeup
 
-------------------------------------------------------------------------
+Carbon
+Nitrogenoid
+Oxygenoid
 
-# Implementation Guidance (For Developers)
+Temperament
 
-Recommended modules:
+Choleric
+Melancholic
+Nervous
+Sanguine
+Plethoric
+Phlegmatic
 
-1.  Patient Management
-2.  Consultation Case Record
-3.  Diagnosis Engine
-4.  Repertory Integration
-5.  Prescription System
-6.  Follow‑up Tracking
-7.  AI Symptom Analysis
-8.  Remedy Suggestion
+Thermal
 
-Recommended Tech Stack:
+Hot
+Ambient
+Cold
 
-Backend: - Node.js - Express - MongoDB
+Side affinity
 
-Frontend: - React - Tailwind
+Left
+Right
+Alternating sides
+Diagonal
+Crosswise
+None
 
-AI: - LLM symptom interpretation - Remedy suggestion model
+Tendencies
+
+Hemorrhagic
+Suppurative
+Abscess
+Boils
+Catch cold
+Exhausted
+Spasms
+Cramps
+Sprain
+Perspire
+
+Growth fast
+Growth retarded
+
+Become fatty
+Lean
+
+---
+
+10. PHYSICAL EXAMINATION
+
+General
+
+Jaundice
+Anemia
+Oedema
+Cyanosis
+Clubbing
+Lymphadenopathy
+Skin colour
+Discoloration
+Skin eruption
+
+Height
+Weight
+BMI
+
+Pulse rate
+Respiratory rate
+Temperature
+Blood pressure
+
+---
+
+Systemic examination
+
+Respiratory system
+Cardiovascular system
+Gastrointestinal system
+Neurogenic system
+Musculoskeletal system
+Central nervous system
+Skin
+Endocrine
+Eye
+ENT
+
+---
+
+11. MENSTRUAL HISTORY
+
+LMP
+
+Amenorrhea
+
+Primary
+Secondary
+
+---
+
+Table
+
+Cycle / regularity
+Duration
+Flow
+
+Quantity
+Consistency / clots
+Colour
+Odour
+Stains
+Air
+Frequency
+
+---
+
+Quantum maintenance
+
+Before
+At the beginning
+During
+After
+
+---
+
+Previous history
+
+FMP
+Menarche
+Early
+Late
+
+Marriage after
+
+Pregnancies after
+
+Recent
+
+---
+
+Climacteric
+
+Age of menopause
+Symptoms associated
+
+Pre menopause
+With menopause
+Post menopause
+
+---
+
+Abnormal vaginal discharges
+
+Columns:
+
+Type
+Onset and duration
+Colour and odour
+Stains and acidity
+Modalities
+Accompaniments
+Obvious reasons
+
+---
+
+12. OBSTETRICAL HISTORY
+
+Previous pregnancies including abortion
+
+Gravida
+Para
+Abortion
+Death or live
+
+Table:
+
+Year
+Date and period of pregnancy
+Abnormalities in pregnancy
+Labour events
+Mode of delivery
+Nature of puerperium
+
+Child
+
+Sex
+Birth weight
+Condition at birth
+Viability
+Cause of death
+
+---
+
+Contraceptive methods adopted
+
+Temporary
+Permanent
+
+---
+
+Present pregnancy
+
+LMP
+Date of conception
+EDC
+Morning sickness
+Other complaints
+Bleeding P/V
+
+---
+
+Physical examination
+
+Gynecological
+Obstetrical
+
+---
+
+13. ANALYSIS AND DIAGNOSIS OF DISEASE
+
+Provisional diagnosis
+
+Differential diagnosis
+
+---
+
+Analysis
+
+Table
+
+Basic or common or pathognomonic symptoms
+
+Determinative or uncommon or non pathognomonic symptoms
+
+---
+
+Laboratory findings
+
+Urine
+Stool
+Blood
+Sputum
+Imaging
+ECG
+Other investigation
+
+Final diagnosis of disease
+
+---
+
+14. DIAGNOSIS OF THE PATIENT
+
+Evaluation of symptoms
+
+Totality of symptoms
+
+---
+
+Miasmatic expression
+
+Psora
+Sycosis
+Syphilis
+
+---
+
+Repertorial totality
+
+Name of repertory
+
+Table
+
+Symptoms evaluated
+Rubrics
+Explanation
+
+---
+
+Final diagnosis
+
+Disease
+Hahnemannian classification
+Miasm dominance
+
+Homeopathic diagnosis
+
+---
+
+15. MANAGEMENT AND TREATMENT
+
+Plan of treatment
+
+General
+Surgical
+Accessory
+
+Restrictions
+
+Diet
+Regimen
+
+Table
+
+Disease restrictions
+Medicinal restrictions
+
+---
+
+First prescription
+
+Basis of selection
+
+Medicine
+Potency
+Dose
+
+---
+
+16. PROGRESS AND FOLLOW UP
+
+Columns
+
+Date
+Symptom changes
+Interference
+Prescription
