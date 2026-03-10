@@ -1,6 +1,7 @@
 "use client";
 
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Brain } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,8 +25,8 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
     },
   });
 
-  const onSubmit = (data: Record<string, any>) => {
-    updateCaseData(data);
+  const onSubmit = (data: Record<string, unknown>) => {
+    updateCaseData(data as Partial<ChronicCase>);
     nextStep();
   };
 
@@ -61,7 +62,7 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
                 <span className={hintClass}>Examples: Company, solitude, music, reprimands, consolation.</span>
                 <Textarea
                   label="Social and environmental reaction patterns"
-                  {...register("lifeSpaceInvestigation.cognitiveFunctions")}
+                  {...register("lifeSpaceInvestigation.traits")}
                   placeholder="Social and environmental reaction patterns..."
                   className="min-h-[120px]"
                 />

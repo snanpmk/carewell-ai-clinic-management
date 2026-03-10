@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
-import { User, Phone, MapPin, Activity, ArrowRight } from "lucide-react";
+import { User, Phone, ArrowRight } from "lucide-react";
 
 // ── Validation Schema ──────────────────────────────────────────────────────
 const schema = z.object({
@@ -57,6 +57,8 @@ export default function OnboardingPage() {
       setPatient(res.data.patientId, formData);
       router.push(`/consultation/acute?patientId=${res.data.patientId}`);
     },
+    onError: () => {
+    }
   });
 
   const onSubmit = (data: FormValues) => {

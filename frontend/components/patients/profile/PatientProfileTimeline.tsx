@@ -124,27 +124,29 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
             }
 
             // --- Acute Case Rendering ---
-            let aiNotes: Record<string, any> | null = null;
+            let aiNotes: Record<string, unknown> | null = null;
             let adviceText = "";
 
             try { 
                 if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes);
-                else if (typeof visit.aiGeneratedNotes === "object") aiNotes = visit.aiGeneratedNotes as Record<string, any>;
+                else if (typeof visit.aiGeneratedNotes === "object") aiNotes = visit.aiGeneratedNotes as Record<string, unknown>;
             } catch { }
 
             try { 
-              if (typeof visit.doctorEditedNotes === 'string' && visit.doctorEditedNotes.startsWith('{')) {
-                const parsed = JSON.parse(visit.doctorEditedNotes);
-                adviceText = parsed.advice || "";
+              if (typeof visit.doctorEditedNotes === 'string') {
+                if (visit.doctorEditedNotes.startsWith('{')) {
+                  const parsed = JSON.parse(visit.doctorEditedNotes);
+                  adviceText = parsed.advice || "";
+                } else {
+                  adviceText = visit.doctorEditedNotes;
+                }
               } else if (typeof visit.doctorEditedNotes === 'object' && visit.doctorEditedNotes !== null) {
-                adviceText = (visit.doctorEditedNotes as Record<string, any>).advice || "";
-              } else if (typeof visit.doctorEditedNotes === 'string') {
-                adviceText = visit.doctorEditedNotes;
+                adviceText = (visit.doctorEditedNotes as Record<string, unknown>).advice as string || "";
               }
             } catch { }
 
             if (!adviceText) {
-                adviceText = aiNotes?.advice || "No advice recorded.";
+                adviceText = (aiNotes?.advice as string) || "No advice recorded.";
             }
 
             return (
@@ -186,14 +188,14 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                       </div>
                     </div>
 
-                    {aiNotes?.assessment && (
+                    {aiNotes && !!aiNotes["assessment"] && (
                        <div>
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                             <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> Clinical Logic
+                             <Activity className="w-3.5 h-3.5 text-indigo-500" /> Clinical Logic
                           </p>
                           <div className="p-4 bg-indigo-50/40 rounded-2xl border border-indigo-100/50 shadow-[0_2px_10px_-3px_rgba(224,231,255,0.4)]">
                             <p className="text-sm font-medium text-slate-600 leading-relaxed pl-3 border-l-[3px] border-indigo-200/50">
-                              {aiNotes.assessment}
+                              {aiNotes["assessment"] as string}
                             </p>
                           </div>
                        </div>

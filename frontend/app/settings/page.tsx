@@ -61,7 +61,7 @@ export default function SettingsPage() {
     }
   });
 
-  const onSubmit = (data: { email: string }) => {
+  const onSubmit = (data: { email: string }) => { // Kept original type, it's more specific and correct
     setMessage(null);
     inviteMutation.mutate(data.email);
   };
@@ -109,7 +109,7 @@ export default function SettingsPage() {
           <div className="space-y-4 pt-6 border-t border-slate-100">
              <div>
                 <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1">Clinic Association</span>
-                <p className="font-bold text-slate-900">{typeof user?.clinic === 'object' ? user.clinic.name : 'Carewell Clinic'}</p>
+                <p className="font-bold text-slate-900">{typeof user?.clinic === 'object' ? (user.clinic.name as React.ReactNode) : 'Carewell Clinic'}</p>
              </div>
           </div>
         </Card>
@@ -173,7 +173,7 @@ export default function SettingsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {team.map((doc: Record<string, any>) => (
+            {team.map((doc: { _id: string; profileImage?: string; name: string; email: string; role: string }) => ( // Explicit type for doc
               <div key={doc._id} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-slate-200 shrink-0 flex items-center justify-center">
                   {doc.profileImage ? (

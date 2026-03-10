@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { createChronicCase } from "@/services/chronicCaseService";
 import { useRouter } from "next/navigation";
 import { ClipboardList, Save } from "lucide-react";
@@ -14,7 +15,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
 import { useMutation } from "@tanstack/react-query";
 
-export default function StepTreatment({ caseData, updateCaseData, prevStep }: StepProps) {
+export default function StepTreatment({ caseData, prevStep }: StepProps) {
   const router = useRouter();
 
   const {
@@ -42,9 +43,9 @@ export default function StepTreatment({ caseData, updateCaseData, prevStep }: St
     }
   });
 
-  const onSave = (data: Record<string, any>) => {
+  const onSave = (data: Record<string, unknown>) => {
     const finalizedCase = { ...caseData, ...data, status: "Completed" as const };
-    saveMutation.mutate(finalizedCase);
+    saveMutation.mutate(finalizedCase as unknown as ChronicCase);
   };
 
   const potencyOptions = useMemo(() => [

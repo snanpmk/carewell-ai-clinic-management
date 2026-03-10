@@ -8,9 +8,10 @@ import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
 import { useMutation } from "@tanstack/react-query";
+import { ChronicCase } from "@/types/chronicCase";
 
 export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, watch } = useForm<ChronicCase>({
     defaultValues: {
       homeopathicDiagnosis: {
         totalityOfSymptoms: caseData.homeopathicDiagnosis?.totalityOfSymptoms || "",
@@ -47,7 +48,7 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
     analysisMutation.mutate(caseData);
   };
 
-  const onSubmit = (data: Record<string, any>) => {
+  const onSubmit = (data: Partial<ChronicCase>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -107,20 +108,20 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
                   <ListTree className="w-4 h-4 text-indigo-500" /> Suggested Rubrics
                 </h3>
                 <div className="space-y-3">
-                  {repertorization.map((item: any, index: number) => (
+                  {repertorization.map((item: Record<string, unknown>, index: number) => (
                     <div key={index} className="bg-white p-3 rounded-xl border border-indigo-50/80 shadow-sm text-xs">
                       <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-2">
                         <div className="flex-1">
                           <span className="font-bold text-slate-700">Symptom: </span>
-                          <span className="text-slate-600">{item.symptom}</span>
+                          <span className="text-slate-600">{item.symptom as string}</span>
                         </div>
                         <div className="flex-1">
                           <span className="font-bold text-indigo-600">Rubric: </span>
-                          <span className="text-indigo-700 font-medium">{item.rubric}</span>
+                          <span className="text-indigo-700 font-medium">{item.rubric as string}</span>
                         </div>
                       </div>
                       <p className="text-slate-500 italic border-t border-slate-50 pt-2 mt-1">
-                        &quot;{item.explanation}&quot;
+                        &quot;{item.explanation as string}&quot;
                       </p>
                     </div>
                   ))}

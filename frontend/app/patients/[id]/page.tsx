@@ -32,17 +32,15 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
     queryFn: () => getPatientChronicCases(patientId),
   });
 
-  const acuteVisits = consultRes?.data || [];
-  const chronicVisits = chronicRes || [];
-
-  // Combine and sort visits logically by date
   const visits = useMemo(() => {
-    return [...acuteVisits, ...chronicVisits].sort((a, b) => {
+    const acute = consultRes?.data || [];
+    const chronic = chronicRes || [];
+    return [...acute, ...chronic].sort((a, b) => {
       const dateA = new Date(a.consultationDate || a.createdAt || 0).getTime();
       const dateB = new Date(b.consultationDate || b.createdAt || 0).getTime();
       return dateB - dateA;
     });
-  }, [acuteVisits, chronicVisits]);
+  }, [consultRes?.data, chronicRes]);
 
   const { data: summaryRes, isLoading: summaryLoading } = useQuery({
     queryKey: ["patient-summary", patientId],
@@ -54,26 +52,26 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const patient = patientRes?.data;
   const aiSummary = summaryRes?.data;
 
-  const unifiedVisits: UnifiedVisitItem[] = visits.map((v: Record<string, any>) => {
+  const unifiedVisits: UnifiedVisitItem[] = visits.map((v: Record<string, unknown>) => {
     // If it has 'demographics', it's a chronic case
     if (v.demographics) {
       return {
-        _id: v._id,
+        _id: v._id as string,
         isChronic: true,
-        date: new Date(v.createdAt),
-        chronicData: v as ChronicCase,
+        date: new Date(v.createdAt as string),
+        chronicData: v as unknown as ChronicCase,
       };
     }
     return {
-      _id: v._id,
+      _id: v._id as string,
       isChronic: false,
-      date: new Date(v.consultationDate),
-      symptoms: v.symptoms,
-      diagnosis: v.diagnosis,
-      prescription: v.prescription,
-      doctorEditedNotes: v.doctorEditedNotes,
-      aiGeneratedNotes: v.aiGeneratedNotes,
-      additionalNotes: v.additionalNotes,
+      date: new Date(v.consultationDate as string),
+      symptoms: v.symptoms as string,
+      diagnosis: v.diagnosis as string,
+      prescription: v.prescription as string,
+      doctorEditedNotes: v.doctorEditedNotes as Record<string, unknown>,
+      aiGeneratedNotes: v.aiGeneratedNotes as Record<string, unknown>,
+      additionalNotes: v.additionalNotes as string,
     };
   });
 

@@ -9,7 +9,11 @@ export interface AuthResponse {
     role: string;
     token: string;
     profileImage?: string;
-    clinic: any;
+    clinic: {
+      _id: string;
+      name: string;
+      [key: string]: unknown;
+    } | string;
   };
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { StepProps } from "../ChronicCaseWizard";
+import { ChronicCase } from "@/types/chronicCase";
 import { Activity } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,8 +42,8 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
     },
   });
 
-  const onSubmit = (data: Record<string, any>) => {
-    updateCaseData(data);
+  const onSubmit = (data: Record<string, unknown>) => {
+    updateCaseData(data as Partial<ChronicCase>);
     nextStep();
   };
 

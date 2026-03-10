@@ -5,9 +5,9 @@ interface User {
   _id: string;
   name: string;
   email: string;
-  profileImage: string;
+  profileImage?: string;
   role?: string;
-  clinic: Record<string, unknown>;
+  clinic: string | Record<string, unknown>;
 }
 
 interface AuthState {

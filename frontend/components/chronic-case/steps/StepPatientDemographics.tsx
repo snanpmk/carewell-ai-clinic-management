@@ -26,7 +26,6 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     queryFn: getAllPatients,
   });
 
-  const allPatients = allPatientsRes?.data || [];
 
   const {
     register,
@@ -54,27 +53,29 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     name: "patient" as const,
   });
 
+  const memoPatients = useMemo(() => allPatientsRes?.data || [], [allPatientsRes?.data]);
+
   useEffect(() => {
     if (selectedPatientId) {
-      const patient = allPatients.find((p: Patient) => p._id === selectedPatientId);
+      const patient = (memoPatients as Patient[]).find((p: Patient) => p._id === selectedPatientId);
       if (patient) {
         setValue("demographics.name", patient.name);
         setValue("demographics.age", patient.age);
         setValue("demographics.sex", patient.sex || "");
       }
     }
-  }, [selectedPatientId, allPatients, setValue]);
+  }, [selectedPatientId, memoPatients, setValue]);
 
-  const onSubmit = (data: Record<string, any>) => {
+  const onSubmit = (data: Record<string, unknown>) => {
     updateCaseData(data);
     nextStep();
   };
 
   const patientOptions = useMemo(() => 
-    allPatients.map((p: Patient) => ({
+    (memoPatients as Patient[]).map((p: Patient) => ({
       value: p._id,
       label: `${p.name} (${p.phone || "No Phone"})`,
-    })), [allPatients]);
+    })), [memoPatients]);
 
   const sexOptions = useMemo(() => [
     { value: "Male", label: "Male" },
@@ -121,7 +122,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
                 label="Full Patient Name"
                 placeholder="John Doe"
                 {...register("demographics.name")}
-                error={(errors.demographics as any)?.name?.message}
+                error={(errors.demographics as Record<string, { message?: string }> | undefined)?.name?.message}
                 required
               />
             </div>
@@ -130,7 +131,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
               label="Age"
               type="number"
               {...register("demographics.age", { valueAsNumber: true })}
-              error={(errors.demographics as any)?.age?.message}
+              error={(errors.demographics as Record<string, { message?: string }> | undefined)?.age?.message}
               required
             />
 
@@ -139,7 +140,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
               options={sexOptions}
               placeholder="Select Sex"
               {...register("demographics.sex")}
-              error={(errors.demographics as any)?.sex?.message}
+              error={(errors.demographics as Record<string, { message?: string }> | undefined)?.sex?.message}
               required
             />
 
