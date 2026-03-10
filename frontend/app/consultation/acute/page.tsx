@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { Suspense } from "react";
 import { Sparkles, Save, User, FileText, Loader2, Activity } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
@@ -95,7 +96,7 @@ function ConsultationForm() {
       queryClient.invalidateQueries({ queryKey: ["consultations"] });
       queryClient.invalidateQueries({ queryKey: ["patient"] });
       queryClient.invalidateQueries({ queryKey: ["patients"] });
-      alert("Consultation saved successfully!");
+      toast.success("Consultation saved successfully!");
       if (selectedPatientId) {
         router.push(`/patients/${selectedPatientId}`);
       } else {
@@ -103,7 +104,7 @@ function ConsultationForm() {
       }
     },
     onError: (error) => {
-      alert(error.message || "Failed to save consultation.");
+      toast.error(error.message || "Failed to save consultation.");
     }
   });
 
@@ -115,15 +116,15 @@ function ConsultationForm() {
     const values = getValues();
     
     if (!values.patientId) {
-      alert("Please select a patient before saving.");
+      toast.error("Please select a patient before saving.");
       return;
     }
     if (!aiNotes) {
-      alert("Please generate notes first.");
+      toast.warning("Please generate clinical notes first.");
       return;
     }
     if (!values.prescription || values.prescription.length < 2) {
-      alert("Please enter a Final Prescription before saving.");
+      toast.error("Please enter a Final Prescription before saving.");
       return;
     }
 

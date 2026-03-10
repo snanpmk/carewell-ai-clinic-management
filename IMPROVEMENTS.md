@@ -5,7 +5,6 @@ This document outlines the strategic and technical enhancements planned for Care
 ---
 
 ## 🛡️ 1. Security & Clinical Compliance (Trust Layer)
-*   **PII Masking (Privacy Mode):** Implement a toggle to redact Patient Identifiable Information (Names, Phone Numbers) in the UI while using AI analysis tools to ensure privacy during clinical reviews.
 *   **Data Encryption:** Move from standard storage to AES-256 bit encryption for sensitive medical notes in the MongoDB layer.
 *   **Audit Logs:** Track all changes made to AI-generated notes to maintain a "Human-in-the-loop" clinical audit trail.
 *   **HIPAA/GDPR Readiness:** Standardize data handling practices to comply with international healthcare privacy laws.

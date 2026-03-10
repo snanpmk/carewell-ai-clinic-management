@@ -3,6 +3,7 @@ import "./globals.css";
 import { QueryProvider } from "@/lib/QueryProvider";
 import { ClientLayout } from "@/components/layout/ClientLayout";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Carewell Homeo Clinic – AI Consultation Notes",

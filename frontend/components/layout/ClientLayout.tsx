@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { HeartPulse, Menu, Loader2 } from "lucide-react";
+import { HeartPulse, Menu, Loader2, Search } from "lucide-react";
+import { CommandPalette } from "@/components/ui/CommandPalette";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -12,6 +13,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -27,6 +29,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       }
     }
   }, [isAuthenticated, pathname, router, mounted]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   if (!mounted) {
     return (
@@ -59,7 +72,22 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         </button>
       </header>
 
+      {/* Desktop Search Toggle (Floating Bottom Right or Top) */}
+      <button 
+        onClick={() => setIsSearchOpen(true)}
+        className="hidden lg:flex fixed bottom-8 left-80 z-40 items-center gap-3 px-5 py-3 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-2xl shadow-blue-500/10 hover:shadow-blue-500/20 hover:-translate-y-1 transition-all group"
+      >
+        <div className="p-1.5 bg-blue-500 rounded-lg group-hover:rotate-12 transition-transform">
+          <Search className="w-4 h-4 text-white" />
+        </div>
+        <div className="flex flex-col items-start leading-none">
+          <span className="text-xs font-black text-slate-900 tracking-tight">Global Search</span>
+          <span className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">Ctrl + K</span>
+        </div>
+      </button>
+
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <CommandPalette isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       
       <main className="flex-1 flex flex-col min-h-screen lg:pl-72">
         {/* Main Area */}

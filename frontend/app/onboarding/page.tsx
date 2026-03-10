@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -55,9 +56,11 @@ export default function OnboardingPage() {
     onSuccess: (res, formData) => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
       setPatient(res.data.patientId, formData);
+      toast.success("Patient registered successfully!");
       router.push(`/consultation/acute?patientId=${res.data.patientId}`);
     },
-    onError: () => {
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to register patient");
     }
   });
 

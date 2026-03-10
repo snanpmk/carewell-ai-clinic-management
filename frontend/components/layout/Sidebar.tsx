@@ -156,6 +156,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </Link>
               );
             })}
+
           </nav>
         </div>
       </div>
