@@ -58,8 +58,6 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
       <StepLayout
         title="Analytical Drafting"
         subtitle="AI-Assisted Synthesis & Totality"
-        icon={<Sparkles className="w-5 h-5" />}
-        iconVariant="gradient"
         onBack={prevStep}
         nextLabel="Final Management"
         error={analysisMutation.error?.message}
@@ -76,35 +74,35 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
           </Button>
         }
       >
-        <div className="space-y-6 text-sm">
-          <div className="space-y-6">
+        <div className="space-y-4 text-sm">
+          <div className="space-y-4">
             <Textarea
-              label="Suggested Totality of Symptoms (Review & Edit)"
+              label="Suggested Totality (Review & Edit)"
               {...register("homeopathicDiagnosis.totalityOfSymptoms")}
-              placeholder="Awaiting synthesis... Click 'Draft Totality' to generate."
-              className="min-h-[120px]"
+              placeholder="Awaiting synthesis..."
+              className="min-h-[80px]"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Textarea
-                label="Miasmatic Evaluation (Draft)"
+                label="Miasmatic Evaluation"
                 {...register("homeopathicDiagnosis.miasmaticExpression")}
-                placeholder="Dominant miasm considerations..."
-                className="min-h-[140px]"
+                placeholder="Dominant miasm..."
+                className="min-h-[80px]"
               />
 
               <Textarea
                 label="Differential Considerations"
                 {...register("homeopathicDiagnosis.differentialConsiderations")}
-                placeholder="Suggested remedy profiles for study..."
-                className="min-h-[140px]"
+                placeholder="Suggested remedy profiles..."
+                className="min-h-[80px]"
               />
             </div>
 
             {/* Read-only Repertorization Display */}
             {repertorization && repertorization.length > 0 && (
               <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100/60">
-                <h3 className="text-sm font-bold text-indigo-900 flex items-center gap-2 mb-4">
+                <h3 className="eyebrow text-slate-900! flex items-center gap-2 mb-4">
                   <ListTree className="w-4 h-4 text-indigo-500" /> Suggested Rubrics
                 </h3>
                 <div className="space-y-3">

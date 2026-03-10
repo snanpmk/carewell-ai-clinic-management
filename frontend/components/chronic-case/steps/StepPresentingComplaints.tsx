@@ -2,7 +2,6 @@
 
 import { StepProps } from "../ChronicCaseWizard";
 import { ChronicCase } from "@/types/chronicCase";
-import { History } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { initialPresentationSchema } from "@/lib/validations/chronicCase";
@@ -38,32 +37,30 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
       <StepLayout
         title="Clinical Presentation"
         subtitle="Narrative & Observation"
-        icon={<History className="w-5 h-5" />}
-        iconVariant="amber"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
-        <div className="space-y-8 text-sm">
+        <div className="space-y-6 text-sm">
           {/* Patient Narration */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-100/50 px-2.5 py-1 rounded-lg shadow-xs">Ipsisima Verba</span>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-100/50 px-2 py-0.5 rounded-lg">Ipsisima Verba</span>
             </div>
             <Textarea
               label="Patient's Narration"
               {...register("initialPresentation.patientNarration")}
               placeholder="Record the patient's exact words..."
-              className="min-h-[120px]"
+              className="min-h-[100px]"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Physician Observation */}
             <Textarea
               label="Objective Observation"
               {...register("initialPresentation.physicianObservation")}
               placeholder="Facial expression, gait, posture, eye contact..."
-              className="min-h-[140px]"
+              className="min-h-[120px]"
             />
 
             {/* Complaints Summary */}
@@ -71,7 +68,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
               label="LSMA Framework (Loc/Sens/Mod/Acc)"
               {...register("historyOfPresentIllness.progression")}
               placeholder="Location, Sensation, Modalities, Accompaniments..."
-              className="min-h-[140px] border-dashed shadow-none"
+              className="min-h-[120px] border-dashed shadow-none"
             />
           </div>
         </div>

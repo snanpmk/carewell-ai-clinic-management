@@ -33,7 +33,6 @@ export default function AppointmentsPage() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-             <div className="p-2 bg-purple-100 rounded-xl"><FileText className="w-6 h-6 text-purple-600" /></div>
              Medical Records
           </h1>
           <p className="text-sm text-slate-500 mt-2 font-medium">Chronological record of clinic consultations.</p>

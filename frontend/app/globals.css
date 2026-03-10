@@ -5,9 +5,18 @@
   --color-brand-secondary: #003057; /* Deep Navy from "CAREWELL" */
   --color-brand-accent: #85C2CB; /* Light Teal from "HOMOEOPATHIC CLINIC" */
   --color-surface-slate: #0F172A;
-
+  
+  /* Additional functional colors */
+  --color-brand-primary-light: #E6F4F5;
+  --color-brand-primary-dark: #00727A;
+  
   --animate-fade-in-up: fadeInUp 0.35s ease-out both;
   --animate-pulse-teal: pulse-teal 1.4s ease-in-out infinite;
+  
+  /* Standardized Font Weights */
+  --font-weight-black: 900;
+  --font-weight-bold: 700;
+  --font-weight-medium: 500;
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
@@ -26,6 +35,23 @@ body {
   min-height: 100vh;
 }
 
+/* ── Typography Standards ─────────────────────────────────────────────────── */
+h1 {
+  @apply text-3xl md:text-4xl font-black text-slate-900 tracking-tight;
+}
+
+h2 {
+  @apply text-xl md:text-2xl font-black text-slate-900 tracking-tight;
+}
+
+h3 {
+  @apply text-lg md:text-xl font-black text-slate-900 tracking-tight;
+}
+
+.eyebrow {
+  @apply text-[11px] font-black uppercase tracking-widest text-slate-500;
+}
+
 /* ── Page Entry Animation ─────────────────────────────────────────────────── */
 @keyframes fadeInUp {
   from {
@@ -42,4 +68,14 @@ body {
 @keyframes pulse-teal {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+/* ── Shimmer for Stepper Lines ───────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
 }

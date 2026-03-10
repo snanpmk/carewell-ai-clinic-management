@@ -149,7 +149,7 @@ function AuthContent() {
         </div>
 
         <div className="relative z-10 max-w-lg mb-10 mt-auto">
-          <h1 className="text-5xl font-black leading-tight tracking-tight mb-6">
+          <h1 className="mb-6">
             Smarter Healing.<br />
             Faster Insights.<br />
             Care Anywhere.
@@ -164,13 +164,13 @@ function AuthContent() {
       <div className="flex-1 flex flex-col justify-center items-center p-8 relative overflow-y-auto w-full">
         <div className="w-full max-w-md mx-auto relative z-10 my-auto py-10">
           <div className="lg:hidden flex items-center gap-3 mb-10 justify-center">
-             <div className="p-2 bg-blue-600 rounded-xl">
+             <div className="p-2 bg-brand-primary rounded-xl">
                <HeartPulse className="w-6 h-6 text-white" />
              </div>
              <span className="font-black text-2xl tracking-tight text-slate-900">Carewell AI</span>
           </div>
 
-          <h2 className="text-4xl font-black text-slate-900 mb-2 tracking-tight">
+          <h2 className="mb-2">
             {isInvite ? "Join Clinic!" : isLogin ? "Welcome Back!" : "Register Clinic"}
           </h2>
           <p className="text-slate-500 font-medium mb-10">
@@ -223,7 +223,7 @@ function AuthContent() {
 
               {!isInvite && (
                 <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Doctor Profile Picture</label>
+                  <label className="eyebrow mb-2 ml-1 block">Doctor Profile Picture</label>
                   <label className="flex items-center gap-4 w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 cursor-pointer hover:bg-slate-100 transition-colors">
                     <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                     <div className="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm relative">
@@ -248,7 +248,7 @@ function AuthContent() {
               <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-slate-400 font-black text-[11px] uppercase tracking-widest">
+              <span className="px-4 bg-white eyebrow">
                 {isInvite ? "Sign In to Accept" : isLogin ? "Authenticate" : "Complete Registration"}
               </span>
             </div>
@@ -256,7 +256,7 @@ function AuthContent() {
 
           <div className="flex justify-center w-full mb-8" style={{ minHeight: '44px' }}>
              {isLoading ? (
-                <div className="text-sm font-bold text-blue-600 bg-blue-50 py-3 px-6 rounded-2xl w-full flex justify-center items-center gap-2">
+                <div className="text-sm font-bold text-brand-primary bg-brand-primary/10 py-3 px-6 rounded-2xl w-full flex justify-center items-center gap-2">
                    <Loader2 className="w-5 h-5 animate-spin" />
                    Authenticating...
                 </div>
@@ -286,7 +286,7 @@ function AuthContent() {
                   setProfileImage(null);
                   setImagePreview(null);
                 }}
-                className="text-slate-900 font-black hover:text-blue-600 transition-colors underline decoration-2 underline-offset-4 pointer-events-auto"
+                className="text-slate-900 font-black hover:text-brand-primary transition-colors underline decoration-2 underline-offset-4 pointer-events-auto"
               >
                 {isLogin ? "Sign up here" : "Log in here"}
               </button>

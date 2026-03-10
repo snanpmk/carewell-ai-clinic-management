@@ -2,7 +2,6 @@
 
 import { StepProps } from "../ChronicCaseWizard";
 import { ChronicCase } from "@/types/chronicCase";
-import { Activity } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { physicalsSchema } from "@/lib/validations/chronicCase";
@@ -54,18 +53,16 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
       <StepLayout
         title="Physical Constitution"
         subtitle="Generals & Physical Features"
-        icon={<Activity className="w-5 h-5" />}
-        iconVariant="emerald"
         onBack={prevStep}
         isSubmitting={isSubmitting}
         nextLabel="Special History"
       >
-        <div className="space-y-6 text-sm">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Input
               label="Physical Build"
               {...register("physicalFeatures.generalAppearance.build")}
-              placeholder="Obese, Thin, Stocky..."
+              placeholder="Obese, Thin..."
             />
 
             <Input
@@ -87,22 +84,22 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
             />
           </div>
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <span className={hintClass}>Record clinical generals: Sleep, Thirst, Sweat, Bowels, Appetite</span>
               <Textarea
                 label="Functional Generals"
                 {...register("physicalFeatures.functionalGenerals.appetite")}
-                placeholder="Record patterns and irregularities..."
-                className="min-h-[100px]"
+                placeholder="Record patterns..."
+                className="min-h-[60px]"
               />
             </div>
 
             <Textarea
               label="Sleep & Dreams"
               {...register("physicalFeatures.functionalGenerals.sleep")}
-              placeholder="Sleep patterns and significant dreams..."
-              className="min-h-[100px] border-dashed shadow-none"
+              placeholder="Significant dreams..."
+              className="min-h-[60px] border-dashed shadow-none"
             />
           </div>
         </div>

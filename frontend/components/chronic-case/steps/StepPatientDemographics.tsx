@@ -1,7 +1,7 @@
 "use client";
 
 import { StepProps } from "../ChronicCaseWizard";
-import { ClipboardList, User } from "lucide-react";
+import { User } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { getAllPatients } from "@/services/patientService";
 import { useQuery } from "@tanstack/react-query";
@@ -90,21 +90,19 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
       <StepLayout
         title="Administrative Data"
         subtitle="Patient Demographics & Identification"
-        icon={<ClipboardList className="w-5 h-5" />}
-        iconVariant="blue"
         isFirstStep
         isSubmitting={isSubmitting}
         error={Object.keys(errors).length > 0 ? "Please check the required fields below." : undefined}
       >
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Patient Selection */}
-          <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+            <h3 className="eyebrow text-slate-900! flex items-center gap-2 mb-4">
               <User className="w-4 h-4 text-blue-500" /> Choose Registered Patient
             </h3>
             <div className="max-w-md">
               {allPatientsLoading ? (
-                <div className="h-11 w-full bg-slate-100 animate-pulse rounded-xl" />
+                <div className="h-10 w-full bg-slate-100 animate-pulse rounded-lg" />
               ) : (
                 <Select
                   label="Select Patient"
@@ -119,7 +117,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
             <div className="md:col-span-2">
               <Input
                 label="Full Patient Name"

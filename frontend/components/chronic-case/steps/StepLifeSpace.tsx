@@ -2,7 +2,6 @@
 
 import { StepProps } from "../ChronicCaseWizard";
 import { ChronicCase } from "@/types/chronicCase";
-import { Brain } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mentalProfileSchema } from "@/lib/validations/chronicCase";
@@ -37,8 +36,6 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
       <StepLayout
         title="Mental Profile"
         subtitle="Disposition & Life Space"
-        icon={<Brain className="w-5 h-5" />}
-        iconVariant="purple"
         onBack={prevStep}
         isSubmitting={isSubmitting}
         nextLabel="Physical Analysis"

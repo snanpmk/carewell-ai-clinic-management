@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
-import { User, Phone, ArrowRight } from "lucide-react";
+import { User, Phone, ArrowRight, UserPlus, Sparkles } from "lucide-react";
 
 // ── Validation Schema ──────────────────────────────────────────────────────
 const schema = z.object({
@@ -71,40 +71,38 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
+    <div className="w-full space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both pb-12 px-4 md:px-0">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-3">
-             <div className="p-2 bg-blue-100 rounded-xl"><User className="w-6 h-6 text-blue-600" /></div>
-             Registration
-          </h1>
-          <p className="text-sm text-slate-500 mt-2 font-medium italic">Onboard new patients into the CareWell Homeo clinic system.</p>
+        <div className="flex-1">
+          <h1>Patient Onboarding</h1>
+          <p className="text-sm text-slate-500 font-medium tracking-tight ml-1 italic">Register new patients into the CareWell Homeopathic registry.</p>
         </div>
       </div>
 
-      <Card className="p-6 sm:p-10 border-slate-200 rounded-3xl shadow-xl shadow-slate-200/50 bg-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-blue-50 to-transparent rounded-bl-full pointer-events-none opacity-40" />
+      <Card className="p-6 sm:p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-linear-to-br from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-12 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
             {/* Essential Info */}
-            <div className="space-y-8">
-              <h3 className="text-xs font-black text-blue-500 uppercase tracking-[0.3em] flex items-center gap-3">
-                 <div className="w-8 h-px bg-blue-500 opacity-30" /> Identity & Profile
-              </h3>
+            <div className="space-y-10">
+              <p className="eyebrow text-brand-primary flex items-center gap-4">
+                 <div className="w-10 h-px bg-brand-primary/30" /> Personal Identity
+              </p>
               
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <Input
-                  label="Full Name"
+                  label="Full Legal Name"
                   {...register("name")}
-                  placeholder="e.g. John Doe"
-                  leftIcon={<User className="w-4 h-4" />}
+                  placeholder="e.g. Johnathan Doe"
+                  leftIcon={<User className="w-5 h-5" />}
                   error={errors.name?.message}
                   required
                   privacyBlur={privacyMode}
+                  className="h-14"
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <Input
                     label="Age"
                     type="number"
@@ -112,10 +110,11 @@ export default function OnboardingPage() {
                     placeholder="25"
                     error={errors.age?.message}
                     required
+                    className="h-14"
                   />
 
                   <Select
-                    label="Gender"
+                    label="Gender Profile"
                     options={[
                       { value: "Male", label: "Male" },
                       { value: "Female", label: "Female" },
@@ -123,82 +122,86 @@ export default function OnboardingPage() {
                     ]}
                     {...register("gender")}
                     required
+                    className="h-14"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <Input
-                    label="Phone Number"
+                    label="Primary Contact"
                     {...register("phone")}
-                    placeholder="+91 0000 0000"
-                    leftIcon={<Phone className="w-4 h-4" />}
+                    placeholder="+91 00000 00000"
+                    leftIcon={<Phone className="w-5 h-5" />}
                     error={errors.phone?.message}
                     required
                     privacyBlur={privacyMode}
+                    className="h-14"
                   />
 
                   <Input
                     label="Email (Optional)"
                     {...register("email")}
-                    placeholder="john@example.com"
+                    placeholder="patient@email.com"
                     privacyBlur={privacyMode}
+                    className="h-14"
                   />
                 </div>
               </div>
             </div>
 
             {/* Background Info */}
-            <div className="space-y-8">
-              <h3 className="text-xs font-black text-emerald-500 uppercase tracking-[0.3em] flex items-center gap-3">
-                 <div className="w-8 h-px bg-emerald-500 opacity-30" /> Residence & Medical Info
-              </h3>
+            <div className="space-y-10">
+              <p className="eyebrow text-brand-accent flex items-center gap-4">
+                 <div className="w-10 h-px bg-brand-accent/30" /> Clinical Context
+              </p>
 
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <Textarea
-                  label="Present Address"
+                  label="Residential Address"
                   {...register("address")}
-                  rows={2}
-                  placeholder="Location details..."
+                  rows={3}
+                  placeholder="Street details, locality, city..."
                   privacyBlur={privacyMode}
                 />
 
-                <div className="relative">
+                <div className="relative group">
                   <Textarea
-                    label="Known Medical Conditions"
+                    label="Medical History Overview"
                     {...register("medicalConditions")}
-                    rows={2}
-                    placeholder="Asthma, Diabetes, Allergies..."
+                    rows={4}
+                    placeholder="Asthma, Diabetes, Known Allergies, Surgical History..."
                   />
-                  <p className="text-[10px] text-slate-400 mt-2 italic ml-1">* Important for classical homeopathic evaluation.</p>
+                  <p className="text-[11px] text-slate-400 mt-3 font-medium italic flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-brand-accent" /> Constitutional data for classical evaluation.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Submission */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-slate-100 mt-12">
-            <div className="text-left">
-              <p className="text-sm font-black text-slate-900 uppercase tracking-tight">Security Check</p>
-              <p className="text-xs text-slate-400 font-medium">All clinical records are encrypted and HIPAA compliant.</p>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-10 pt-10 border-t border-slate-100 mt-16">
+            <div className="text-left max-w-sm">
+              <p className="text-base font-black text-slate-900 tracking-tight uppercase italic mb-1">Secure Registration</p>
+              <p className="text-sm text-slate-500 font-medium leading-relaxed">By registering, you confirm the clinical data is accurate and follows institutional compliance.</p>
             </div>
             
             <Button
               type="submit"
               variant="primary"
               size="lg"
-              className="min-w-[280px]"
+              className="h-16 w-full md:w-[320px]"
               isLoading={mutation.isPending}
-              rightIcon={<ArrowRight className="w-5 h-5" />}
-              fullWidth
+              rightIcon={<ArrowRight className="w-6 h-6" />}
             >
-              Register & Start Visit
+              Onboard & Initialize
             </Button>
           </div>
         </form>
       </Card>
       
       {mutation.error && (
-        <div className="rounded-2xl border-2 border-red-500 animate-in shake duration-500 overflow-hidden">
+        <div className="rounded-[2rem] border-2 border-red-500 animate-in shake duration-500 overflow-hidden shadow-2xl">
           <Alert type="error" message={mutation.error.message} />
         </div>
       )}

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
 import { Stepper } from "@/components/ui/Stepper";
+import { CheckCircle2, FileText, Sparkles, ChevronLeft, Save } from "lucide-react";
 
 export default function NotesPage() {
   const router = useRouter();
@@ -41,6 +42,9 @@ export default function NotesPage() {
         aiGeneratedNotes: aiNotes!,
         doctorEditedNotes: data,
       }),
+    onSuccess: () => {
+      // Potentially redirect or show success state
+    }
   });
 
   // Pre-fill editable notes with AI output when they become available
@@ -69,124 +73,131 @@ export default function NotesPage() {
   if (!aiNotes) return null;
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 animate-fade-in-up">
+    <div className="max-w-2xl mx-auto px-4 py-12 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both pb-24">
       {/* Stepper */}
-      <div className="mb-8">
+      <div className="mb-12">
         <Stepper currentStep={3} />
       </div>
 
       {/* Success State */}
       {mutation.isSuccess ? (
-        <Card className="text-center py-10">
-          <div className="w-16 h-16 rounded-full bg-green-100 mx-auto flex items-center justify-center mb-4">
-            <svg
-              className="w-8 h-8 text-green-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+        <Card className="text-center py-16 px-8 flex flex-col items-center">
+          <div className="w-24 h-24 rounded-[2rem] bg-brand-primary/10 flex items-center justify-center mb-8 border border-brand-primary/20 shadow-inner">
+            <CheckCircle2 className="w-12 h-12 text-brand-primary" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Consultation Saved
-          </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            The consultation record has been saved to the patient&apos;s profile.
+          <h1 className="mb-3">Consultation Saved</h1>
+          <p className="text-slate-500 mb-10 font-medium max-w-sm mx-auto">
+            The clinical record has been successfully committed to the patient&apos;s digital history.
           </p>
-          <Button onClick={handleStartNew} fullWidth>
-            Start New Consultation
-          </Button>
+          <div className="w-full max-w-xs space-y-3">
+            <Button onClick={handleStartNew} fullWidth variant="primary">
+              New Consultation
+            </Button>
+            <Button onClick={() => router.push('/dashboard')} fullWidth variant="ghost">
+              Back to Dashboard
+            </Button>
+          </div>
         </Card>
       ) : (
-        <div className="space-y-4">
-          <Card>
-            <div className="mb-5">
-              <h2 className="text-xl font-bold text-gray-900">
-                AI Generated Consultation Notes
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Review and edit the notes below before saving to the patient record.
-              </p>
-              {/* Symptom summary */}
+        <div className="space-y-8">
+          <div className="flex flex-col items-center text-center mb-4">
+            <div className="p-3 bg-brand-primary/10 rounded-2xl text-brand-primary mb-4 border border-brand-primary/20">
+              <Sparkles className="w-6 h-6 animate-pulse" />
+            </div>
+            <h1>Clinical Review</h1>
+            <p className="text-slate-500 font-medium mt-2">Finalize the AI-generated medical drafts</p>
+          </div>
+
+          <Card className="p-8 sm:p-10 space-y-8">
+            <div className="border-b border-slate-100 pb-8">
+              <h2 className="mb-4">Patient Assessment</h2>
               {symptomData && (
-                <div className="mt-3 flex flex-wrap gap-2 items-center">
-                  <span className="text-xs text-gray-400">Diagnosis:</span>
-                  <span className="text-xs font-medium text-gray-600">
-                    {symptomData.diagnosis || "None"}
-                  </span>
-                  <span className="text-xs text-gray-400 ml-1">Prescription:</span>
-                  <span className="text-xs font-medium text-gray-600">
-                    {symptomData.prescription || "None"}
-                  </span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <p className="eyebrow text-slate-400 mb-1">Diagnosis</p>
+                    <p className="font-black text-slate-900 tracking-tight uppercase italic">{symptomData.diagnosis || "UNSPECIFIED"}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <p className="eyebrow text-slate-400 mb-1">Prescription</p>
+                    <p className="font-black text-slate-900 tracking-tight uppercase italic">{symptomData.prescription || "UNSPECIFIED"}</p>
+                  </div>
                 </div>
               )}
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
-                  <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
-                    Drafted Chief Complaint
-                  </span>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              <div className="space-y-6">
+                <div className="group transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 bg-brand-primary/10 rounded-lg text-brand-primary">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <span className="eyebrow text-brand-primary">
+                      Chief Complaint Synthesis
+                    </span>
+                  </div>
+                  <Textarea
+                    {...register("chiefComplaint")}
+                    label=""
+                    rows={3}
+                    className="bg-slate-50/50 focus:bg-white transition-all"
+                  />
                 </div>
-                <Textarea
-                  {...register("chiefComplaint")}
-                  label=""
-                  rows={2}
-                />
-              </div>
 
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-                  <span className="text-xs font-semibold text-amber-600 uppercase tracking-wide">
-                    Clinical Synthesis
-                  </span>
+                <div className="group transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 bg-brand-accent/10 rounded-lg text-brand-accent">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                    <span className="eyebrow text-brand-accent">
+                      Clinical Analysis
+                    </span>
+                  </div>
+                  <Textarea
+                    {...register("assessment")}
+                    label=""
+                    rows={4}
+                    className="bg-slate-50/50 focus:bg-white transition-all"
+                  />
                 </div>
-                <Textarea
-                  {...register("assessment")}
-                  label=""
-                  rows={2}
-                />
-              </div>
 
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
-                  <span className="text-xs font-semibold text-green-600 uppercase tracking-wide">
-                    Advice
-                  </span>
+                <div className="group transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 bg-slate-950/10 rounded-lg text-slate-900">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <span className="eyebrow text-slate-900">
+                      Management & Advice
+                    </span>
+                  </div>
+                  <Textarea
+                    {...register("advice")}
+                    label=""
+                    rows={4}
+                    className="bg-slate-50/50 focus:bg-white transition-all"
+                  />
                 </div>
-                <Textarea
-                  {...register("advice")}
-                  label=""
-                  rows={2}
-                />
               </div>
 
               {mutation.error && <Alert type="error" message={mutation.error.message} />}
 
-              <div className="space-y-2 pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-6">
                 <Button
                   type="submit"
                   isLoading={mutation.isPending}
                   fullWidth
+                  variant="primary"
+                  leftIcon={<Save className="w-5 h-5" />}
                 >
-                  Save Consultation Record
+                  Confirm & Commit
                 </Button>
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/symptoms")}
                   fullWidth
+                  leftIcon={<ChevronLeft className="w-5 h-5" />}
                 >
-                  ← Back to Symptoms
+                  Edit Symptoms
                 </Button>
               </div>
             </form>

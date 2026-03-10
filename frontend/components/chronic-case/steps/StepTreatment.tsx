@@ -5,7 +5,7 @@ import { StepProps } from "../ChronicCaseWizard";
 import { ChronicCase } from "@/types/chronicCase";
 import { createChronicCase } from "@/services/chronicCaseService";
 import { useRouter } from "next/navigation";
-import { ClipboardList, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { treatmentSchema } from "@/lib/validations/chronicCase";
@@ -65,8 +65,6 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
       <StepLayout
         title="Management & Prescription"
         subtitle="Treatment & Remedial Plan"
-        icon={<ClipboardList className="w-5 h-5" />}
-        iconVariant="blue"
         onBack={prevStep}
         isLastStep
         isSubmitting={saveMutation.isPending}
@@ -74,16 +72,16 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
         nextIcon={<Save className="w-4 h-4" />}
         error={saveMutation.error?.message}
       >
-        <div className="space-y-6 text-sm">
-          <div className="space-y-6">
+        <div className="space-y-4 text-sm">
+          <div className="space-y-4">
             <Textarea
               label="Treatment Strategy"
               {...register("management.treatmentPlan")}
               placeholder="Overall strategy and clinical goals..."
-              className="min-h-[100px]"
+              className="min-h-[80px]"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
                 label="First Prescription"
                 {...register("management.firstPrescription.medicine")}

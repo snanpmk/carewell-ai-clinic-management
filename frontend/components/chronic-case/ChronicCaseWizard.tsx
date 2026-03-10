@@ -53,34 +53,30 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
 
   return (
     <div className="flex flex-col mx-auto w-full space-y-4 animate-in fade-in duration-500 pb-8">
-      {/* Header Section - More compact */}
-      <div className="flex flex-col gap-0.5 px-1">
-        <h1 className="text-xl lg:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-          <div className="p-2 bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100/50 shadow-xs">
-            <Sparkles className="w-4 h-4 text-blue-600" />
-          </div>
-          Chronic Case Builder
-        </h1>
-        <p className="text-xs text-slate-500 font-medium">
-          Comprehensive constitutional analysis and repertorization
+      {/* Header Section - Condensed */}
+      <div className="flex flex-col gap-0.5">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl">Chronic Case Builder</h1>
+        </div>
+        <p className="text-xs text-slate-500 font-medium tracking-tight ">
+          Constitutional analysis & repertorization
         </p>
       </div>
 
       {/* Stepper Navigation */}
       <ChronicCaseStepper steps={steps} currentStepIndex={currentStepIndex} />
 
-      {/* Main Form Container - No fixed height, natural scroll */}
+      {/* Main Form Container */}
       <div className="w-full">
-        <div className="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-lg shadow-slate-200/30 flex flex-col relative overflow-visible">
-          {/* Animated Transition for Steps - Reduced Padding */}
-          <div className="p-5 sm:p-8">
+        <div className="bg-white border border-slate-200 rounded-4xl shadow-2xl shadow-slate-200/40 flex flex-col relative overflow-visible">
+          <div className="p-6 sm:p-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStepIndex}
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
               >
                 <ActiveStep
                   caseData={caseData}

@@ -29,7 +29,7 @@ export default function PatientsPage() {
   });
 
   return (
-    <div className="mx-auto space-y-6 animate-in fade-in duration-500 pb-12 fill-mode-both">
+    <div className="mx-auto space-y-6 animate-in fade-in duration-500 pb-12 fill-mode-both px-4 md:px-0">
       <PatientsHeader />
 
       {isLoading ? (

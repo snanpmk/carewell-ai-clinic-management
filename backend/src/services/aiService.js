@@ -39,7 +39,7 @@ Respond ONLY with valid JSON.`;
  */
 const generateConsultationNotes = async (symptomData) => {
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-flash-latest",
+    model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
     generationConfig: {
       maxOutputTokens: 2048,
       temperature: 0.1, // Low temperature for high professionalism and consistency
@@ -77,7 +77,7 @@ const summarizePatientHistory = async (consultations) => {
   }
 
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-flash-latest",
+    model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
     generationConfig: { maxOutputTokens: 1000, temperature: 0.1 },
   });
 
@@ -108,7 +108,7 @@ Write a dense, 2-3 sentence professional summary. Avoid conversational language.
  */
 const analyzeChronicCase = async (caseData) => {
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-flash-latest",
+    model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
     generationConfig: {
       maxOutputTokens: 4096,
       temperature: 0.1,

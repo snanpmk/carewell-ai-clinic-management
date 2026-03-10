@@ -2,20 +2,23 @@ import React, { forwardRef } from "react";
 import { clsx } from "clsx";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   error?: string;
   leftIcon?: React.ReactNode;
   privacyBlur?: boolean;
+  labelClassName?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, leftIcon, id, className, privacyBlur, ...props }, ref) => {
-    const inputId = id || label.toLowerCase().replace(/\s+/g, "-");
+  ({ label, error, leftIcon, id, className, privacyBlur, labelClassName, ...props }, ref) => {
+    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : Math.random().toString(36).substring(7));
     return (
       <div className="flex flex-col gap-2 relative">
-        <label htmlFor={inputId} className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-          {label}
-        </label>
+        {label && (
+          <label htmlFor={inputId} className={clsx("eyebrow ml-1", labelClassName)}>
+            {label}
+          </label>
+        )}
         <div className={clsx("relative group transition-all", privacyBlur && "blur-sm select-none")}>
           {leftIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-primary transition-colors pointer-events-none">

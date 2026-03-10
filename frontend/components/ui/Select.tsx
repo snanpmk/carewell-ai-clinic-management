@@ -14,7 +14,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const inputId = id || label.toLowerCase().replace(/\s+/g, "-");
     return (
       <div className="flex flex-col gap-2 relative">
-        <label htmlFor={inputId} className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+        <label htmlFor={inputId} className="eyebrow ml-1">
           {label}
           {props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
         </label>

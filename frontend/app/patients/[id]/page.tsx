@@ -76,14 +76,13 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   });
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both px-4 md:px-0">
       {/* Navigation & Header */}
       <PatientProfileHeader patientId={patientId} />
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center p-24 text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin mb-4 text-blue-500" />
-          <p className="text-sm font-medium">Loading patient record...</p>
+          <p className="eyebrow animate-pulse">Syncing patient record...</p>
         </div>
       ) : !patient ? (
         <div className="text-center py-24 text-slate-500 bg-white border border-slate-200 rounded-3xl shadow-sm">

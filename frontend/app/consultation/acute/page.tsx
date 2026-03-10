@@ -37,6 +37,8 @@ interface Patient {
   phone: string;
 }
 
+import { Button } from "@/components/ui/Button";
+
 function ConsultationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -87,8 +89,6 @@ function ConsultationForm() {
         setValue("advice", result.data.advice);
       }
     },
-    onError: () => {
-    }
   });
 
   const aiNotes = generateMutation.data?.success ? generateMutation.data.data : null;
@@ -117,7 +117,7 @@ function ConsultationForm() {
 
   const handleSave = () => {
     const values = getValues();
-    
+
     if (!values.patientId) {
       toast.error("Please select a patient before saving.");
       return;
@@ -155,73 +155,76 @@ function ConsultationForm() {
     }));
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both w-full">
+    <div className="space-y-8 animate-in fade-in duration-500 fill-mode-both w-full pb-12 px-4 md:px-0">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex-1">
-          <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight uppercase">New Consultation</h1>
-          {patientLoading || allPatientsLoading ? (
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Status: Loading...</p>
-          ) : patient ? (
-            <p className="text-sm font-bold text-blue-600 mt-1 italic">
-              Case: <span className={clsx("transition-all", privacyMode && "blur-sm select-none")}>{patient?.name}</span> {patient?.age ? `(${patient.age}Y)` : ""}
-            </p>
-          ) : (
-            <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-1">Attention: Select a patient to begin</p>
-          )}
+          <h1>New Consultation</h1>
+          <div className="mt-2 flex items-center gap-3">
+            {patientLoading || allPatientsLoading ? (
+              <p className="eyebrow text-slate-400">Loading Patient Data...</p>
+            ) : patient ? (
+              <div className="flex items-center gap-2">
+                <span className="eyebrow text-brand-primary">Active Case:</span>
+                <span className={clsx("text-sm font-black text-slate-900 uppercase tracking-tight italic", privacyMode && "blur-sm select-none")}>
+                  {patient?.name} {patient?.age ? `(${patient.age}Y)` : ""}
+                </span>
+              </div>
+            ) : (
+              <p className="eyebrow text-amber-500">Select a patient to begin</p>
+            )}
+          </div>
         </div>
-        <button
+        <Button
           onClick={handleSave}
           disabled={saveMutation.isPending || !aiNotes}
-          className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-black uppercase tracking-widest text-white transition-all active:scale-95
-            ${!aiNotes ? 'bg-slate-200 cursor-not-allowed text-slate-400 shadow-none' : 'bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200'}`}
+          variant="primary"
+          leftIcon={saveMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
         >
-          {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Save Consultation
-        </button>
+          Save Case
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
         {/* Left Side: Input Form */}
-        <div className="space-y-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-4 border-b border-slate-100 pb-4">
-            <User className="w-5 h-5 text-blue-500" />
-            Patient Input
-          </h2>
+        <div className="xl:col-span-5 space-y-8 bg-white p-6 sm:p-10 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40">
+          <div className="border-b border-slate-100 pb-6">
+            <h2 className="text-xl font-black text-slate-900 uppercase italic tracking-tight">Clinical Input</h2>
+          </div>
 
-          <form onSubmit={handleSubmit(onGenerate)} className="space-y-5">
+          <form onSubmit={handleSubmit(onGenerate)} className="space-y-6">
             {!urlPatientId && (
               <Select
-                label="Select Patient"
+                label="Target Patient"
                 options={patientOptions}
-                placeholder="-- Choose a patient --"
+                placeholder="Search patient registry..."
                 {...register("patientId")}
                 error={errors.patientId?.message}
               />
             )}
 
             <Textarea
-              label="Chief Complaint / Symptoms"
+              label="Chief Complaint"
               {...register("symptoms")}
-              rows={3}
-              placeholder="E.g. Migraine, cold"
+              rows={4}
+              placeholder="Primary symptoms reported by patient..."
               error={errors.symptoms?.message}
               required
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Textarea
-                label="Modalities (Better / Worse)"
+                label="Modalities"
                 {...register("modalities")}
                 rows={2}
-                placeholder="E.g. Worse from cold, better resting"
+                placeholder="Better / Worse from..."
               />
 
               <Textarea
-                label="Mentals / Disposition"
+                label="Mentals"
                 {...register("mentals")}
                 rows={2}
-                placeholder="E.g. Irritable, weepy, anxious"
+                placeholder="Disposition, mood..."
               />
             </div>
 
@@ -229,121 +232,105 @@ function ConsultationForm() {
               label="Physical Generals"
               {...register("generals")}
               rows={2}
-              placeholder="E.g. Thirstless, craves salts, chilly"
+              placeholder="Thirst, appetite, sleep, thermal..."
             />
 
             <Input
-              label="Diagnosis / Assessment (Optional)"
+              label="Assessment / Diagnosis"
               {...register("diagnosis")}
               placeholder="E.g. Common Cold"
-              leftIcon={<Activity className="w-4 h-4" />}
+              leftIcon={<Activity className="w-5 h-5" />}
             />
 
             <Textarea
-              label="Additional Notes"
+              label="Additional Context"
               {...register("additionalNotes")}
               rows={2}
-              placeholder="E.g. Worse in morning"
+              placeholder="Any other observations..."
             />
 
-            {Object.keys(errors).length > 0 && !aiNotes && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-xs font-bold text-red-600 flex items-center gap-2">
-                  <Activity className="w-3 h-3" /> Please fill required fields (Patient, Symptoms)
-                </p>
-              </div>
-            )}
-
-            <button
+            <Button
               type="submit"
-              disabled={generateMutation.isPending}
-              className={`w-full py-3 flex items-center justify-center gap-2 rounded-lg text-sm font-bold tracking-wide text-white transition-all 
-                ${generateMutation.isPending 
-                  ? "bg-indigo-400 cursor-not-allowed" 
-                  : "bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg"
-                }`}
+              isLoading={generateMutation.isPending}
+              variant="secondary"
+              fullWidth
+              leftIcon={<Sparkles className="w-5 h-5" />}
+              className="mt-4 h-14"
             >
-              {generateMutation.isPending ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Analyzing Symptoms...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Generate AI Notes
-                </>
-              )}
-            </button>
+              Analyze & Draft Notes
+            </Button>
           </form>
         </div>
 
         {/* Right Side: AI Generated Notes */}
-        <div className="space-y-6">
-          <div className="bg-linear-to-br from-indigo-50 to-blue-50 p-6 rounded-xl border border-indigo-100 shadow-sm h-full flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-bl-full pointer-events-none" />
-            
-            <h2 className="text-lg font-bold text-indigo-900 flex items-center gap-2 mb-6 border-b border-indigo-200/60 pb-4 relative z-10">
-              <Sparkles className="w-5 h-5 text-indigo-500" />
-              Clinical Drafting (Assistant)
-            </h2>
+        <div className="xl:col-span-7">
+          <div className="bg-slate-950 p-6 sm:p-10 rounded-[2.5rem] border border-slate-900 shadow-2xl h-full flex flex-col relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-brand-primary/10 transition-all duration-700" />
+
+            <div className="mb-8 border-b border-white/5 pb-6 relative z-10">
+              <h2 className="text-xl  text-slate-200! uppercase italic tracking-tight">AI  Clinical Assistant</h2>
+            </div>
+
 
             {aiNotes ? (
-              <div className="space-y-5 flex-1 relative z-10 animate-in fade-in slide-in-from-bottom-2">
-                <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-indigo-100 shadow-sm">
-                  <Textarea
-                    label="Drafted Chief Complaint"
-                    defaultValue={aiNotes.chiefComplaint}
-                    readOnly
-                    rows={4}
-                    className="bg-transparent border-none p-0 text-sm font-medium text-slate-800 focus:ring-0 resize-y min-h-[80px] shadow-none"
-                  />
-                </div>
-                
-                <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-indigo-100 shadow-sm">
-                  <Textarea
-                    label="Clinical Synthesis"
-                    defaultValue={aiNotes.assessment}
-                    readOnly
-                    rows={4}
-                    className="bg-transparent border-none p-0 text-sm font-medium text-slate-800 focus:ring-0 resize-y min-h-[120px] shadow-none"
-                  />
+              <div className="space-y-8 flex-1 relative z-10 animate-in fade-in slide-in-from-bottom-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
+                    <p className="eyebrow text-brand-primary mb-3">Drafted Complaint</p>
+                    <p className="text-sm font-medium text-slate-300 leading-relaxed italic">&quot;{aiNotes.chiefComplaint}&quot;</p>
+                  </div>
+
+                  <div className="bg-white/5 p-6 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
+                    <p className="eyebrow text-brand-accent mb-3">Clinical Logic</p>
+                    <p className="text-sm font-medium text-slate-300 leading-relaxed italic border-l-4 border-brand-accent/20 pl-4">{aiNotes.assessment}</p>
+                  </div>
                 </div>
 
                 {aiNotes.aiSuggestions && (
-                  <div className="bg-amber-50/80 backdrop-blur-sm p-4 rounded-lg border border-amber-200 shadow-sm">
-                    <label className="flex items-center gap-1.5 text-xs font-bold text-amber-600 uppercase tracking-widest mb-2">
-                      <Sparkles className="w-3.5 h-3.5" /> Analytical Considerations
-                    </label>
-                    <p className="text-sm font-medium text-amber-900 whitespace-pre-wrap leading-relaxed">
+                  <div className="bg-brand-primary/5 p-6 rounded-3xl border border-brand-primary/10 shadow-inner">
+                    <label className="eyebrow text-brand-primary mb-3 flex items-center gap-2">
+                       <Sparkles className="w-4 h-4" /> Analytical Suggestions
+                     </label>
+                    <p className="text-sm font-medium text-slate-300 whitespace-pre-wrap leading-relaxed">
                       {aiNotes.aiSuggestions}
                     </p>
                   </div>
                 )}
 
-                <Textarea
-                  label="Physician's Plan & Advice (Required)"
-                  {...register("advice")}
-                  rows={8}
-                  className="bg-white/80 border-indigo-100"
-                />
-
-                <div className="bg-emerald-50/80 backdrop-blur-sm p-4 rounded-lg border border-emerald-200 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400 transition-all">
-                  <Input
-                    label="Final Prescription (Required)"
-                    {...register("prescription")}
-                    placeholder="E.g. Nux Vomica 200c, 2 pills TID"
-                    leftIcon={<FileText className="w-4 h-4 text-emerald-500" />}
-                    error={errors.prescription?.message}
-                    className="bg-white/80"
+                <div className="space-y-6">
+                  <Textarea
+                    label="Final Plan & Patient Advice"
+                    {...register("advice")}
+                    rows={6}
+                    placeholder="Enter management plan and instructions..."
+                    className="bg-white/5 border-white/10 text-white focus:border-brand-accent h-auto"
+                    labelClassName="text-slate-200!"
                   />
+
+                  <div className="bg-linear-to-br from-brand-primary/10 to-transparent p-1 rounded-4xl border border-brand-primary/20 shadow-2xl">
+                    <div className="bg-slate-900 rounded-[1.9rem] p-6 border border-white/5">
+                      <Input
+                        label="Final Prescription"
+                        {...register("prescription")}
+                        placeholder="Remedy Name, Potency, Dosage..."
+                        leftIcon={<FileText className="w-5 h-5 text-brand-primary" />}
+                        error={errors.prescription?.message}
+                        className="bg-white/5 border-white/10 text-white h-14"
+                        labelClassName="text-slate-200!"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 relative z-10 text-indigo-300">
-                <FileText className="w-16 h-16 mb-4 opacity-50" />
-                <p className="font-medium text-indigo-400">No notes generated yet.</p>
-                <p className="text-sm mt-2 max-w-xs leading-relaxed">Fill out the patient symptoms on the left and click &quot;Generate&quot; to create structured medical notes.</p>
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-8 relative z-10 text-slate-400">
+                <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-6 border border-white/5 shadow-inner">
+                  <FileText className="w-10 h-10 opacity-30" />
+                </div>
+                <p className="eyebrow mb-2 text-slate-300!">Awaiting Diagnosis</p>
+                <p className="text-sm font-medium text-slate-400 max-w-xs leading-relaxed">
+                  Fill out the clinical symptoms on the left and trigger the AI analysis to generate medical drafts.
+                </p>
               </div>
             )}
           </div>
@@ -353,11 +340,11 @@ function ConsultationForm() {
   );
 }
 
-
 export default function Page() {
   return (
-    <Suspense fallback={<div className="flex justify-center h-64 items-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>}>
+    <Suspense fallback={<div className="flex justify-center h-64 items-center"><Loader2 className="w-10 h-10 animate-spin text-brand-primary" /></div>}>
       <ConsultationForm />
     </Suspense>
   );
 }
+

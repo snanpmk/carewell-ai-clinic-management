@@ -24,20 +24,22 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
   return (
     <>
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
-          <div className="p-2.5 bg-indigo-50/80 rounded-xl border border-indigo-100/50 shadow-xs shadow-indigo-100">
-            <Clock className="w-5 h-5 text-indigo-500" />
+        <h2 className="text-xl font-black text-slate-900 flex items-center gap-4 tracking-tight uppercase italic">
+          <div className="p-3 bg-brand-primary/10 rounded-2xl border border-brand-primary/20 shadow-inner">
+            <Clock className="w-6 h-6 text-brand-primary" />
           </div>
           Clinical Timeline
         </h2>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {visits.length === 0 ? (
-          <div className="bg-slate-50 border-2 border-dashed border-slate-200/80 rounded-3xl p-16 text-center shadow-xs">
-            <FileText className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Empty Record</p>
-            <p className="text-slate-400 text-sm mt-2">No past visits found for this patient.</p>
+          <div className="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] p-24 text-center shadow-sm">
+            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <FileText className="w-10 h-10 text-slate-200" />
+            </div>
+            <p className="eyebrow">Empty Medical Record</p>
+            <p className="text-slate-400 text-sm mt-3 font-medium">No past visits found for this patient.</p>
           </div>
         ) : (
           visits.map((visit: UnifiedVisitItem, idx: number) => {
@@ -60,61 +62,64 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                 : "No prescription finalized.";
 
               return (
-                <div key={visit._id} className="bg-linear-to-b from-rose-50/50 to-white border border-rose-200/70 rounded-3xl p-8 shadow-sm hover:shadow-lg hover:shadow-rose-100/50 transition-all duration-300 group relative overflow-hidden backdrop-blur-md">
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-rose-500 to-pink-500 opacity-100" />
+                <div key={visit._id} className="bg-slate-950 border border-slate-900 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group transition-all duration-500">
+                  <div className="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-brand-primary to-brand-accent opacity-100" />
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-brand-primary/10 transition-all duration-700" />
                   
-                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 pb-6 border-b border-rose-100/60">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-linear-to-br from-rose-100 to-pink-100 border border-rose-200 rounded-2xl flex items-center justify-center text-rose-600 shadow-xs shadow-rose-200/40">
-                        <Sparkles className="w-5 h-5" />
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 pb-8 border-b border-white/5">
+                    <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 bg-linear-to-br from-brand-primary to-brand-accent rounded-2xl flex items-center justify-center text-white shadow-xl shadow-brand-primary/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+                        <Sparkles className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-black text-slate-900 tracking-tight">Chronic Evaluation</h3>
-                        <p className="text-xs font-bold text-slate-400 mt-0.5 uppercase tracking-widest">
+                        <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Chronic Evaluation</h3>
+                        <p className="eyebrow text-brand-accent mt-1.5 opacity-80">
                            {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                       </div>
                     </div>
-                    <span className="inline-flex items-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-rose-100 text-rose-700 border border-rose-200/60 shadow-xs shadow-rose-100">
-                        Chronic Focus
+                    <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 text-brand-accent border border-white/10 shadow-inner">
+                        Depth Focus
                     </span>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="space-y-8">
                       <div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <Activity className="w-3.5 h-3.5 text-rose-500" /> Totality of Symptoms
+                         <p className="eyebrow mb-4 flex items-center gap-2 text-slate-400">
+                            <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
                          </p>
-                         <div className="p-5 bg-white rounded-2xl border border-rose-100 shadow-[0_2px_10px_-3px_rgba(255,228,230,0.5)]">
-                           <p className="text-sm font-medium text-slate-700 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
+                         <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
+                           <p className="text-sm md:text-base font-medium text-slate-300 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
                          </div>
                       </div>
 
                       <div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> Rubrics & Remedies
+                         <p className="eyebrow mb-4 flex items-center gap-2 text-slate-400">
+                            <Sparkles className="w-4 h-4 text-brand-accent" /> Repertorization
                          </p>
-                         <div className="p-5 bg-white/50 rounded-2xl border border-indigo-100/60 shadow-[0_2px_10px_-3px_rgba(224,231,255,0.5)]">
-                           <p className="text-xs font-medium text-slate-600 leading-relaxed max-h-24 overflow-y-auto mb-3 border-b border-indigo-50 pb-3">{rubric}</p>
-                           <p className="text-xs font-bold text-indigo-700"><span className="text-indigo-400 font-medium">Suggestions:</span> {remedies}</p>
+                         <div className="p-6 bg-slate-900 rounded-3xl border border-white/5 shadow-inner">
+                           <p className="text-xs font-medium text-slate-400 leading-relaxed max-h-32 overflow-y-auto mb-4 border-b border-white/5 pb-4 custom-scrollbar">{rubric}</p>
+                           <p className="text-xs font-black text-brand-accent uppercase tracking-widest leading-snug"><span className="text-slate-500 font-black mr-2">Suggestions:</span> {remedies}</p>
                          </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-6">
-                      <div className="bg-linear-to-br from-rose-50 to-pink-50/30 rounded-3xl p-7 border border-rose-200/60 relative shadow-[0_4px_20px_-4px_rgba(255,228,230,0.5)] h-full">
-                         <div className="absolute top-5 right-5 text-rose-300">
-                           <FileText className="w-8 h-8 opacity-40 mix-blend-multiply" />
+                    <div className="space-y-8">
+                      <div className="bg-linear-to-br from-white/5 to-transparent rounded-[2rem] p-8 border border-white/10 relative shadow-2xl h-full flex flex-col justify-center">
+                         <div className="absolute top-6 right-6 text-white/5">
+                           <FileText className="w-12 h-12" />
                          </div>
-                         <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-4">First Prescription</p>
-                         <p className="text-lg font-black text-slate-800 leading-tight mb-2 tracking-tight line-clamp-2">
+                         <p className="eyebrow text-brand-primary mb-6">Management Plan</p>
+                         <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-2 uppercase italic">
                            {docPrescription}
                          </p>
                          {c.management?.supportiveMeasures && (
-                           <p className="text-xs text-slate-500 font-medium italic mt-5 pt-5 border-t border-rose-200/50">
-                             <span className="text-rose-400 not-italic font-bold mr-1">Advice:</span> {c.management.supportiveMeasures}
-                           </p>
+                           <div className="mt-6 pt-6 border-t border-white/5">
+                             <p className="text-xs text-slate-400 font-medium leading-relaxed italic">
+                               <span className="eyebrow text-brand-accent not-italic mr-2">Advice:</span> {c.management.supportiveMeasures}
+                             </p>
+                           </div>
                          )}
                       </div>
                     </div>
@@ -150,38 +155,38 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
             }
 
             return (
-              <div key={visit._id} className="bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 group relative overflow-hidden backdrop-blur-md">
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div key={visit._id} className="bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/40 group relative overflow-hidden transition-all duration-500 hover:shadow-2xl">
+                <div className="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-brand-primary/20 to-brand-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 pb-6 border-b border-slate-100">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-linear-to-br from-slate-50 to-slate-100 border border-slate-200 shadow-xs rounded-2xl flex items-center justify-center text-slate-500 font-black text-lg group-hover:text-blue-600 transition-colors">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 pb-8 border-b border-slate-100">
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 bg-slate-50 border border-slate-200 shadow-inner rounded-2xl flex items-center justify-center text-slate-400 font-black text-xl group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
                       {visits.length - idx}
                     </div>
                     <div>
-                      <h3 className="text-lg font-black text-slate-900 tracking-tight">Acute Consultation</h3>
-                      <p className="text-xs font-bold text-slate-400 mt-0.5 uppercase tracking-widest">
+                      <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase italic">Acute Consultation</h3>
+                      <p className="eyebrow mt-1.5">
                          {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
                     </div>
                   </div>
-                  <span className="inline-flex items-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-50 text-slate-500 border border-slate-200/60 shadow-xs group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-200 transition-colors">
+                  <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-slate-100 text-slate-500 border border-slate-200 shadow-inner group-hover:bg-brand-primary/10 group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
                       {visit.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-8">
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                         <Activity className="w-3.5 h-3.5 text-amber-500" /> Patient Report
+                      <p className="eyebrow mb-4 flex items-center gap-2">
+                         <Activity className="w-4 h-4 text-brand-primary" /> Presenting Symptoms
                       </p>
-                      <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-100/80 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)]">
-                        <p className="text-sm font-medium text-slate-700 leading-relaxed italic">&quot;{visit.symptoms}&quot;</p>
+                      <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 shadow-inner">
+                        <p className="text-sm md:text-base font-medium text-slate-700 leading-relaxed italic">&quot;{visit.symptoms}&quot;</p>
                         {visit.diagnosis && (
-                          <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-2">
-                            <span className="px-2.5 py-1 bg-amber-50 text-amber-700 text-[10px] uppercase tracking-widest font-black rounded-lg border border-amber-100/50">
-                              Assessed: <span className="font-bold">{visit.diagnosis}</span>
+                          <div className="mt-6 pt-5 border-t border-slate-200/60 flex items-center gap-3">
+                            <span className="px-3 py-1.5 bg-brand-primary/5 text-brand-primary text-[10px] uppercase tracking-[0.2em] font-black rounded-lg border border-brand-primary/10">
+                              Assessment: <span className="text-slate-900 ml-1">{visit.diagnosis}</span>
                             </span>
                           </div>
                         )}
@@ -190,11 +195,11 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
 
                     {aiNotes && !!aiNotes["assessment"] && (
                        <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                             <Activity className="w-3.5 h-3.5 text-indigo-500" /> Clinical Logic
+                          <p className="eyebrow mb-4 flex items-center gap-2">
+                             <Sparkles className="w-4 h-4 text-brand-accent" /> Clinical Reasoning
                           </p>
-                          <div className="p-4 bg-indigo-50/40 rounded-2xl border border-indigo-100/50 shadow-[0_2px_10px_-3px_rgba(224,231,255,0.4)]">
-                            <p className="text-sm font-medium text-slate-600 leading-relaxed pl-3 border-l-[3px] border-indigo-200/50">
+                          <div className="p-6 bg-brand-primary/5 rounded-3xl border border-brand-primary/10 shadow-inner">
+                            <p className="text-sm font-medium text-slate-600 leading-relaxed italic border-l-4 border-brand-primary/20 pl-4">
                               {aiNotes["assessment"] as string}
                             </p>
                           </div>
@@ -202,27 +207,29 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                     )}
                   </div>
                   
-                  <div className="space-y-6">
-                    <div className="bg-linear-to-br from-emerald-50/80 to-teal-50/30 rounded-3xl p-7 border border-emerald-100/80 relative shadow-[0_4px_20px_-4px_rgba(16,185,129,0.15)] h-full">
-                       <div className="absolute top-5 right-5 text-emerald-300">
-                         <FileText className="w-8 h-8 opacity-30 mix-blend-multiply" />
+                  <div className="space-y-8">
+                    <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-8 border border-slate-800 relative shadow-2xl h-full flex flex-col justify-center">
+                       <div className="absolute top-6 right-6 text-white/5">
+                         <FileText className="w-12 h-12" />
                        </div>
-                      <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-4">Final Prescription</p>
-                      <p className="text-lg font-black text-slate-800 leading-tight mb-2 tracking-tight line-clamp-3">
+                      <p className="eyebrow text-brand-accent mb-6">Prescription</p>
+                      <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-3 uppercase italic">
                         {visit.prescription || "No prescription recorded."}
                       </p>
 
-                      <div className="mt-5 pt-5 border-t border-emerald-200/40">
-                         <p className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest mb-2">Physician&apos;s Plan & Advice</p>
-                         <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                      <div className="mt-6 pt-6 border-t border-white/5">
+                         <p className="eyebrow text-slate-500 mb-3">Advice & Follow-up</p>
+                         <p className="text-sm text-slate-400 font-medium leading-relaxed italic">
                            {adviceText}
                          </p>
                       </div>
 
                       {visit.additionalNotes && (
-                        <p className="text-xs text-slate-500 font-medium italic mt-5 pt-5 border-t border-emerald-200/40">
-                          <span className="text-emerald-500 not-italic font-bold mr-1">Note:</span> {visit.additionalNotes}
-                        </p>
+                        <div className="mt-6 pt-6 border-t border-white/5">
+                          <p className="text-xs text-slate-500 font-medium italic">
+                            <span className="eyebrow text-slate-600 not-italic mr-2">Note:</span> {visit.additionalNotes}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>

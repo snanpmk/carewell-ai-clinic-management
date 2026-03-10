@@ -13,57 +13,52 @@ interface ChronicCaseStepperProps {
 
 export default function ChronicCaseStepper({ steps, currentStepIndex }: ChronicCaseStepperProps) {
   return (
-    <div className="w-full relative py-2">
+    <div className="w-full bg-slate-50 border border-slate-200 rounded-[2.5rem] p-2 mb-8 shadow-inner overflow-hidden">
       {/* Scrollable Container for small screens */}
-      <div className="flex items-center overflow-x-auto no-scrollbar pb-1">
-        <div className="flex items-center w-full min-w-max">
-          {steps.map((step, index) => {
-            const isActive = index === currentStepIndex;
-            const isCompleted = index < currentStepIndex;
-            const isLast = index === steps.length - 1;
+      <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth">
+        {steps.map((step, index) => {
+          const isActive = index === currentStepIndex;
+          const isCompleted = index < currentStepIndex;
 
-            return (
-              <div key={step.id} className="flex items-center group">
-                {/* Step Item */}
-                <div 
-                  className={clsx(
-                    "flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg transition-all duration-300",
-                    isActive ? "bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20" : 
-                    isCompleted ? "bg-white border border-slate-200 text-slate-700 shadow-xs hover:bg-slate-50" : 
-                    "bg-transparent text-slate-400"
+          return (
+            <div 
+              key={step.id} 
+              className={clsx(
+                "flex-1 min-w-[180px] flex items-center justify-between gap-4 py-4 px-6 rounded-[2rem] transition-all duration-500 relative group cursor-default",
+                isActive 
+                  ? "bg-white text-slate-900 shadow-2xl shadow-slate-200/80 scale-[1.02] z-10 border border-slate-100" 
+                  : "text-slate-400 hover:bg-white/50"
+              )}
+            >
+              <div className="flex items-center gap-4">
+                {/* Number/Check Indicator */}
+                <div className={clsx(
+                  "w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-500",
+                  isActive ? "bg-slate-900 text-white shadow-xl rotate-6" : 
+                  isCompleted ? "bg-brand-primary/10 text-brand-primary" : "bg-slate-200/50 text-slate-400"
+                )}>
+                  {isCompleted ? (
+                    <Check className="w-5 h-5 stroke-[3]" />
+                  ) : (
+                    <span className="text-sm font-black italic">{index + 1}</span>
                   )}
-                >
-                  {/* Icon/Number indicator */}
-                  <div className={clsx(
-                    "flex items-center justify-center w-5 h-5 rounded-md shrink-0 text-[10px] font-black transition-colors duration-300",
-                    isActive ? "bg-white/20 text-white shadow-xs" : 
-                    isCompleted ? "bg-blue-50 text-blue-600 border border-blue-100" : 
-                    "border border-slate-200 text-slate-300"
-                  )}>
-                    {isCompleted ? <Check className="w-2.5 h-2.5" /> : index + 1}
-                  </div>
-                  
-                  {/* Label */}
-                  <span className="text-[13px] font-bold whitespace-nowrap">
-                    {step.title}
-                  </span>
                 </div>
 
-                {/* Connector Line */}
-                {!isLast && (
-                  <div className="w-4 sm:w-6 md:w-8 h-0.5 mx-1 shrink-0 transition-colors duration-300 bg-slate-100 rounded-full overflow-hidden">
-                    <div 
-                      className={clsx(
-                        "h-full transition-all duration-500 rounded-full",
-                        isCompleted ? "bg-linear-to-r from-blue-500 to-indigo-500 w-full" : "bg-transparent w-0"
-                      )}
-                    />
-                  </div>
-                )}
+                <div className="flex flex-col">
+                  <span className={clsx(
+                    "text-[11px] font-black uppercase tracking-[0.15em] whitespace-nowrap transition-colors",
+                    isActive ? "text-slate-900" : isCompleted ? "text-brand-primary" : "text-inherit"
+                  )}>
+                    {step.title}
+                  </span>
+               
+                </div>
               </div>
-            );
-          })}
-        </div>
+
+              
+            </div>
+          );
+        })}
       </div>
     </div>
   );

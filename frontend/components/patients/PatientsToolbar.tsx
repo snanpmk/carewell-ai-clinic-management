@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { Input } from "@/components/ui/Input";
 
 interface PatientsToolbarProps {
   searchQuery: string;
@@ -10,19 +11,19 @@ interface PatientsToolbarProps {
 
 export function PatientsToolbar({ searchQuery, setSearchQuery, filteredCount }: PatientsToolbarProps) {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white/60 backdrop-blur-xl px-4 py-3 rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/40">
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white px-6 py-4 rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/40">
       <div className="relative w-full sm:max-w-md">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-        <input 
+        <Input 
           type="text" 
-          placeholder="Search patients by name, phone, or ID..." 
+          placeholder="Search patients..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 text-sm font-medium text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-white transition-all shadow-xs placeholder:text-slate-400"
+          leftIcon={<Search className="w-4 h-4" />}
+          className="py-3"
         />
       </div>
-      <div className="text-sm font-medium text-slate-500 bg-slate-100/50 px-3 py-1.5 rounded-lg border border-slate-200/50">
-        <span className="font-bold text-slate-900">{filteredCount}</span> patient{filteredCount !== 1 && 's'}
+      <div className="text-sm font-black text-slate-500 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 flex items-center gap-2">
+        <span className="text-brand-primary">{filteredCount}</span> PATIENTS
       </div>
     </div>
   );

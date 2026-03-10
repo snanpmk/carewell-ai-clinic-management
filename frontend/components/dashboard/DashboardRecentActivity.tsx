@@ -19,11 +19,9 @@ interface DashboardRecentActivityProps {
 
 export function DashboardRecentActivity({ recentConsultations }: DashboardRecentActivityProps) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
       <div className="px-8 py-6 border-b border-slate-200 flex justify-between items-center bg-linear-to-r from-slate-50 to-white">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-           <Clock className="w-5 h-5 text-brand-primary" /> Recent Consultations
-        </h2>
+        <h2>Recent Consultations</h2>
         <Link href="/appointments" className="text-sm font-bold text-brand-primary hover:text-brand-primary/80 flex items-center gap-1 group">
           View All Records <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Link>
@@ -36,7 +34,7 @@ export function DashboardRecentActivity({ recentConsultations }: DashboardRecent
             <div key={apt._id} className="px-8 py-5 flex items-center justify-between hover:bg-slate-50/80 transition-all group">
               <div className="flex items-center gap-8">
                 <div className="text-center min-w-[80px]">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-tighter">
+                  <p className="eyebrow !text-slate-400 tracking-tighter">
                     {new Date(apt.consultationDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </p>
                   <p className="text-[10px] font-bold text-slate-300">
@@ -50,7 +48,7 @@ export function DashboardRecentActivity({ recentConsultations }: DashboardRecent
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-100`}>
+                <span className="inline-flex items-center px-3 py-1 rounded-full eyebrow !text-emerald-700 bg-emerald-50 border border-emerald-100">
                   Record
                 </span>
                 <Link
