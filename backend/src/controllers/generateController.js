@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const AICache = require("../models/AICache");
-const { generateConsultationNotes, summarizePatientHistory } = require("../services/aiService");
+const { generateConsultationNotes, summarizePatientHistory, analyzeChronicCase } = require("../services/aiService");
 
 /**
  * Helper to generate a stable hash for any object
@@ -121,4 +121,48 @@ const summarizeHistory = async (req, res) => {
   }
 };
 
-module.exports = { generateNotes, summarizeHistory };
+/**
+ * POST /api/ai/analyze-chronic-case
+ * Analyzes a full chronic case JSON and returns Miasm, Totality, and Repertorization.
+ */
+const analyzeChronicCaseController = async (req, res) => {
+  try {
+    const caseData = req.body;
+    
+    if (!caseData || Object.keys(caseData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Case data is required.",
+      });
+    }
+
+    const inputHash = generateHash(caseData);
+
+    // Check Cache
+    const cachedResponse = await AICache.findOne({ inputHash, useCase: "analyzeChronicCase" });
+    if (cachedResponse) {
+      console.log("💾 Returning cached chronic case analysis");
+      return res.status(200).json({ success: true, data: cachedResponse.outputData });
+    }
+
+    const analysis = await analyzeChronicCase(caseData);
+
+    // Save to Cache
+    await AICache.create({
+      inputHash,
+      inputData: { ...caseData },
+      outputData: analysis,
+      useCase: "analyzeChronicCase"
+    }).catch(err => console.error("Cache save error:", err.message));
+
+    return res.status(200).json({ success: true, data: analysis });
+  } catch (error) {
+    console.error("analyzeChronicCase error:", error.message);
+    return res.status(500).json({
+      success: false,
+      error: "AI service failed to analyze chronic case.",
+    });
+  }
+};
+
+module.exports = { generateNotes, summarizeHistory, analyzeChronicCaseController };

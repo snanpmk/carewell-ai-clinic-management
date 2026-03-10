@@ -8,13 +8,13 @@ const registerPatient = async (req, res) => {
   try {
     const { name, age, gender, phone, email, address, medicalConditions } = req.body;
 
-    // Check for duplicate email only if provided
-    if (email) {
-      const existing = await Patient.findOne({ email: email.toLowerCase() });
+    // Check for duplicate phone
+    if (phone) {
+      const existing = await Patient.findOne({ phone: phone });
       if (existing) {
         return res.status(409).json({
           success: false,
-          error: "A patient with this email already exists.",
+          error: "A patient with this phone number already exists.",
         });
       }
     }

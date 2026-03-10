@@ -6,6 +6,8 @@ import { ChevronLeft, User, Phone, Clock, FileText, Activity, Sparkles, Plus, Lo
 import { useQuery } from "@tanstack/react-query";
 import { getPatient } from "@/services/patientService";
 import { getConsultationsByPatient, summarizeHistory } from "@/services/consultationService";
+import { getPatientChronicCases } from "@/services/chronicCaseService";
+import { ChronicCase } from "@/types/chronicCase";
 
 export default function PatientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
@@ -21,7 +23,20 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
     queryFn: () => getConsultationsByPatient(patientId),
   });
 
-  const visits = consultRes?.data || [];
+  const { data: chronicRes, isLoading: chronicLoading } = useQuery({
+    queryKey: ["chronicCases", patientId],
+    queryFn: () => getPatientChronicCases(patientId),
+  });
+
+  const acuteVisits = consultRes?.data || [];
+  const chronicVisits = chronicRes || [];
+
+  // Combine and sort visits logically by date
+  const visits = [...acuteVisits, ...chronicVisits].sort((a, b) => {
+    const dateA = new Date(a.consultationDate || a.createdAt || Date.now()).getTime();
+    const dateB = new Date(b.consultationDate || b.createdAt || Date.now()).getTime();
+    return dateB - dateA;
+  });
 
   const { data: summaryRes, isLoading: summaryLoading } = useQuery({
     queryKey: ["patient-summary", patientId],
@@ -29,19 +44,43 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
     enabled: visits.length > 0,
   });
 
-  const isLoading = patientLoading || consultLoading;
+  const isLoading = patientLoading || consultLoading || chronicLoading;
   const patient = patientRes?.data;
   const aiSummary = summaryRes?.data;
 
-  interface VisitItem {
+  interface UnifiedVisitItem {
     _id: string;
-    consultationDate: string;
-    symptoms: string;
+    isChronic?: boolean;
+    date: Date;
+    symptoms?: string;
     diagnosis?: string;
     doctorEditedNotes?: string | Record<string, unknown>;
-    aiGeneratedNotes?: string;
+    aiGeneratedNotes?: string | Record<string, unknown>;
     additionalNotes?: string;
+    chronicData?: ChronicCase;
   }
+
+  const unifiedVisits: UnifiedVisitItem[] = visits.map((v: any) => {
+    // If it has 'demographics', it's a chronic case
+    if (v.demographics) {
+      return {
+        _id: v._id,
+        isChronic: true,
+        date: new Date(v.createdAt),
+        chronicData: v as ChronicCase,
+      };
+    }
+    return {
+      _id: v._id,
+      isChronic: false,
+      date: new Date(v.consultationDate),
+      symptoms: v.symptoms,
+      diagnosis: v.diagnosis,
+      doctorEditedNotes: v.doctorEditedNotes,
+      aiGeneratedNotes: v.aiGeneratedNotes,
+      additionalNotes: v.additionalNotes,
+    };
+  });
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
@@ -139,7 +178,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                     <Loader2 className="w-4 h-4 animate-spin" /> Distilling history...
                   </span>
                 ) : (
-                  `&quot;${aiSummary}&quot;` || "Unable to generate summary."
+                  aiSummary ? `&ldquo;${aiSummary}&rdquo;` : "Unable to generate summary."
                 )}
               </div>
             </div>
@@ -157,16 +196,97 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
             </div>
 
             <div className="space-y-6">
-              {visits.length === 0 ? (
+              {unifiedVisits.length === 0 ? (
                 <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-16 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">
                   Empty Record
                 </div>
               ) : (
-                visits.map((visit: VisitItem, idx: number) => {
+                unifiedVisits.map((visit: UnifiedVisitItem, idx: number) => {
+                  if (visit.isChronic && visit.chronicData) {
+                    const c = visit.chronicData;
+                    
+                    const totality = c.homeopathicDiagnosis?.totalityOfSymptoms || "No totality extracted.";
+                    // @ts-ignore - Property might not exist in type yet
+                    const rubric = c.homeopathicDiagnosis?.repertorizationRubrics || "No rubrics run.";
+                    
+                    // @ts-ignore - Property might not exist in type yet
+                    const suggestedArray = c.homeopathicDiagnosis?.suggestedRemedies || [];
+                    const remedies = Array.isArray(suggestedArray) && suggestedArray.length > 0
+                      ? (suggestedArray as Array<{ remedyName: string; potency: string }>).map((r) => `${r.remedyName} (${r.potency})`).join(", ")
+                      : "No suggestions.";
+
+                    const docPrescription = c.management?.firstPrescription?.medicine 
+                      ? `${c.management.firstPrescription.medicine} ${c.management.firstPrescription.potency || ""} - ${c.management.firstPrescription.dose || ""}`
+                      : "No prescription finalized.";
+
+                    return (
+                      <div key={visit._id} className="bg-linear-to-b from-rose-50/50 to-white border border-rose-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-rose-500 opacity-100 transition-opacity" />
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 pb-6 border-b border-rose-100">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-500">
+                              <Sparkles className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-black text-rose-900 uppercase tracking-tight">Chronic Evaluation</h3>
+                              <p className="text-xs font-bold text-rose-400">
+                                 {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-rose-100 text-rose-700 border border-rose-200">
+                              Chronic Focus
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="space-y-6">
+                            <div>
+                               <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                  <Activity className="w-3 h-3 text-rose-500" /> Totality of Symptoms
+                               </p>
+                               <div className="p-4 bg-white rounded-xl border border-rose-100">
+                                 <p className="text-sm font-bold text-slate-700 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
+                               </div>
+                            </div>
+
+                            <div>
+                               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                  <Sparkles className="w-3 h-3" /> Rubrics & Remedies
+                               </p>
+                               <div className="p-4 bg-white rounded-xl border border-indigo-100">
+                                 <p className="text-xs font-bold text-slate-800 leading-relaxed max-h-24 overflow-y-auto mb-2 border-b border-slate-50 pb-2">{rubric}</p>
+                                 <p className="text-xs font-bold text-indigo-600"><span className="text-indigo-400 font-medium">Suggestions:</span> {remedies}</p>
+                               </div>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-6">
+                            <div className="bg-rose-50 rounded-2xl p-6 border border-rose-200 relative shadow-xs h-full">
+                               <div className="absolute top-4 right-4 text-rose-200">
+                                 <FileText className="w-8 h-8 opacity-20" />
+                               </div>
+                               <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-4">First Prescription</p>
+                               <p className="text-lg font-black text-rose-900 leading-tight mb-2 uppercase tracking-tight">
+                                 {docPrescription}
+                               </p>
+                               {c.management?.supportiveMeasures && (
+                                 <p className="text-xs text-rose-600 font-medium italic mt-4 pt-4 border-t border-rose-200/50">
+                                   Advice: {c.management.supportiveMeasures}
+                                 </p>
+                               )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Standard Acute
                   let aiNotes = null;
                   let parsedDoctorNotes = visit.doctorEditedNotes;
                   
-                  try { if (visit.aiGeneratedNotes) aiNotes = JSON.parse(visit.aiGeneratedNotes); } catch { }
+                  try { if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes); } catch { }
                   try { 
                     if (visit.doctorEditedNotes && typeof visit.doctorEditedNotes === 'string' && visit.doctorEditedNotes.startsWith('{')) {
                       const parsed = JSON.parse(visit.doctorEditedNotes);
@@ -180,17 +300,17 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 pb-6 border-b border-slate-50">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 font-black text-lg">
-                            {visits.length - idx}
+                            {unifiedVisits.length - idx}
                           </div>
                           <div>
-                            <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Examination</h3>
+                            <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Acute Consultation</h3>
                             <p className="text-xs font-bold text-slate-400">
-                               {new Date(visit.consultationDate).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
+                               {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                             </p>
                           </div>
                         </div>
                         <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-50 text-blue-700 border border-blue-100">
-                            {new Date(visit.consultationDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {visit.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                       
@@ -221,7 +341,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                         </div>
                         
                         <div className="space-y-6">
-                          <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 relative shadow-xs">
+                          <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 relative shadow-xs h-full">
                              <div className="absolute top-4 right-4 text-emerald-200">
                                <FileText className="w-8 h-8 opacity-20" />
                              </div>

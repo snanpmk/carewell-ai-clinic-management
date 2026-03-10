@@ -116,4 +116,59 @@ Write a short, concise 2-3 sentence paragraph summarizing their past conditions 
   return result.response.text().trim();
 };
 
-module.exports = { generateConsultationNotes, summarizePatientHistory };
+/**
+ * Analyzes a full chronic case and extracts homeopathic observations.
+ */
+const analyzeChronicCase = async (caseData) => {
+  const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    generationConfig: {
+      maxOutputTokens: 1500,
+      temperature: 0.3,
+      responseMimeType: "application/json",
+    },
+  });
+
+  const prompt = `You are an expert Homeopathic AI doctor analyzing a detailed chronic case record.
+  Your job is to identify the "Totality of Symptoms", "Miasmatic Expression", and potential "Repertorization" rubrics.
+
+  Here is the raw case data (JSON format):
+  ${JSON.stringify(caseData, null, 2)}
+
+  Respond ONLY with a valid JSON object in this exact structure:
+  {
+    "totalityOfSymptoms": "A narrative string summarizing the characteristic and striking symptoms across the whole case.",
+    "miasmaticExpression": "Psora / Sycosis / Syphilis or a combination, based on the history and symptoms, with a brief explanation.",
+    "repertorization": [
+      {
+        "symptom": "The patient's symptom",
+        "rubric": "The classical repertory rubric matching the symptom",
+        "explanation": "Why this rubric is appropriate"
+      }
+    ],
+    "suggestedRemedies": "A comma-separated list of top 3-5 homeopathic remedies to consider."
+  }
+
+  Do not include any text outside of the JSON object.`;
+
+  const result = await model.generateContent(prompt);
+  const text = result.response.text().trim();
+
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch (parseError) {
+    const startIdx = text.indexOf("{");
+    const endIdx = text.lastIndexOf("}");
+    if (startIdx !== -1 && endIdx !== -1) {
+      const extracted = text.substring(startIdx, endIdx + 1);
+      parsed = JSON.parse(extracted);
+    } else {
+      throw new SyntaxError("AI response was not valid JSON even after extraction attempt.");
+    }
+  }
+
+  return parsed;
+};
+
+module.exports = { generateConsultationNotes, summarizePatientHistory, analyzeChronicCase };

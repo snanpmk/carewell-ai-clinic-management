@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ChronicCase = require("../models/ChronicCase");
 const Patient = require("../models/Patient");
-const { protect } = require("../middlewares/authMiddleware");
+const { protect } = require("../middleware/auth");
 
 // @route   POST /api/chronicCases
 // @desc    Create a new chronic case
