@@ -2,6 +2,7 @@
 
 import { Activity, Clock, FileText, Sparkles } from "lucide-react";
 import { ChronicCase } from "@/types/chronicCase";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export interface UnifiedVisitItem {
   _id: string;
@@ -21,6 +22,9 @@ interface PatientProfileTimelineProps {
 }
 
 export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) {
+  const { user } = useAuthStore();
+  const aiEnabled = user?.clinic?.aiEnabled ?? true;
+
   return (
     <>
       <div className="flex items-center justify-between mb-8">
@@ -72,8 +76,8 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                         <Sparkles className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-xl  text-white! tracking-tight uppercase italic">Chronic Evaluation</h3>
-                        <p className="eyebrow text-brand-accent! mt-1.5 opacity-100">
+                        <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Chronic Evaluation</h3>
+                        <p className="eyebrow !text-brand-accent mt-1.5 opacity-100">
                            {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                       </div>
@@ -85,24 +89,35 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-8">
-                      <div>
-                         <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
-                            <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
-                         </p>
-                         <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
-                           <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
-                         </div>
-                      </div>
+                      {aiEnabled && (
+                        <>
+                          <div>
+                            <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
+                                <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
+                            </p>
+                            <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
+                              <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
+                            </div>
+                          </div>
 
-                      <div>
-                         <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
-                            <Sparkles className="w-4 h-4 text-brand-accent" /> Repertorization
-                         </p>
-                         <div className="p-6 bg-slate-900 rounded-3xl border border-white/5 shadow-inner">
-                           <p className="text-xs font-medium text-slate-300 leading-relaxed max-h-32 overflow-y-auto mb-4 border-b border-white/5 pb-4 custom-scrollbar">{rubric}</p>
-                           <p className="text-xs font-black text-brand-accent uppercase tracking-widest leading-snug"><span className="!text-slate-400 font-black mr-2">Suggestions:</span> {remedies}</p>
-                         </div>
-                      </div>
+                          <div>
+                            <p className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
+                                <Sparkles className="w-4 h-4 text-brand-accent" /> Repertorization
+                            </p>
+                            <div className="p-6 bg-slate-900 rounded-3xl border border-white/5 shadow-inner">
+                              <p className="text-xs font-medium text-slate-300 leading-relaxed max-h-32 overflow-y-auto mb-4 border-b border-white/5 pb-4 custom-scrollbar">{rubric}</p>
+                              <p className="text-xs font-black text-brand-accent uppercase tracking-widest leading-snug"><span className="!text-slate-400 font-black mr-2">Suggestions:</span> {remedies}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      
+                      {!aiEnabled && (
+                        <div className="p-10 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-center h-full">
+                           <FileText className="w-10 h-10 text-white/5 mb-4" />
+                           <p className="eyebrow !text-white/20">Clinical data archive</p>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="space-y-8">
@@ -193,7 +208,7 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                       </div>
                     </div>
 
-                    {aiNotes && !!aiNotes["assessment"] && (
+                    {aiEnabled && aiNotes && !!aiNotes["assessment"] && (
                        <div>
                           <p className="eyebrow mb-4 flex items-center gap-2">
                              <Sparkles className="w-4 h-4 text-brand-accent" /> Clinical Reasoning

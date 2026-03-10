@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Search, Users, FilePlus, Stethoscope, Sparkles, X, ChevronRight, Loader2 } from "lucide-react";
+import { Search, Users, FilePlus, Stethoscope, X, ChevronRight, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllPatients } from "@/services/patientService";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface Patient {
   _id: string;
@@ -18,6 +19,8 @@ interface Patient {
 export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const router = useRouter();
+  const { user } = useAuthStore();
+  const aiEnabled = user?.clinic?.aiEnabled ?? true;
 
   const { data: response, isLoading } = useQuery({
     queryKey: ["patients"],
@@ -37,9 +40,8 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
   }, [patients, query]);
 
   const quickActions = useMemo(() => [
-    { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-orange-500", bg: "bg-orange-50" },
-    { name: "Chronic Case Case", href: "/consultation/chronic", icon: Stethoscope, color: "text-rose-500", bg: "bg-rose-50" },
-    { name: "AI Tools", href: "/ai-tools", icon: Sparkles, color: "text-indigo-500", bg: "bg-indigo-50" },
+    { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-brand-primary", bg: "bg-brand-primary/10" },
+    { name: "Chronic Case Builder", href: "/consultation/chronic", icon: Stethoscope, color: "text-brand-accent", bg: "bg-brand-accent/10" },
   ].filter(action => !query || action.name.toLowerCase().includes(query.toLowerCase())), [query]);
 
   useEffect(() => {
@@ -86,36 +88,36 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
             <Search className="w-5 h-5 text-slate-400 mr-4" />
             <input 
               autoFocus
-              className="flex-1 bg-transparent border-none outline-none text-slate-800 placeholder-slate-400 font-medium"
+              className="flex-1 bg-transparent border-none outline-none text-slate-800 placeholder-slate-400 font-medium h-12"
               placeholder="Search patients, actions, or tools..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-slate-300 border border-slate-200 px-1.5 py-0.5 rounded-md">ESC</span>
-              <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors">
-                <X className="w-4 h-4" />
+              <span className="text-[10px] font-black text-slate-300 border border-slate-200 px-2 py-1 rounded-lg">ESC</span>
+              <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl text-slate-400 transition-colors">
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          <div className="max-h-[60vh] overflow-y-auto p-4 space-y-6 custom-scrollbar">
+          <div className="max-h-[60vh] overflow-y-auto p-4 space-y-8 custom-scrollbar">
             {/* Quick Actions */}
             {quickActions.length > 0 && (
               <div>
-                <h3 className="px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Quick Actions</h3>
+                <h3 className="px-3 eyebrow !text-slate-400 mb-4">Command Actions</h3>
                 <div className="grid grid-cols-1 gap-1">
                   {quickActions.map((action) => (
                     <button
                       key={action.href}
                       onClick={() => handleNavigate(action.href)}
-                      className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-all group"
+                      className="flex items-center gap-4 p-4 rounded-[2rem] hover:bg-slate-50 transition-all group active:scale-[0.98] w-full"
                     >
-                      <div className={clsx("p-2.5 rounded-xl transition-transform group-hover:scale-110", action.bg)}>
+                      <div className={clsx("p-3 rounded-2xl transition-transform group-hover:scale-110", action.bg)}>
                         <action.icon className={clsx("w-5 h-5", action.color)} />
                       </div>
-                      <span className="flex-1 text-sm font-bold text-slate-700 text-left">{action.name}</span>
-                      <ChevronRight className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="flex-1 text-base font-black text-slate-900 tracking-tight text-left uppercase italic">{action.name}</span>
+                      <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-brand-primary group-hover:translate-x-1 transition-all" />
                     </button>
                   ))}
                 </div>
@@ -124,32 +126,32 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
 
             {/* Patients Search Results */}
             <div>
-              <div className="flex items-center justify-between px-2 mb-3">
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Patients</h3>
-                {isLoading && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}
+              <div className="flex items-center justify-between px-3 mb-4">
+                <h3 className="eyebrow !text-slate-400">Patient Registry</h3>
+                {isLoading && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
               </div>
               
               <div className="space-y-1">
                 {filteredPatients.length === 0 ? (
-                  <div className="p-10 text-center">
-                    <Users className="w-8 h-8 text-slate-200 mx-auto mb-2" />
-                    <p className="text-sm font-medium text-slate-400">No patients found</p>
+                  <div className="py-16 text-center">
+                    <Users className="w-12 h-12 text-slate-100 mx-auto mb-4" />
+                    <p className="eyebrow text-slate-300">No matches found</p>
                   </div>
                 ) : (
                   filteredPatients.map((patient) => (
                     <button
                       key={patient._id}
                       onClick={() => handleNavigate(`/patients/${patient._id}`)}
-                      className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100"
+                      className="w-full flex items-center gap-4 p-4 rounded-[2rem] hover:bg-slate-50 transition-all group border border-transparent active:scale-[0.98]"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-black group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                      <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-brand-primary to-brand-accent text-white flex items-center justify-center font-black text-lg shadow-lg shadow-brand-primary/20 transition-transform group-hover:rotate-3">
                         {patient.name.charAt(0).toUpperCase()}
                       </div>
-                      <div className="flex-1 text-left">
-                        <p className="text-sm font-bold text-slate-800 tracking-tight">{patient.name}</p>
-                        <p className="text-[11px] font-medium text-slate-500">{patient.phone} • Age {patient.age}</p>
+                      <div className="flex-1 text-left min-w-0">
+                        <p className="text-base font-black text-slate-900 tracking-tight uppercase truncate">{patient.name}</p>
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{patient.phone} • AGE {patient.age}</p>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-brand-primary transition-all" />
                     </button>
                   ))
                 )}
@@ -158,16 +160,16 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
           </div>
 
           {/* Footer */}
-          <div className="bg-slate-50 px-6 py-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5">
-                <span className="border border-slate-200 px-1 py-0.5 rounded shadow-xs bg-white text-slate-500">↑↓</span> Select
+          <div className="bg-slate-50 px-8 py-4 border-t border-slate-100 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            <div className="flex items-center gap-6">
+              <span className="flex items-center gap-2">
+                <span className="border border-slate-200 px-2 py-1 rounded-lg bg-white text-slate-900 shadow-xs">↑↓</span> NAVIGATION
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="border border-slate-200 px-1 py-0.5 rounded shadow-xs bg-white text-slate-500">ENTER</span> Open
+              <span className="flex items-center gap-2">
+                <span className="border border-slate-200 px-2 py-1 rounded-lg bg-white text-slate-900 shadow-xs">ENTER</span> SELECT
               </span>
             </div>
-            <span>Carewell AI Command Center</span>
+            <span className="italic opacity-60">CAREWELL COMMAND CENTER</span>
           </div>
         </motion.div>
       </motion.div>

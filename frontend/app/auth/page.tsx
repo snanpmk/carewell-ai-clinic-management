@@ -261,7 +261,7 @@ function AuthContent() {
                    Authenticating...
                 </div>
              ) : (
-                <div className="w-full rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-100">
+                <div className="w-full  transition-all">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={() => {}}

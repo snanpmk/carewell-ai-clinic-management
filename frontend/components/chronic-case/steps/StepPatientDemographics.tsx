@@ -107,7 +107,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
                 <Select
                   label="Select Patient"
                   options={patientOptions}
-                  placeholder="-- Select Patient --"
+                  placeholder="Select Patient"
                   required
                   {...register("patient")}
                   error={errors.patient?.message as string}
