@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { StepProps } from "../ChronicCaseWizard";
 import { createChronicCase } from "@/services/chronicCaseService";
 import { useRouter } from "next/navigation";
@@ -13,9 +12,9 @@ import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
 
-export default function StepTreatment({ caseData, prevStep }: StepProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+import { useMutation } from "@tanstack/react-query";
+
+export default function StepTreatment({ caseData, updateCaseData, prevStep }: StepProps) {
   const router = useRouter();
 
   const {
@@ -36,19 +35,16 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
     },
   });
 
-  const onSave = async (data: Record<string, any>) => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const finalizedCase = { ...caseData, ...data, status: "Completed" as const };
-      await createChronicCase(finalizedCase);
+  const saveMutation = useMutation({
+    mutationFn: createChronicCase,
+    onSuccess: () => {
       router.push(`/patients/${caseData.patient}`);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to save chronic case.");
-    } finally {
-      setLoading(false);
     }
+  });
+
+  const onSave = (data: any) => {
+    const finalizedCase = { ...caseData, ...data, status: "Completed" as const };
+    saveMutation.mutate(finalizedCase);
   };
 
   const potencyOptions = [
@@ -68,10 +64,10 @@ export default function StepTreatment({ caseData, prevStep }: StepProps) {
       iconVariant="blue"
       onBack={prevStep}
       isLastStep
-      isSubmitting={loading}
-      nextLabel={loading ? "Finalizing..." : "Complete Case"}
+      isSubmitting={saveMutation.isPending}
+      nextLabel={saveMutation.isPending ? "Finalizing..." : "Complete Case"}
       nextIcon={<Save className="w-4 h-4" />}
-      error={error}
+      error={saveMutation.error?.message}
     >
       <form onSubmit={handleSubmit(onSave)} className="space-y-6 text-sm">
         <div className="space-y-6">

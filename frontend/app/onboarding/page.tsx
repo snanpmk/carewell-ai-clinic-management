@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 import { registerPatient, PatientFormData } from "@/services/patientService";
 import { useClinicStore } from "@/store/useClinicStore";
@@ -16,7 +15,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
-import { User, Phone, ArrowRight } from "lucide-react";
+import { User, Phone, MapPin, Activity, ArrowRight } from "lucide-react";
 
 // ── Validation Schema ──────────────────────────────────────────────────────
 const schema = z.object({
@@ -41,7 +40,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const setPatient = useClinicStore((s) => s.setPatient);
-  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -59,14 +57,9 @@ export default function OnboardingPage() {
       setPatient(res.data.patientId, formData);
       router.push(`/consultation/acute?patientId=${res.data.patientId}`);
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (err: any) => {
-      setError(err?.response?.data?.message || err.message || "Failed to register patient");
-    },
   });
 
   const onSubmit = (data: FormValues) => {
-    setError(null);
     mutation.mutate(data as PatientFormData);
   };
 
@@ -194,9 +187,9 @@ export default function OnboardingPage() {
         </form>
       </Card>
       
-      {error && (
+      {mutation.error && (
         <div className="rounded-2xl border-2 border-red-500 animate-in shake duration-500 overflow-hidden">
-          <Alert type="error" message={error} />
+          <Alert type="error" message={mutation.error.message} />
         </div>
       )}
     </div>

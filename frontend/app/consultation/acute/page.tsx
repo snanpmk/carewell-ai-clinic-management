@@ -48,14 +48,6 @@ function ConsultationForm() {
   const searchParams = useSearchParams();
   const urlPatientId = searchParams.get("patientId");
 
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [aiNotes, setAiNotes] = useState<{
-    chiefComplaint: string;
-    assessment: string;
-    advice: string;
-    aiSuggestions?: string;
-  } | null>(null);
-
   const {
     register,
     handleSubmit,
@@ -90,6 +82,17 @@ function ConsultationForm() {
 
   const queryClient = useQueryClient();
 
+  const generateMutation = useMutation({
+    mutationFn: generateNotes,
+    onSuccess: (result) => {
+      if (result.success) {
+        setValue("advice", result.data.advice);
+      }
+    }
+  });
+
+  const aiNotes = generateMutation.data?.success ? generateMutation.data.data : null;
+
   const saveMutation = useMutation({
     mutationFn: saveConsultation,
     onSuccess: () => {
@@ -103,27 +106,13 @@ function ConsultationForm() {
         router.push("/appointments");
       }
     },
-    onError: () => {
-      alert("Failed to save consultation.");
+    onError: (error) => {
+      alert(error.message || "Failed to save consultation.");
     }
   });
 
-  const onGenerate = async (data: FormData) => {
-    setIsGenerating(true);
-    try {
-      const result = await generateNotes(data);
-      if (result.success) {
-        setAiNotes(result.data);
-        setValue("advice", result.data.advice);
-      } else {
-        alert("Failed to generate notes");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("AI Service unavailable.");
-    } finally {
-      setIsGenerating(false);
-    }
+  const onGenerate = (data: FormData) => {
+    generateMutation.mutate(data);
   };
 
   const handleSave = () => {
@@ -257,14 +246,14 @@ function ConsultationForm() {
 
             <button
               type="submit"
-              disabled={isGenerating}
+              disabled={generateMutation.isPending}
               className={`w-full py-3 flex items-center justify-center gap-2 rounded-lg text-sm font-bold tracking-wide text-white transition-all 
-                ${isGenerating 
+                ${generateMutation.isPending 
                   ? "bg-indigo-400 cursor-not-allowed" 
                   : "bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg"
                 }`}
             >
-              {isGenerating ? (
+              {generateMutation.isPending ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Analyzing Symptoms...

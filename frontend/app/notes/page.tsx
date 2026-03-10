@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -22,7 +22,6 @@ export default function NotesPage() {
     register,
     handleSubmit,
     reset,
-    formState: { isSubmitting },
   } = useForm<ConsultationNotes>({
     defaultValues: {
       chiefComplaint: "",
@@ -31,10 +30,18 @@ export default function NotesPage() {
     },
   });
 
-  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
-    "idle"
-  );
-  const [apiError, setApiError] = useState<string | null>(null);
+  const mutation = useMutation({
+    mutationFn: (data: ConsultationNotes) =>
+      saveConsultation({
+        patientId: patientId!,
+        symptoms: symptomData!.symptoms,
+        diagnosis: symptomData!.diagnosis,
+        prescription: symptomData!.prescription,
+        additionalNotes: symptomData!.additionalNotes,
+        aiGeneratedNotes: aiNotes!,
+        doctorEditedNotes: data,
+      }),
+  });
 
   // Pre-fill editable notes with AI output when they become available
   useEffect(() => {
@@ -50,29 +57,7 @@ export default function NotesPage() {
     }
   }, [patientId, aiNotes, router]);
 
-  const mutation = useMutation({
-    mutationFn: (data: ConsultationNotes) =>
-      saveConsultation({
-        patientId: patientId!,
-        symptoms: symptomData!.symptoms,
-        diagnosis: symptomData!.diagnosis,
-        prescription: symptomData!.prescription,
-        additionalNotes: symptomData!.additionalNotes,
-        aiGeneratedNotes: aiNotes!,
-        doctorEditedNotes: data,
-      }),
-    onSuccess: () => {
-      setSaveStatus("success");
-    },
-    onError: (err: Error) => {
-      setApiError(err.message);
-      setSaveStatus("error");
-    },
-  });
-
   const onSubmit = (data: ConsultationNotes) => {
-    setApiError(null);
-    setSaveStatus("idle");
     mutation.mutate(data);
   };
 
@@ -91,7 +76,7 @@ export default function NotesPage() {
       </div>
 
       {/* Success State */}
-      {saveStatus === "success" ? (
+      {mutation.isSuccess ? (
         <Card className="text-center py-10">
           <div className="w-16 h-16 rounded-full bg-green-100 mx-auto flex items-center justify-center mb-4">
             <svg
@@ -186,7 +171,7 @@ export default function NotesPage() {
                 />
               </div>
 
-              {apiError && <Alert type="error" message={apiError} />}
+              {mutation.error && <Alert type="error" message={mutation.error.message} />}
 
               <div className="space-y-2 pt-4">
                 <Button

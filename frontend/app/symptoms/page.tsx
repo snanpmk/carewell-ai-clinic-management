@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { generateNotes, SymptomData } from "@/services/consultationService";
 import { useClinicStore } from "@/store/useClinicStore";
@@ -32,7 +32,6 @@ type FormValues = z.infer<typeof schema>;
 export default function SymptomsPage() {
   const router = useRouter();
   const { patientData, patientId, setSymptomData, setAiNotes } = useClinicStore();
-  const [apiError, setApiError] = useState<string | null>(null);
 
   // Redirect back if no patient registered
   useEffect(() => {
@@ -55,13 +54,9 @@ export default function SymptomsPage() {
       setAiNotes(res.data);
       router.push("/notes");
     },
-    onError: (err: Error) => {
-      setApiError(err.message);
-    },
   });
 
   const onSubmit = (data: FormValues) => {
-    setApiError(null);
     mutation.mutate(data as SymptomData);
   };
 
@@ -116,9 +111,9 @@ export default function SymptomsPage() {
           </div>
         </div>
 
-        {apiError && (
+        {mutation.error && (
           <div className="mb-4">
-            <Alert type="error" message={apiError} />
+            <Alert type="error" message={mutation.error.message} />
           </div>
         )}
 

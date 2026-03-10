@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { StepProps } from "../ChronicCaseWizard";
 import { analyzeChronicCaseWithAI } from "@/services/chronicCaseService";
 import { Sparkles, Loader2 } from "lucide-react";
@@ -9,10 +8,9 @@ import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
 
-export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+import { useMutation } from "@tanstack/react-query";
 
+export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
       homeopathicDiagnosis: {
@@ -23,12 +21,9 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
     }
   });
 
-  const runAnalysis = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const result = await analyzeChronicCaseWithAI(caseData);
-      
+  const analysisMutation = useMutation({
+    mutationFn: analyzeChronicCaseWithAI,
+    onSuccess: (result) => {
       setValue("homeopathicDiagnosis.totalityOfSymptoms", result.totalityOfSymptoms || "");
       setValue("homeopathicDiagnosis.miasmaticExpression", result.miasmaticExpression || "");
       setValue("homeopathicDiagnosis.repertorization", result.repertorization || []);
@@ -41,11 +36,11 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
           repertorization: result.repertorization,
         }
       });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to run AI analysis");
-    } finally {
-      setLoading(false);
     }
+  });
+
+  const runAnalysis = () => {
+    analysisMutation.mutate(caseData);
   };
 
   const onSubmit = (data: any) => {
@@ -61,17 +56,17 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
       iconVariant="gradient"
       onBack={prevStep}
       nextLabel="Final Management"
-      error={error}
+      error={analysisMutation.error?.message}
       headerActions={
         <Button
           type="button"
           onClick={runAnalysis}
-          disabled={loading}
+          disabled={analysisMutation.isPending}
           variant="primary"
           className="shadow-md shadow-indigo-500/20 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 border-none px-6"
-          leftIcon={loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          leftIcon={analysisMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
         >
-          {loading ? "Analyzing..." : "Generate Analysis"}
+          {analysisMutation.isPending ? "Analyzing..." : "Generate Analysis"}
         </Button>
       }
     >

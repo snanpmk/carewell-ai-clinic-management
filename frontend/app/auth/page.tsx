@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/Input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { useMutation } from "@tanstack/react-query";
+import { loginWithGoogle, registerWithGoogle, acceptInviteWithGoogle } from "@/services/authService";
+import { uploadImage } from "@/services/patientService";
 
 const authSchema = z.object({
   clinicName: z.string().min(2, "Clinic name is required").optional(),
@@ -28,8 +28,6 @@ function AuthContent() {
   const isInvite = !!inviteToken;
 
   const [isLogin, setIsLogin] = useState(!isInvite);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -58,6 +56,35 @@ function AuthContent() {
     }
   }, [isInvite]);
 
+  // Mutations
+  const loginMutation = useMutation({
+    mutationFn: loginWithGoogle,
+    onSuccess: (data) => {
+      login(data.data, data.data.token);
+      router.push("/");
+    }
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: registerWithGoogle,
+    onSuccess: (data) => {
+      login(data.data, data.data.token);
+      router.push("/");
+    }
+  });
+
+  const acceptInviteMutation = useMutation({
+    mutationFn: acceptInviteWithGoogle,
+    onSuccess: (data) => {
+      login(data.data, data.data.token);
+      router.push("/");
+    }
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: uploadImage,
+  });
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -66,86 +93,43 @@ function AuthContent() {
     }
   };
 
-  const uploadImageToCloudinaryFallback = async (file: File) => {
-    const formData = new FormData();
-    formData.append("image", file);
-    try {
-      const { data } = await axios.post(`${API_URL}/api/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return data.url;
-    } catch (err) {
-      console.error("Upload failed", err);
-      return null;
-    }
-  };
-
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    // For Login, we don't need to validate the other fields
-    if (!isLogin) {
-      // Manual trigger for validation if needed, but since Google button is external, 
-      // we'll just check the current values
-      const values = getValues();
-      if (!isInvite && !values.clinicName) {
-        setError("Clinic name is required for registration.");
-        return;
-      }
-      if (!values.doctorPhone || !values.doctorLicense) {
-        setError("Phone and License are required.");
-        return;
-      }
-    }
+    const credential = credentialResponse.credential;
+    const values = getValues();
 
-    setLoading(true);
-    setError(null);
-    try {
-      const credential = credentialResponse.credential;
-      const values = getValues();
-
-      if (isInvite) {
-        const { data } = await axios.post(`${API_URL}/api/auth/accept-invite`, {
-          credential,
-          inviteToken,
-          doctorPhone: values.doctorPhone,
-          doctorLicense: values.doctorLicense,
-        });
-
-        if (data.success) {
-          login(data.data, data.data.token);
-          router.push("/");
-        }
-      } else if (isLogin) {
-        const { data } = await axios.post(`${API_URL}/api/auth/login`, { credential });
-        if (data.success) {
-          login(data.data, data.data.token);
-          router.push("/");
-        }
-      } else {
-        let uploadedImageUrl = null;
-        if (profileImage) {
-          uploadedImageUrl = await uploadImageToCloudinaryFallback(profileImage);
-        }
-
-        const { data } = await axios.post(`${API_URL}/api/auth/register`, {
-          clinicName: values.clinicName,
-          clinicAddress: values.clinicAddress,
-          doctorPhone: values.doctorPhone,
-          doctorLicense: values.doctorLicense,
-          credential,
-          profileImage: uploadedImageUrl,
-        });
-
-        if (data.success) {
-          login(data.data, data.data.token);
-          router.push("/");
+    if (isInvite) {
+      acceptInviteMutation.mutate({
+        credential,
+        inviteToken: inviteToken!,
+        doctorPhone: values.doctorPhone,
+        doctorLicense: values.doctorLicense,
+      });
+    } else if (isLogin) {
+      loginMutation.mutate(credential);
+    } else {
+      // Registration
+      let uploadedImageUrl = null;
+      if (profileImage) {
+        try {
+          uploadedImageUrl = await uploadMutation.mutateAsync(profileImage);
+        } catch (err) {
+          console.error("Image upload failed, continuing without image");
         }
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.error || err.message || "Failed to authenticate");
-    } finally {
-      setLoading(false);
+
+      registerMutation.mutate({
+        clinicName: values.clinicName,
+        clinicAddress: values.clinicAddress,
+        doctorPhone: values.doctorPhone,
+        doctorLicense: values.doctorLicense,
+        credential,
+        profileImage: uploadedImageUrl,
+      });
     }
   };
+
+  const isLoading = loginMutation.isPending || registerMutation.isPending || acceptInviteMutation.isPending || uploadMutation.isPending;
+  const error = loginMutation.error?.message || registerMutation.error?.message || acceptInviteMutation.error?.message || uploadMutation.error?.message;
 
   return (
     <div className="flex w-full h-screen bg-white">
@@ -275,7 +259,7 @@ function AuthContent() {
           </div>
 
           <div className="flex justify-center w-full mb-8" style={{ minHeight: '44px' }}>
-             {loading ? (
+             {isLoading ? (
                 <div className="text-sm font-bold text-blue-600 bg-blue-50 py-3 px-6 rounded-2xl w-full flex justify-center items-center gap-2">
                    <Loader2 className="w-5 h-5 animate-spin" />
                    Authenticating...
@@ -284,7 +268,7 @@ function AuthContent() {
                 <div className="w-full rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-100">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
-                    onError={() => setError("Google Sign-In was unsuccessful. Try again.")}
+                    onError={() => {}}
                     useOneTap={false}
                     theme="outline"
                     shape="rectangular"
@@ -302,7 +286,6 @@ function AuthContent() {
               <button
                 onClick={() => {
                   setIsLogin(!isLogin);
-                  setError(null);
                   reset();
                   setProfileImage(null);
                   setImagePreview(null);
