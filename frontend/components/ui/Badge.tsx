@@ -7,8 +7,8 @@ interface BadgeProps {
 }
 
 const colorMap = {
-  primary: "bg-blue-100 text-blue-600 border border-blue-200",
-  secondary: "bg-indigo-100 text-indigo-600 border border-indigo-200",
+  primary: "bg-brand-primary/10 text-brand-primary border border-brand-primary/20",
+  secondary: "bg-brand-secondary/10 text-brand-secondary border border-brand-secondary/20",
   success: "bg-emerald-100 text-emerald-600 border border-emerald-200",
   warning: "bg-orange-100 text-orange-600 border border-orange-200",
   danger: "bg-red-100 text-red-600 border border-red-200",

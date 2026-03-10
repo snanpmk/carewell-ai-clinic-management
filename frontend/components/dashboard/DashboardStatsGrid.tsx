@@ -12,7 +12,7 @@ export function DashboardStatsGrid({ totalPatients, totalConsultations, appointm
   const stats = [
     { label: "Total Patients", value: totalPatients.toString(), icon: Users, color: "text-emerald-600", bg: "bg-emerald-100/40", border: "border-emerald-100" },
     { label: "Total Consultations", value: totalConsultations.toString(), icon: FileText, color: "text-purple-600", bg: "bg-purple-100/40", border: "border-purple-100" },
-    { label: "Appointments Today", value: appointmentsToday.toString(), icon: Clock, color: "text-blue-600", bg: "bg-blue-100/40", border: "border-blue-100" },
+    { label: "Appointments Today", value: appointmentsToday.toString(), icon: Clock, color: "text-brand-primary", bg: "bg-brand-primary/10", border: "border-brand-primary/20" },
     { label: "Follow-ups", value: Math.floor(totalConsultations * 0.3).toString(), icon: Activity, color: "text-amber-600", bg: "bg-amber-100/40", border: "border-amber-100" },
   ];
 

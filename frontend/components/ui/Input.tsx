@@ -18,7 +18,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </label>
         <div className={clsx("relative group transition-all", privacyBlur && "blur-sm select-none")}>
           {leftIcon && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors pointer-events-none">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-primary transition-colors pointer-events-none">
               {leftIcon}
             </div>
           )}
@@ -30,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               leftIcon ? "pl-12" : "pl-4",
               error
                 ? "border-red-400 bg-red-50 focus:border-red-500"
-                : "border-slate-200 bg-white focus:border-blue-500 hover:border-slate-300",
+                : "border-slate-200 bg-white focus:border-brand-primary hover:border-slate-300",
               className
             )}
             {...props}

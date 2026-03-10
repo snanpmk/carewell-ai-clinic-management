@@ -23,12 +23,12 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/Badge";
 
 const navItems = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard, color: "text-blue-500" },
-  { name: "Appointments", href: "/appointments", icon: Calendar, color: "text-purple-500" },
-  { name: "Patients", href: "/patients", icon: Users, color: "text-emerald-500" },
-  { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-orange-500" },
-  { name: "Chronic Case", href: "/consultation/chronic", icon: Stethoscope, color: "text-rose-500" },
-  { name: "AI Tools", href: "/ai-tools", icon: Sparkles, color: "text-indigo-500" },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard, color: "text-brand-primary" },
+  { name: "Appointments", href: "/appointments", icon: Calendar, color: "text-brand-accent" },
+  { name: "Patients", href: "/patients", icon: Users, color: "text-brand-primary" },
+  { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-brand-accent" },
+  { name: "Chronic Case", href: "/consultation/chronic", icon: Stethoscope, color: "text-brand-primary" },
+  { name: "AI Tools", href: "/ai-tools", icon: Sparkles, color: "text-brand-accent" },
 ];
 
 const secondaryItems = [
@@ -74,19 +74,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       </button>
 
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-64 bg-linear-to-b from-blue-600/5 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-64 bg-linear-to-b from-brand-primary/10 to-transparent pointer-events-none" />
       
       {/* Brand */}
       <div className="h-24 flex items-center px-8 relative z-10">
         <div className="relative group cursor-pointer">
-          <div className="absolute -inset-1.5 bg-linear-to-r from-blue-600 to-indigo-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
+          <div className="absolute -inset-1.5 bg-linear-to-r from-brand-primary to-brand-accent rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
           <div className="relative bg-slate-900 ring-1 ring-slate-800 rounded-xl p-2.5">
-            <HeartPulse className="w-6 h-6 text-blue-500" />
+            <Stethoscope className="w-6 h-6 text-brand-primary" />
           </div>
         </div>
         <div className="ml-4">
-          <h1 className="text-lg font-black tracking-tight leading-none bg-clip-text text-transparent bg-linear-to-r from-white to-slate-400">Carewell</h1>
-          <p className="text-[10px] text-blue-400 font-black uppercase tracking-[0.2em] mt-1.5">Doctor Portal</p>
+          <h1 className="text-xl font-black tracking-tight leading-none bg-clip-text text-transparent bg-linear-to-r from-white to-slate-400">CAREWELL</h1>
+          <p className="text-[9px] text-brand-accent font-black uppercase tracking-[0.1em] mt-1.5 leading-tight">Homoeopathic Clinic</p>
         </div>
       </div>
 
@@ -108,26 +108,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className={clsx(
                     "group relative flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 active:scale-[0.98]",
                     isActive
-                      ? "bg-linear-to-r from-blue-600/20 to-transparent text-white"
+                      ? "bg-linear-to-r from-brand-primary/20 to-transparent text-white"
                       : "text-slate-400 hover:text-white hover:bg-slate-900/50"
                   )}
                 >
                   {/* Active Indicator Pips */}
                   {isActive && (
-                     <div className="absolute left-0 w-1 h-6 bg-blue-500 rounded-r-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                     <div className="absolute left-0 w-1 h-6 bg-brand-primary rounded-r-full shadow-[0_0_10px_rgba(0,141,150,0.5)]" />
                   )}
                   
                   <div className={clsx(
                     "p-2 rounded-xl transition-all duration-300",
-                    isActive ? "bg-blue-600/20 shadow-inner" : "bg-slate-900/40 group-hover:bg-slate-800"
+                    isActive ? "bg-brand-primary/20 shadow-inner" : "bg-slate-900/40 group-hover:bg-slate-800"
                   )}>
-                    <item.icon className={clsx("w-5 h-5 transition-transform group-hover:scale-110", isActive ? "text-blue-400" : "text-slate-500")} />
+                    <item.icon className={clsx("w-5 h-5 transition-transform group-hover:scale-110", isActive ? "text-brand-accent" : "text-slate-500")} />
                   </div>
                   
                   <span className="flex-1 tracking-tight">{item.name}</span>
                   
                   {isActive && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shadow-[0_0_8px_rgba(0,141,150,0.8)]" />
                   )}
                 </Link>
               );
@@ -188,16 +188,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="p-4 mt-auto">
         <div className="group bg-slate-900/40 backdrop-blur-md hover:bg-slate-900 transition-all cursor-pointer p-4 rounded-4xl border border-slate-900 hover:border-slate-800 shadow-2xl relative overflow-hidden">
           {/* Animated Glow */}
-          <div className="absolute top-0 left-0 w-full h-full bg-linear-to-r from-blue-600/0 via-blue-600/5 to-blue-600/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          <div className="absolute top-0 left-0 w-full h-full bg-linear-to-r from-brand-primary/0 via-brand-primary/5 to-brand-primary/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           
           <div className="flex items-center gap-3 relative z-10">
             <div className="relative shrink-0 w-11 h-11">
-              <div className="absolute -inset-0.5 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full opacity-75 blur-[2px]" />
+              <div className="absolute -inset-0.5 bg-linear-to-tr from-brand-primary to-brand-accent rounded-full opacity-75 blur-[2px]" />
               <div className="relative w-11 h-11 rounded-full bg-slate-950 flex items-center justify-center border border-white/10 overflow-hidden">
                 {user?.profileImage ? (
                   <Image src={user.profileImage} alt={user.name || "User"} width={44} height={44} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-sm font-black text-white italic">{user?.name ? user.name.charAt(0) : "D"}</span>
+                  <span className="text-sm font-black text-white italic">{user?.name ? user.name.charAt(0) : "C"}</span>
                 )}
               </div>
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full" />

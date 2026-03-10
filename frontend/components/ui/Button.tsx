@@ -15,9 +15,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, leftIcon, rightIcon, children, disabled, fullWidth = false, ...props }, ref) => {
     
     const variants = {
-      primary: "bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30",
-      secondary: "bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/20",
-      outline: "border-2 border-slate-300 bg-white hover:border-blue-500 hover:bg-slate-50 text-slate-700 hover:text-blue-600",
+      primary: "bg-linear-to-r from-brand-primary to-brand-accent hover:from-brand-primary/90 hover:to-brand-accent/90 text-white shadow-lg shadow-brand-primary/30",
+      secondary: "bg-linear-to-r from-brand-secondary to-slate-800 hover:from-brand-secondary/90 hover:to-slate-700 text-white shadow-lg shadow-brand-secondary/20",
+      outline: "border-2 border-slate-300 bg-white hover:border-brand-primary hover:bg-slate-50 text-slate-700 hover:text-brand-primary",
       ghost: "bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-transparent",
     };
 
@@ -34,7 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={clsx(
           "inline-flex items-center justify-center gap-2 font-black uppercase tracking-widest transition-all duration-300 active:scale-[0.98]",
           fullWidth ? "w-full" : "w-auto min-w-[120px]",
-          "disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 focus:outline-none focus:ring-4 focus:ring-blue-500/20",
+          "disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 focus:outline-none focus:ring-4 focus:ring-brand-primary/20",
           variants[variant],
           sizes[size],
           className

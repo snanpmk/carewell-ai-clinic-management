@@ -26,7 +26,7 @@ export function DashboardHeader() {
         <Button
           onClick={() => router.push('/consultation/acute')}
           variant="primary"
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-500/20 capitalize text-sm font-semibold text-white transition-colors"
+          className="w-full sm:w-auto capitalize text-sm font-semibold transition-colors"
           leftIcon={<Plus className="w-4 h-4 shrink-0" />}
         >
           New Consultation
