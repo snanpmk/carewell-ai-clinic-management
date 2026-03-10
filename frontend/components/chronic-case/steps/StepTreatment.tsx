@@ -13,7 +13,7 @@ import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
 
-export default function StepTreatment({ caseData, updateCaseData, prevStep }: StepProps) {
+export default function StepTreatment({ caseData, prevStep }: StepProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function StepTreatment({ caseData, updateCaseData, prevStep }: St
     },
   });
 
-  const onSave = async (data: any) => {
+  const onSave = async (data: Record<string, any>) => {
     setLoading(true);
     setError("");
 

@@ -40,3 +40,15 @@ export const getAllPatients = async () => {
   const response = await apiClient.get("/api/patients");
   return response.data;
 };
+
+/**
+ * Upload an image to the backend (Cloudinary).
+ */
+export const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("image", file);
+  const { data } = await apiClient.post("/api/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.url;
+};

@@ -7,7 +7,7 @@ interface User {
   email: string;
   profileImage: string;
   role?: string;
-  clinic: any;
+  clinic: Record<string, unknown>;
 }
 
 interface AuthState {

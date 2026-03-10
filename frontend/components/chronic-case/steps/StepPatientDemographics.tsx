@@ -1,12 +1,12 @@
 "use client";
 
 import { StepProps } from "../ChronicCaseWizard";
-import { ClipboardList, ChevronRight, User } from "lucide-react";
+import { ClipboardList, User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useEffect } from "react";
 import { getAllPatients } from "@/services/patientService";
 import { useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { demographicsSchema } from "@/lib/validations/chronicCase";
 import { Input } from "@/components/ui/Input";
@@ -34,7 +34,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(demographicsSchema),
@@ -51,7 +51,10 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     },
   });
 
-  const selectedPatientId = watch("patient");
+  const selectedPatientId = useWatch({
+    control,
+    name: "patient" as const,
+  });
 
   // Update form fields when a patient is selected
   useEffect(() => {
@@ -65,7 +68,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     }
   }, [selectedPatientId, allPatients, setValue]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Record<string, any>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -118,25 +121,25 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
               label="Full Patient Name"
               placeholder="John Doe"
               {...register("demographics.name")}
-              error={(errors.demographics as any)?.name?.message}
+              error={(errors.demographics as Record<string, any>)?.name?.message}
               required
             />
           </div>
-
+ 
           <Input
             label="Age"
             type="number"
             {...register("demographics.age", { valueAsNumber: true })}
-            error={(errors.demographics as any)?.age?.message}
+            error={(errors.demographics as Record<string, any>)?.age?.message}
             required
           />
-
+ 
           <Select
             label="Sex"
             options={sexOptions}
             placeholder="Select Sex"
             {...register("demographics.sex")}
-            error={(errors.demographics as any)?.sex?.message}
+            error={(errors.demographics as Record<string, any>)?.sex?.message}
             required
           />
 

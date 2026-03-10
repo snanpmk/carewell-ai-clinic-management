@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Card } from "@/components/ui/Card";
-import { UserPlus, Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2 } from "lucide-react";
+import { Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import apiClient from "@/services/apiClient";
@@ -12,9 +12,9 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+// Invitation Schema
 const inviteSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
@@ -55,8 +55,9 @@ export default function SettingsPage() {
       setMessage({ type: "success", text: "Invitation sent successfully!" });
       reset();
     },
-    onError: (err: any) => {
-      setMessage({ type: "error", text: err?.response?.data?.error || "Failed to send invite." });
+    onError: (err: unknown) => {
+      const errorMsg = err instanceof Error ? err.message : "Failed to send invite.";
+      setMessage({ type: "error", text: errorMsg });
     }
   });
 
@@ -123,7 +124,7 @@ export default function SettingsPage() {
             </h3>
 
             <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">
-              As the primary doctor, you can invite associate doctors to join this clinic. They will receive an email linking them to this clinic's workspace.
+              As the primary doctor, you can invite associate doctors to join this clinic. They will receive an email linking them to this clinic&apos;s workspace.
             </p>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -172,7 +173,7 @@ export default function SettingsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {team.map((doc: any) => (
+            {team.map((doc: Record<string, any>) => (
               <div key={doc._id} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-slate-200 shrink-0 flex items-center justify-center">
                   {doc.profileImage ? (

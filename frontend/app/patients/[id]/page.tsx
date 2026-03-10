@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useMemo } from "react";
 import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getPatient } from "@/services/patientService";
@@ -36,11 +36,13 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const chronicVisits = chronicRes || [];
 
   // Combine and sort visits logically by date
-  const visits = [...acuteVisits, ...chronicVisits].sort((a, b) => {
-    const dateA = new Date(a.consultationDate || a.createdAt || Date.now()).getTime();
-    const dateB = new Date(b.consultationDate || b.createdAt || Date.now()).getTime();
-    return dateB - dateA;
-  });
+  const visits = useMemo(() => {
+    return [...acuteVisits, ...chronicVisits].sort((a, b) => {
+      const dateA = new Date(a.consultationDate || a.createdAt || 0).getTime();
+      const dateB = new Date(b.consultationDate || b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+  }, [acuteVisits, chronicVisits]);
 
   const { data: summaryRes, isLoading: summaryLoading } = useQuery({
     queryKey: ["patient-summary", patientId],
@@ -52,7 +54,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const patient = patientRes?.data;
   const aiSummary = summaryRes?.data;
 
-  const unifiedVisits: UnifiedVisitItem[] = visits.map((v: any) => {
+  const unifiedVisits: UnifiedVisitItem[] = visits.map((v: Record<string, any>) => {
     // If it has 'demographics', it's a chronic case
     if (v.demographics) {
       return {

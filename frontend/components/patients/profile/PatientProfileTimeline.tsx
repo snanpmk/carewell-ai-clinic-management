@@ -45,11 +45,11 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
             if (visit.isChronic && visit.chronicData) {
               const c = visit.chronicData;
               const totality = c.homeopathicDiagnosis?.totalityOfSymptoms || "No totality extracted.";
-              // @ts-ignore
-              const rubric = c.homeopathicDiagnosis?.repertorizationRubrics || "No rubrics run.";
-              
-              // @ts-ignore
-              const suggestedArray = c.homeopathicDiagnosis?.suggestedRemedies || [];
+                // @ts-expect-error - HomeopathicDiagnosis needs updated types
+                const rubric = c.homeopathicDiagnosis?.repertorizationRubrics || "No rubrics run.";
+                
+                // @ts-expect-error - HomeopathicDiagnosis needs updated types
+                const suggestedArray = c.homeopathicDiagnosis?.suggestedRemedies || [];
               const remedies = Array.isArray(suggestedArray) && suggestedArray.length > 0
                 ? (suggestedArray as Array<{ remedyName: string; potency: string }>).map((r) => `${r.remedyName} (${r.potency})`).join(", ")
                 : "No suggestions.";

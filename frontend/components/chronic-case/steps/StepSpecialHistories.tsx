@@ -1,8 +1,7 @@
 "use client";
 
 import { StepProps } from "../ChronicCaseWizard";
-import { History, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { History } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { specialHistorySchema } from "@/lib/validations/chronicCase";
@@ -25,7 +24,7 @@ export default function StepSpecialHistories({ caseData, updateCaseData, nextSte
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Record<string, any>) => {
     updateCaseData(data);
     nextStep();
   };
