@@ -14,6 +14,9 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Alert } from "@/components/ui/Alert";
+import { User, Phone, ArrowRight } from "lucide-react";
 
 // ── Validation Schema ──────────────────────────────────────────────────────
 const schema = z.object({

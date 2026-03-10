@@ -13,7 +13,7 @@ export function PatientsHeader() {
         <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
           Patients
         </h1>
-        <p className="text-sm text-slate-500 font-medium">Manage your clinic's patient records and contact details.</p>
+        <p className="text-sm text-slate-500 font-medium">Manage your clinic&apos;s patient records and contact details.</p>
       </div>
 
       <div className="flex flex-col xs:flex-row sm:flex-row items-stretch xs:items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">

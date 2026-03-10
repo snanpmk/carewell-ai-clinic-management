@@ -1,8 +1,7 @@
 "use client";
 
 import { StepProps } from "../ChronicCaseWizard";
-import { History, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { History } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { initialPresentationSchema } from "@/lib/validations/chronicCase";
@@ -29,7 +28,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Record<string, any>) => {
     updateCaseData(data);
     nextStep();
   };
@@ -49,7 +48,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center">
-                Patient's Narration
+                Patient&apos;s Narration
               </label>
               <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-100/50 px-2.5 py-1 rounded-lg shadow-xs">Ipsisima Verba</span>
             </div>
