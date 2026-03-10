@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { useAuthStore } from "@/store/useAuthStore";
 import { HeartPulse, UploadCloud, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
@@ -12,6 +12,7 @@ import * as z from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { loginWithGoogle, registerWithGoogle, acceptInviteWithGoogle } from "@/services/authService";
 import { uploadImage } from "@/services/patientService";
+import Image from "next/image";
 
 const authSchema = z.object({
   clinicName: z.string().min(2, "Clinic name is required").optional(),
@@ -33,7 +34,6 @@ function AuthContent() {
 
   const {
     register,
-    handleSubmit,
     getValues,
     reset,
     formState: { errors },
@@ -49,12 +49,6 @@ function AuthContent() {
 
   const login = useAuthStore((s) => s.login);
   const router = useRouter();
-
-  useEffect(() => {
-    if (isInvite) {
-      setIsLogin(false);
-    }
-  }, [isInvite]);
 
   // Mutations
   const loginMutation = useMutation({
@@ -93,8 +87,10 @@ function AuthContent() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     const credential = credentialResponse.credential;
+    if (!credential) return;
+    
     const values = getValues();
 
     if (isInvite) {
@@ -112,7 +108,7 @@ function AuthContent() {
       if (profileImage) {
         try {
           uploadedImageUrl = await uploadMutation.mutateAsync(profileImage);
-        } catch (err) {
+        } catch {
           console.error("Image upload failed, continuing without image");
         }
       }
@@ -230,9 +226,9 @@ function AuthContent() {
                   <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Doctor Profile Picture</label>
                   <label className="flex items-center gap-4 w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 cursor-pointer hover:bg-slate-100 transition-colors">
                     <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-                    <div className="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                    <div className="w-12 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm relative">
                       {imagePreview ? (
-                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                        <Image src={imagePreview} alt="Preview" fill className="object-cover" />
                       ) : (
                         <UploadCloud className="w-5 h-5 text-slate-400" />
                       )}

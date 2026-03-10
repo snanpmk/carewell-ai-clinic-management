@@ -1,17 +1,8 @@
 "use client";
 
-
-
-interface Patient {
-  _id: string;
-  name: string;
-  age: number;
-  phone: string;
-}
-
-import { useState, Suspense, useEffect } from "react";
-import { Sparkles, Save, User, AlertCircle, FileText, Loader2, Activity } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Suspense } from "react";
+import { Sparkles, Save, User, FileText, Loader2, Activity } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -52,7 +43,7 @@ function ConsultationForm() {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     getValues,
     formState: { errors },
   } = useForm<FormData>({
@@ -64,7 +55,10 @@ function ConsultationForm() {
     },
   });
 
-  const selectedPatientId = watch("patientId");
+  const selectedPatientId = useWatch({
+    control,
+    name: "patientId",
+  });
 
   const { data: patientRes, isLoading: patientLoading } = useQuery({
     queryKey: ["patient", selectedPatientId],
