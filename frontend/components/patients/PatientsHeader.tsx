@@ -1,0 +1,31 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+
+export function PatientsHeader() {
+  const router = useRouter();
+
+  return (
+    <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 sm:gap-6 w-full">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
+          Patients
+        </h1>
+        <p className="text-sm text-slate-500 font-medium">Manage your clinic's patient records and contact details.</p>
+      </div>
+
+      <div className="flex flex-col xs:flex-row sm:flex-row items-stretch xs:items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+        <Button
+          onClick={() => router.push('/onboarding')}
+          variant="primary"
+          className="w-full sm:w-auto capitalize text-sm font-semibold transition-colors"
+          leftIcon={<Plus className="w-4 h-4 shrink-0" />}
+        >
+          Add Patient
+        </Button>
+      </div>
+    </header>
+  );
+}
