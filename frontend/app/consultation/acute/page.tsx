@@ -1,6 +1,15 @@
 "use client";
 
-import { useState, Suspense } from "react";
+
+
+interface Patient {
+  _id: string;
+  name: string;
+  age: number;
+  phone: string;
+}
+
+import { useState, Suspense, useEffect } from "react";
 import { Sparkles, Save, User, AlertCircle, FileText, Loader2, Activity } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,15 +18,20 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { generateNotes, saveConsultation } from "@/services/consultationService";
 import { getPatient, getAllPatients } from "@/services/patientService";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Select } from "@/components/ui/Select";
 
 const formSchema = z.object({
+  patientId: z.string().min(1, "Please select a patient"),
   symptoms: z.string().min(5, "Symptoms are required"),
   modalities: z.string().optional(),
   generals: z.string().optional(),
   mentals: z.string().optional(),
   diagnosis: z.string().optional(),
-  prescription: z.string().optional(),
+  prescription: z.string().min(2, "Final prescription is required"),
   additionalNotes: z.string().optional(),
+  advice: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -33,7 +47,6 @@ function ConsultationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlPatientId = searchParams.get("patientId");
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(urlPatientId);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiNotes, setAiNotes] = useState<{
@@ -42,24 +55,38 @@ function ConsultationForm() {
     advice: string;
     aiSuggestions?: string;
   } | null>(null);
-  
-  // Doctor editable fields
-  const [editedNotes, setEditedNotes] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    getValues,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      patientId: urlPatientId || "",
+      prescription: "",
+      advice: "",
+    },
+  });
+
+  const selectedPatientId = watch("patientId");
 
   const { data: patientRes, isLoading: patientLoading } = useQuery({
-    queryKey: ["patient", urlPatientId],
-    queryFn: () => getPatient(urlPatientId as string),
-    enabled: !!urlPatientId,
+    queryKey: ["patient", selectedPatientId],
+    queryFn: () => getPatient(selectedPatientId as string),
+    enabled: !!selectedPatientId,
   });
 
   const { data: allPatientsRes, isLoading: allPatientsLoading } = useQuery({
     queryKey: ["patients"],
     queryFn: getAllPatients,
-    enabled: !urlPatientId,
   });
 
   const allPatients = allPatientsRes?.data || [];
-  const patient = urlPatientId ? patientRes?.data : allPatients.find((p: Patient) => p._id === selectedPatientId);
+  const patient = patientRes?.data;
 
   const queryClient = useQueryClient();
 
@@ -81,22 +108,13 @@ function ConsultationForm() {
     }
   });
 
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-  });
-
   const onGenerate = async (data: FormData) => {
     setIsGenerating(true);
     try {
-      const result = await generateNotes(data as FormData);
+      const result = await generateNotes(data);
       if (result.success) {
         setAiNotes(result.data);
-        setEditedNotes(result.data.advice); // Default pre-fill
+        setValue("advice", result.data.advice);
       } else {
         alert("Failed to generate notes");
       }
@@ -109,7 +127,9 @@ function ConsultationForm() {
   };
 
   const handleSave = () => {
-    if (!selectedPatientId) {
+    const values = getValues();
+    
+    if (!values.patientId) {
       alert("Please select a patient before saving.");
       return;
     }
@@ -117,29 +137,33 @@ function ConsultationForm() {
       alert("Please generate notes first.");
       return;
     }
-    const formData = getValues();
-    if (!formData.prescription || formData.prescription.length < 2) {
+    if (!values.prescription || values.prescription.length < 2) {
       alert("Please enter a Final Prescription before saving.");
       return;
     }
 
     saveMutation.mutate({
-      patientId: selectedPatientId,
-      symptoms: formData.symptoms,
-      modalities: formData.modalities,
-      generals: formData.generals,
-      mentals: formData.mentals,
-      diagnosis: formData.diagnosis,
-      prescription: formData.prescription,
-      additionalNotes: formData.additionalNotes,
+      patientId: values.patientId,
+      symptoms: values.symptoms,
+      modalities: values.modalities,
+      generals: values.generals,
+      mentals: values.mentals,
+      diagnosis: values.diagnosis,
+      prescription: values.prescription,
+      additionalNotes: values.additionalNotes,
       aiGeneratedNotes: aiNotes,
       doctorEditedNotes: { 
         chiefComplaint: aiNotes.chiefComplaint,
         assessment: aiNotes.assessment,
-        advice: editedNotes // Capture what doctor typed
+        advice: values.advice || aiNotes.advice
       }
     });
   };
+
+  const patientOptions = allPatients.map((p: Patient) => ({
+    value: p._id,
+    label: `${p.name} (${p.phone})`,
+  }));
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both w-full">
@@ -147,7 +171,7 @@ function ConsultationForm() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex-1">
           <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight uppercase">New Consultation</h1>
-          {patientLoading || (!urlPatientId && allPatientsLoading) ? (
+          {patientLoading || allPatientsLoading ? (
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Status: Loading...</p>
           ) : patient ? (
             <p className="text-sm font-bold text-blue-600 mt-1 italic">Case: {patient?.name} {patient?.age ? `(${patient.age}Y)` : ""}</p>
@@ -176,97 +200,60 @@ function ConsultationForm() {
 
           <form onSubmit={handleSubmit(onGenerate)} className="space-y-5">
             {!urlPatientId && (
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Select Patient</label>
-                {allPatientsLoading ? (
-                  <p className="text-sm text-slate-500">Loading patients...</p>
-                ) : (
-                  <select
-                    value={selectedPatientId || ""}
-                    onChange={(e) => setSelectedPatientId(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50"
-                  >
-                    <option value="">-- Choose a patient --</option>
-                    {allPatients.map((p: Patient) => (
-                      <option key={p._id} value={p._id}>{p.name} ({p.phone})</option>
-                    ))}
-                  </select>
-                )}
-              </div>
+              <Select
+                label="Select Patient"
+                options={patientOptions}
+                placeholder="-- Choose a patient --"
+                {...register("patientId")}
+                error={errors.patientId?.message}
+              />
             )}
 
-            <div>
-              <label className="flex items-center gap-1 text-sm font-bold text-slate-700 mb-1.5">Chief Complaint / Symptoms</label>
-              <textarea
-                {...register("symptoms")}
-                rows={3}
-                placeholder="E.g. Migraine, cold"
-                className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none bg-slate-50"
-              />
-              {errors.symptoms && (
-                <p className="mt-1 flex items-center gap-1 text-xs text-red-500 font-medium">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.symptoms.message}
-                </p>
-              )}
-            </div>
+            <Textarea
+              label="Chief Complaint / Symptoms"
+              {...register("symptoms")}
+              rows={3}
+              placeholder="E.g. Migraine, cold"
+              error={errors.symptoms?.message}
+              required
+            />
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Modalities (Better / Worse)</label>
-                <textarea
-                  {...register("modalities")}
-                  rows={2}
-                  placeholder="E.g. Worse from cold, better resting"
-                  className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none bg-slate-50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Mentals / Disposition</label>
-                <textarea
-                  {...register("mentals")}
-                  rows={2}
-                  placeholder="E.g. Irritable, weepy, anxious"
-                  className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none bg-slate-50"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1.5">Physical Generals</label>
-              <textarea
-                {...register("generals")}
+              <Textarea
+                label="Modalities (Better / Worse)"
+                {...register("modalities")}
                 rows={2}
-                placeholder="E.g. Thirstless, craves salts, chilly"
-                className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none bg-slate-50"
+                placeholder="E.g. Worse from cold, better resting"
+              />
+
+              <Textarea
+                label="Mentals / Disposition"
+                {...register("mentals")}
+                rows={2}
+                placeholder="E.g. Irritable, weepy, anxious"
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Diagnosis / Assessment (Optional)</label>
-                <div className="relative">
-                  <Activity className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    {...register("diagnosis")}
-                    placeholder="E.g. Common Cold"
-                    className="w-full rounded-lg border border-slate-300 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50"
-                  />
-                </div>
-              </div>
-            </div>
+            <Textarea
+              label="Physical Generals"
+              {...register("generals")}
+              rows={2}
+              placeholder="E.g. Thirstless, craves salts, chilly"
+            />
 
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1.5">Additional Notes</label>
-              <textarea
-                {...register("additionalNotes")}
-                rows={2}
-                placeholder="E.g. Worse in morning"
-                className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none bg-slate-50"
-              />
-            </div>
+            <Input
+              label="Diagnosis / Assessment (Optional)"
+              {...register("diagnosis")}
+              placeholder="E.g. Common Cold"
+              leftIcon={<Activity className="w-4 h-4" />}
+            />
+
+            <Textarea
+              label="Additional Notes"
+              {...register("additionalNotes")}
+              rows={2}
+              placeholder="E.g. Worse in morning"
+            />
 
             <button
               type="submit"
@@ -305,22 +292,22 @@ function ConsultationForm() {
             {aiNotes ? (
               <div className="space-y-5 flex-1 relative z-10 animate-in fade-in slide-in-from-bottom-2">
                 <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-indigo-100 shadow-sm">
-                  <label className="block text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Chief Complaint</label>
-                  <textarea
-                    className="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-800 focus:ring-0 resize-y min-h-[80px]"
+                  <Textarea
+                    label="Chief Complaint"
                     defaultValue={aiNotes.chiefComplaint}
                     readOnly
                     rows={4}
+                    className="bg-transparent border-none p-0 text-sm font-medium text-slate-800 focus:ring-0 resize-y min-h-[80px] shadow-none"
                   />
                 </div>
                 
                 <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-indigo-100 shadow-sm">
-                  <label className="block text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Assessment</label>
-                  <textarea
-                    className="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-800 focus:ring-0 resize-y min-h-[120px]"
+                  <Textarea
+                    label="Assessment"
                     defaultValue={aiNotes.assessment}
                     readOnly
                     rows={4}
+                    className="bg-transparent border-none p-0 text-sm font-medium text-slate-800 focus:ring-0 resize-y min-h-[120px] shadow-none"
                   />
                 </div>
 
@@ -335,30 +322,22 @@ function ConsultationForm() {
                   </div>
                 )}
 
-                <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg border border-indigo-100 shadow-sm focus-within:ring-2 focus-within:ring-indigo-400">
-                  <label className="flex text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1 items-center justify-between">
-                    Advice & Plan (Editable)
-                  </label>
-                  <textarea
-                    className="w-full bg-transparent border-none p-0 text-sm font-bold text-slate-800 focus:ring-0 resize-y min-h-[160px]"
-                    value={editedNotes}
-                    onChange={(e) => setEditedNotes(e.target.value)}
-                    rows={8}
-                  />
-                </div>
+                <Textarea
+                  label="Advice & Plan (Editable)"
+                  {...register("advice")}
+                  rows={8}
+                  className="bg-white/80 border-indigo-100"
+                />
+
                 <div className="bg-emerald-50/80 backdrop-blur-sm p-4 rounded-lg border border-emerald-200 shadow-sm focus-within:ring-2 focus-within:ring-emerald-400 transition-all">
-                  <label className="flex text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2 items-center justify-between">
-                    Final Prescription (Required)
-                  </label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                    <input
-                      type="text"
-                      {...register("prescription")}
-                      placeholder="E.g. Nux Vomica 200c, 2 pills TID"
-                      className="w-full rounded-lg border border-emerald-300 pl-9 pr-3 py-3 text-sm font-bold text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white/80"
-                    />
-                  </div>
+                  <Input
+                    label="Final Prescription (Required)"
+                    {...register("prescription")}
+                    placeholder="E.g. Nux Vomica 200c, 2 pills TID"
+                    leftIcon={<FileText className="w-4 h-4 text-emerald-500" />}
+                    error={errors.prescription?.message}
+                    className="bg-white/80"
+                  />
                 </div>
               </div>
             ) : (
@@ -374,6 +353,7 @@ function ConsultationForm() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

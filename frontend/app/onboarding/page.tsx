@@ -10,9 +10,10 @@ import { useState } from "react";
 import { registerPatient, PatientFormData } from "@/services/patientService";
 import { useClinicStore } from "@/store/useClinicStore";
 
-import { Card } from "@/components/ui/Card";
-import { Alert } from "@/components/ui/Alert";
-import { User, Phone, MapPin, Activity, ArrowRight, Loader2, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
+import { Button } from "@/components/ui/Button";
 
 // ── Validation Schema ──────────────────────────────────────────────────────
 const schema = z.object({
@@ -90,69 +91,52 @@ export default function OnboardingPage() {
               </h3>
               
               <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
-                  <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    <input
-                      {...register("name")}
-                      placeholder="e.g. John Doe"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all focus:ring-4 focus:ring-blue-500/5"
-                    />
-                  </div>
-                  {errors.name && <p className="text-xs text-red-500 mt-2 font-bold ml-1 flex items-center gap-1">✕ {errors.name.message}</p>}
+                <Input
+                  label="Full Name"
+                  {...register("name")}
+                  placeholder="e.g. John Doe"
+                  leftIcon={<User className="w-4 h-4" />}
+                  error={errors.name?.message}
+                  required
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Input
+                    label="Age"
+                    type="number"
+                    {...register("age", { valueAsNumber: true })}
+                    placeholder="25"
+                    error={errors.age?.message}
+                    required
+                  />
+
+                  <Select
+                    label="Gender"
+                    options={[
+                      { value: "Male", label: "Male" },
+                      { value: "Female", label: "Female" },
+                      { value: "Other", label: "Other" },
+                    ]}
+                    {...register("gender")}
+                    required
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Age</label>
-                    <input
-                      type="number"
-                      {...register("age", { valueAsNumber: true })}
-                      placeholder="25"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all focus:ring-4 focus:ring-blue-500/5"
-                    />
-                    {errors.age && <p className="text-xs text-red-500 mt-2 font-bold ml-1 uppercase tracking-tighter">{errors.age.message}</p>}
-                  </div>
+                  <Input
+                    label="Phone Number"
+                    {...register("phone")}
+                    placeholder="+91 0000 0000"
+                    leftIcon={<Phone className="w-4 h-4" />}
+                    error={errors.phone?.message}
+                    required
+                  />
 
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Gender</label>
-                    <div className="relative">
-                      <select
-                        {...register("gender")}
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                      </select>
-                      <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 rotate-90 pointer-events-none" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
-                    <div className="relative group">
-                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                       <input
-                        {...register("phone")}
-                        placeholder="+91 0000 0000"
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-900 font-mono focus:outline-none focus:border-blue-500 focus:bg-white transition-all focus:ring-4 focus:ring-blue-500/5"
-                      />
-                    </div>
-                    {errors.phone && <p className="text-xs text-red-500 mt-2 font-bold ml-1">{errors.phone.message}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email (Optional)</label>
-                    <input
-                      {...register("email")}
-                      placeholder="john@example.com"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all focus:ring-4 focus:ring-blue-500/5"
-                    />
-                  </div>
+                  <Input
+                    label="Email (Optional)"
+                    {...register("email")}
+                    placeholder="john@example.com"
+                  />
                 </div>
               </div>
             </div>
@@ -164,30 +148,22 @@ export default function OnboardingPage() {
               </h3>
 
               <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Present Address</label>
-                  <div className="relative group">
-                    <MapPin className="absolute left-4 top-5 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                    <textarea
-                      {...register("address")}
-                      rows={2}
-                      placeholder="Location details..."
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all resize-none"
-                    />
-                  </div>
-                </div>
+                <Textarea
+                  label="Present Address"
+                  {...register("address")}
+                  rows={2}
+                  placeholder="Location details..."
+                  className="pl-12"
+                />
 
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Known Medical Conditions</label>
-                  <div className="relative group">
-                    <Activity className="absolute left-4 top-5 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                    <textarea
-                      {...register("medicalConditions")}
-                      rows={2}
-                      placeholder="Asthma, Diabetes, Allergies..."
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all resize-none"
-                    />
-                  </div>
+                <div className="relative">
+                  <Textarea
+                    label="Known Medical Conditions"
+                    {...register("medicalConditions")}
+                    rows={2}
+                    placeholder="Asthma, Diabetes, Allergies..."
+                    className="pl-12"
+                  />
                   <p className="text-[10px] text-slate-400 mt-2 italic ml-1">* Important for classical homeopathic evaluation.</p>
                 </div>
               </div>
@@ -201,27 +177,16 @@ export default function OnboardingPage() {
               <p className="text-xs text-slate-400 font-medium">All clinical records are encrypted and HIPAA compliant.</p>
             </div>
             
-            <button
+            <Button
               type="submit"
-              disabled={mutation.isPending}
-              className={`min-w-[280px] py-5 px-8 flex items-center justify-center gap-3 rounded-2xl text-base font-black uppercase tracking-widest text-white transition-all shadow-xl active:scale-95
-                ${mutation.isPending 
-                  ? "bg-slate-300 cursor-not-allowed shadow-none" 
-                  : "bg-linear-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 shadow-blue-500/20 hover:shadow-blue-500/40"
-                }`}
+              variant="primary"
+              size="lg"
+              className="min-w-[280px]"
+              isLoading={mutation.isPending}
+              rightIcon={<ArrowRight className="w-5 h-5" />}
             >
-              {mutation.isPending ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Saving Record...
-                </>
-              ) : (
-                <>
-                  Register & Start Visit
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
-            </button>
+              Register & Start Visit
+            </Button>
           </div>
         </form>
       </Card>

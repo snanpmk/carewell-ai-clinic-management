@@ -6,9 +6,21 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useAuthStore } from "@/store/useAuthStore";
 import { HeartPulse, UploadCloud, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+const authSchema = z.object({
+  clinicName: z.string().min(2, "Clinic name is required").optional(),
+  clinicAddress: z.string().optional(),
+  doctorPhone: z.string().min(5, "Phone number is required"),
+  doctorLicense: z.string().min(2, "Medical license is required"),
+});
+
+type AuthFormValues = z.infer<typeof authSchema>;
 
 function AuthContent() {
   const searchParams = useSearchParams();
@@ -18,12 +30,24 @@ function AuthContent() {
   const [isLogin, setIsLogin] = useState(!isInvite);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [clinicName, setClinicName] = useState("");
-  const [clinicAddress, setClinicAddress] = useState("");
-  const [doctorPhone, setDoctorPhone] = useState("");
-  const [doctorLicense, setDoctorLicense] = useState("");
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    reset,
+    formState: { errors },
+  } = useForm<AuthFormValues>({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      clinicName: "",
+      clinicAddress: "",
+      doctorPhone: "",
+      doctorLicense: "",
+    },
+  });
 
   const login = useAuthStore((s) => s.login);
   const router = useRouter();
@@ -52,24 +76,38 @@ function AuthContent() {
       return data.url;
     } catch (err) {
       console.error("Upload failed", err);
-      // Even if upload fails, we don't strictly require it so we return null rather than breaking the flow
       return null;
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
+    // For Login, we don't need to validate the other fields
+    if (!isLogin) {
+      // Manual trigger for validation if needed, but since Google button is external, 
+      // we'll just check the current values
+      const values = getValues();
+      if (!isInvite && !values.clinicName) {
+        setError("Clinic name is required for registration.");
+        return;
+      }
+      if (!values.doctorPhone || !values.doctorLicense) {
+        setError("Phone and License are required.");
+        return;
+      }
+    }
+
     setLoading(true);
     setError(null);
     try {
       const credential = credentialResponse.credential;
+      const values = getValues();
 
       if (isInvite) {
-        // ACCEPT INVITE FLOW
         const { data } = await axios.post(`${API_URL}/api/auth/accept-invite`, {
           credential,
           inviteToken,
-          doctorPhone,
-          doctorLicense,
+          doctorPhone: values.doctorPhone,
+          doctorLicense: values.doctorLicense,
         });
 
         if (data.success) {
@@ -77,28 +115,22 @@ function AuthContent() {
           router.push("/");
         }
       } else if (isLogin) {
-        // LOGIN FLOW
         const { data } = await axios.post(`${API_URL}/api/auth/login`, { credential });
         if (data.success) {
           login(data.data, data.data.token);
           router.push("/");
         }
       } else {
-        // SIGNUP FLOW
-        if (!clinicName) {
-          throw new Error("Clinic name is required for registration.");
-        }
-        
         let uploadedImageUrl = null;
         if (profileImage) {
           uploadedImageUrl = await uploadImageToCloudinaryFallback(profileImage);
         }
 
         const { data } = await axios.post(`${API_URL}/api/auth/register`, {
-          clinicName,
-          clinicAddress,
-          doctorPhone,
-          doctorLicense,
+          clinicName: values.clinicName,
+          clinicAddress: values.clinicAddress,
+          doctorPhone: values.doctorPhone,
+          doctorLicense: values.doctorLicense,
           credential,
           profileImage: uploadedImageUrl,
         });
@@ -117,9 +149,8 @@ function AuthContent() {
 
   return (
     <div className="flex w-full h-screen bg-white">
-      {/* Left Panel - Dark Marketing Section */}
+      {/* Left Panel */}
       <div className="hidden lg:flex flex-col flex-1 bg-slate-900 border-r border-slate-800 relative overflow-hidden text-white pt-10 px-16 pb-20 justify-between">
-        {/* Geometric Background Overlay */}
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <polygon fill="currentColor" points="0,0 100,0 50,100" className="text-blue-500" />
@@ -149,7 +180,7 @@ function AuthContent() {
         </div>
       </div>
 
-      {/* Right Panel - Form Section */}
+      {/* Right Panel */}
       <div className="flex-1 flex flex-col justify-center items-center p-8 relative overflow-y-auto w-full">
         <div className="w-full max-w-md mx-auto relative z-10 my-auto py-10">
           <div className="lg:hidden flex items-center gap-3 mb-10 justify-center">
@@ -177,20 +208,19 @@ function AuthContent() {
           )}
 
           {!isLogin && (
-            <div className="space-y-6 mb-8 mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <form className="space-y-6 mb-8 mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
               
               {!isInvite && (
                 <>
                   <Input
                     label="Clinic Name"
-                    value={clinicName}
-                    onChange={(e) => setClinicName(e.target.value)}
+                    {...register("clinicName")}
+                    error={errors.clinicName?.message}
                     placeholder="e.g. HealthFirst Clinic"
                   />
                   <Input
                     label="Clinic Address"
-                    value={clinicAddress}
-                    onChange={(e) => setClinicAddress(e.target.value)}
+                    {...register("clinicAddress")}
                     placeholder="Complete Address"
                   />
                 </>
@@ -199,14 +229,14 @@ function AuthContent() {
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="Doctor Phone"
-                  value={doctorPhone}
-                  onChange={(e) => setDoctorPhone(e.target.value)}
+                  {...register("doctorPhone")}
+                  error={errors.doctorPhone?.message}
                   placeholder="+1 234 567 890"
                 />
                 <Input
                   label="Medical License #"
-                  value={doctorLicense}
-                  onChange={(e) => setDoctorLicense(e.target.value)}
+                  {...register("doctorLicense")}
+                  error={errors.doctorLicense?.message}
                   placeholder="MD-12345"
                 />
               </div>
@@ -230,7 +260,7 @@ function AuthContent() {
                   </label>
                 </div>
               )}
-            </div>
+            </form>
           )}
 
           <div className="relative mb-8">
@@ -273,10 +303,7 @@ function AuthContent() {
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError(null);
-                  setClinicName("");
-                  setClinicAddress("");
-                  setDoctorPhone("");
-                  setDoctorLicense("");
+                  reset();
                   setProfileImage(null);
                   setImagePreview(null);
                 }}
