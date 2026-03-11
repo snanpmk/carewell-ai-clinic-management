@@ -93,39 +93,50 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       
       <main className="flex-1 flex flex-col min-h-screen lg:pl-64">
         {/* Global Header */}
-        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200">
-          <div className="w-full  mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                {/* Avatar */}
+        <div className="sticky top-0 z-20 bg-white/70 backdrop-blur-xl border-b border-slate-200/60 transition-all duration-300">
+          <div className="w-full mx-auto px-4 sm:px-8 py-3.5">
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-4 group">
+                {/* Refined Avatar with Active Ring */}
                 <div className="relative shrink-0 hidden sm:block">
-                  <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shadow-sm">
+                  <div className="absolute -inset-1 bg-linear-to-tr from-brand-primary/20 to-brand-accent/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative w-11 h-11 rounded-full bg-white border-2 border-slate-100 flex items-center justify-center overflow-hidden shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
                     {user?.profileImage ? (
-                      <Image src={user.profileImage} alt={user.name} width={40} height={40} className="object-cover" />
+                      <Image src={user.profileImage} alt={user.name} width={44} height={44} className="object-cover w-full h-full" />
                     ) : (
-                      <UserIcon className="w-5 h-5 text-slate-300" />
+                      <div className="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300">
+                        <UserIcon className="w-5 h-5" />
+                      </div>
                     )}
                   </div>
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full shadow-xs" />
                 </div>
-                <div>
-                  <h2 className="text-sm font-bold text-slate-900 leading-none">
+                
+                <div className="flex flex-col">
+                  <h3 className="text-[15px] font-black text-slate-900 leading-tight tracking-tight italic ">
                     {greeting}, Dr. {user?.name?.split(' ')[0] || "Practitioner"}
-                  </h2>
-                  <div className="flex items-center gap-2 mt-1.5 text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-                    <CalendarIcon className="w-3 h-3" />
-                    {formattedDate}
+                  </h3>
+                  <div className="flex items-center gap-2.5 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <CalendarIcon className="w-3 h-3 text-brand-primary/60" />
+                    <span className="opacity-80">{formattedDate}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Search Toggle - Wider */}
+              {/* Advanced Search Command Bar */}
               <button 
                 onClick={() => setIsSearchOpen(true)}
-                className="flex items-center gap-3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-all group min-w-[180px] md:min-w-[240px]"
+                className="flex items-center gap-4 px-5 py-2.5 bg-slate-100/50 border border-slate-200/80 rounded-2xl hover:bg-white hover:border-brand-primary/30 hover:shadow-xl hover:shadow-brand-primary/5 transition-all duration-300 group min-w-[200px] md:min-w-[320px] backdrop-blur-sm"
               >
-                <Search className="w-4 h-4 text-slate-400 group-hover:text-brand-primary transition-colors" />
-                <span className="text-[11px] font-semibold text-slate-500 flex-1 text-left">Search patients...</span>
-                <span className="text-[9px] font-bold text-slate-300 border border-slate-200 px-1.5 py-0.5 rounded bg-white hidden lg:block shadow-xs">⌘K</span>
+                <div className="p-1.5 bg-white rounded-lg shadow-xs border border-slate-100 group-hover:bg-brand-primary group-hover:text-white transition-colors">
+                  <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-white" />
+                </div>
+                <span className="text-xs font-bold text-slate-400 group-hover:text-slate-600 flex-1 text-left transition-colors">Search Patient Registry...</span>
+                <div className="hidden lg:flex items-center gap-1.5 px-2 py-1 bg-white border border-slate-200/60 rounded-lg shadow-2xs">
+                  <span className="text-[9px] font-black text-slate-400">CMD</span>
+                  <div className="w-px h-2 bg-slate-200" />
+                  <span className="text-[9px] font-black text-slate-400">K</span>
+                </div>
               </button>
             </div>
           </div>

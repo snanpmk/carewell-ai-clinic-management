@@ -51,7 +51,6 @@ export default function StepLayout({
       <div className="flex-1 overflow-y-auto pr-2 no-scrollbar">
         {children}
       </div>
-      </div>
 
       {/* Navigation */}
       <div
