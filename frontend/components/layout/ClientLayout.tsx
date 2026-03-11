@@ -113,7 +113,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                 </div>
                 
                 <div className="flex flex-col">
-                  <h3 className="text-[15px] font-black text-slate-900 leading-tight tracking-tight italic ">
+                  <h3 className="text-[15px] font-extrabold text-slate-900 leading-tight tracking-tight">
                     {greeting}, Dr. {user?.name?.split(' ')[0] || "Practitioner"}
                   </h3>
                   <div className="flex items-center gap-2.5 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -133,9 +133,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                 </div>
                 <span className="text-xs font-bold text-slate-400 group-hover:text-slate-600 flex-1 text-left transition-colors">Search Patient Registry...</span>
                 <div className="hidden lg:flex items-center gap-1.5 px-2 py-1 bg-white border border-slate-200/60 rounded-lg shadow-2xs">
-                  <span className="text-[9px] font-black text-slate-400">CMD</span>
+                  <span className="text-[9px] font-bold text-slate-400">CMD</span>
                   <div className="w-px h-2 bg-slate-200" />
-                  <span className="text-[9px] font-black text-slate-400">K</span>
+                  <span className="text-[9px] font-bold text-slate-400">K</span>
                 </div>
               </button>
             </div>
