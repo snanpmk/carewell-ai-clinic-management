@@ -204,9 +204,20 @@ const inviteDoctor = async (req, res) => {
       return res.status(403).json({ success: false, error: "Only primary doctors can invite others." });
     }
 
+    const normalizedEmail = email.toLowerCase();
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: normalizedEmail }).populate("clinic");
+    if (existingUser) {
+      return res.status(400).json({ 
+        success: false, 
+        error: `This doctor is already registered in ${existingUser.clinic?._id.toString() === req.user.clinic.toString() ? 'your' : 'another'} clinic.` 
+      });
+    }
+
     // Generate an invite token valid for 7 days
     const inviteToken = jwt.sign(
-      { clinicId: req.user.clinic, email: email.toLowerCase() },
+      { clinicId: req.user.clinic, email: normalizedEmail },
       process.env.JWT_SECRET || "fallback_secret",
       { expiresIn: "7d" }
     );
@@ -216,14 +227,17 @@ const inviteDoctor = async (req, res) => {
     // Fetch clinic info for the email template
     const clinic = await Clinic.findById(req.user.clinic);
 
-    console.log(clinic);
-    console.log(email);
-    console.log(inviteUrl);
-    console.log(req.user.name);
+    // Create or update invitation in DB
+    await Invitation.findOneAndUpdate(
+      { email: normalizedEmail, clinic: req.user.clinic },
+      { invitedBy: req.user.id, status: "pending" },
+      { upsert: true, new: true }
+    );
+
     // Send email via Nodemailer
     const mailOptions = {
       from: `"Carewell Clinic" <${process.env.EMAIL_USER}>`,
-      to: email,
+      to: normalizedEmail,
       subject: `Invitation to join ${clinic?.name || "Carewell Clinic"}`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
@@ -310,6 +324,12 @@ const acceptInvite = async (req, res) => {
        });
     }
 
+    // Update invitation status
+    await Invitation.findOneAndUpdate(
+      { email: googleEmail, clinic: decodedInvite.clinicId },
+      { status: "accepted" }
+    );
+
     const populatedDoctor = await User.findById(doctor._id).populate("clinic");
 
     res.status(200).json({
@@ -379,6 +399,49 @@ const toggleAI = async (req, res) => {
   }
 };
 
+// @desc    Remove a doctor from the clinic
+// @route   DELETE /api/auth/doctors/:id
+// @access  Private (Primary Doctor only)
+const removeDoctor = async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+
+    if (req.user.role !== "primary") {
+      return res.status(403).json({ success: false, error: "Only primary doctors can remove other doctors." });
+    }
+
+    const doctorToRemove = await User.findById(doctorId);
+
+    if (!doctorToRemove) {
+      return res.status(404).json({ success: false, error: "Doctor not found." });
+    }
+
+    // Verify the doctor belongs to the same clinic
+    if (doctorToRemove.clinic.toString() !== req.user.clinic.toString()) {
+      return res.status(403).json({ success: false, error: "You can only remove doctors from your own clinic." });
+    }
+
+    // Prevent primary doctor from removing themselves
+    if (doctorToRemove.role === "primary") {
+      return res.status(400).json({ success: false, error: "Primary doctors cannot be removed. Transfer primary ownership first or delete the clinic." });
+    }
+
+    // Option 1: Delete the user entirely
+    await User.findByIdAndDelete(doctorId);
+
+    // Option 2: Clean up any related invitations (optional)
+    await Invitation.deleteMany({ email: doctorToRemove.email, clinic: req.user.clinic });
+
+    res.status(200).json({
+      success: true,
+      message: `Dr. ${doctorToRemove.name} has been removed from the clinic.`,
+    });
+  } catch (error) {
+    console.error("Remove Doctor Error:", error);
+    res.status(500).json({ success: false, error: "Server Error during doctor removal" });
+  }
+};
+
 module.exports = {
   registerClinic,
   loginDoctor,
@@ -387,4 +450,5 @@ module.exports = {
   acceptInvite,
   getClinicDoctors,
   toggleAI,
+  removeDoctor,
 };

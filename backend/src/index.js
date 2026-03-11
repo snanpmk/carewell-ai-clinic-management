@@ -69,8 +69,21 @@ app.use((req, res) => {
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error("Unhandled error:", err.message);
-  res.status(500).json({ success: false, error: "Internal server error." });
+  console.error("Unhandled Error:", {
+    message: err.message,
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    path: req.path,
+    method: req.method,
+  });
+
+  const statusCode = err.status || 500;
+  const message = err.message || "Internal server error.";
+
+  res.status(statusCode).json({ 
+    success: false, 
+    error: message,
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+  });
 });
 
 // ─── Start Server ─────────────────────────────────────────────────────────────
