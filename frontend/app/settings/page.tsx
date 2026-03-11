@@ -110,7 +110,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-4 mb-2">
             <h1>Settings & Team</h1>
           </div>
-          <p className="text-sm text-slate-500 font-medium tracking-tight ml-1 italic">Manage your clinic preferences and staff access.</p>
+          <p className="text-sm text-slate-500 font-medium tracking-tight ml-1">Manage your clinic preferences and staff access.</p>
         </div>
       </div>
 
@@ -129,12 +129,12 @@ export default function SettingsPage() {
                 {user?.profileImage ? (
                   <Image src={user.profileImage} alt={user.name || "User"} width={96} height={96} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300 font-black text-3xl italic">{user?.name?.charAt(0) || "U"}</div>
+                  <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300 font-extrabold text-3xl">{user?.name?.charAt(0) || "U"}</div>
                 )}
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic">{user?.name}</h2>
+              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight uppercase">{user?.name}</h2>
               <p className="text-sm font-bold text-slate-500 mt-1">{user?.email}</p>
               <div className="mt-4">
                  <Badge 
@@ -148,7 +148,7 @@ export default function SettingsPage() {
 
           <div className="pt-8 border-t border-slate-100">
              <p className="eyebrow text-slate-400 mb-2">Clinic Affiliation</p>
-             <p className="text-lg font-black text-slate-900 tracking-tight uppercase italic">{typeof user?.clinic === 'object' ? (user.clinic.name as React.ReactNode) : 'Carewell Clinic'}</p>
+             <p className="text-lg font-extrabold text-slate-900 tracking-tight uppercase">{typeof user?.clinic === 'object' ? (user.clinic.name as React.ReactNode) : 'Carewell Clinic'}</p>
           </div>
         </Card>
 
@@ -163,7 +163,7 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between gap-6 mb-8">
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase italic">AI Clinical Assistance</h2>
+                <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight uppercase">AI Clinical Assistance</h2>
                 <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed">
                   Toggle AI features including smart symptom analysis, clinical drafting, and automated history summarization for all practitioners.
                 </p>
@@ -192,7 +192,7 @@ export default function SettingsPage() {
                 <Sparkles className={clsx("w-6 h-6", aiEnabled && "animate-pulse")} />
               </div>
               <div>
-                <p className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">
                   Status: {aiEnabled ? "Active & Synthesizing" : "Disabled"}
                 </p>
                 <p className="text-xs font-medium text-slate-500">
@@ -228,7 +228,7 @@ export default function SettingsPage() {
               />
 
               {message && (
-                <div className={`p-5 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center gap-4 animate-in fade-in slide-in-from-top-2 ${
+                <div className={`p-5 rounded-2xl text-sm font-bold uppercase tracking-widest flex items-center gap-4 animate-in fade-in slide-in-from-top-2 ${
                   message.type === "success" ? "bg-brand-primary/10 text-brand-primary border border-brand-primary/20" : "bg-red-50 text-red-600 border border-red-100"
                 }`}>
                   {message.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <div className="text-lg">✖</div>} {message.text}
@@ -277,7 +277,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-black text-slate-900 text-base tracking-tight truncate uppercase italic">{doc.name}</h4>
+                      <h4 className="font-bold text-slate-900 text-base tracking-tight truncate uppercase">{doc.name}</h4>
                       <p className="text-xs font-bold text-slate-400 truncate">{doc.email}</p>
                     </div>
                   </div>

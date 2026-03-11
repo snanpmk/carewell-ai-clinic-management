@@ -37,14 +37,14 @@ export default function AppointmentsPage() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4">
         <div>
           <h1>Medical Records</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium tracking-tight italic">Chronological archive of all clinical consultations.</p>
+          <p className="text-sm text-slate-500 mt-1 font-medium tracking-tight">Chronological archive of all clinical consultations.</p>
         </div>
         <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
           {["All", "Today", "Week"].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 ${
+              className={`px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 ${
                 filter === f 
                   ? "bg-white text-slate-900 shadow-xl border border-slate-100" 
                   : "text-slate-400 hover:text-slate-600"

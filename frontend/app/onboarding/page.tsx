@@ -75,7 +75,7 @@ export default function OnboardingPage() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4">
         <div className="flex-1">
           <h1>Patient Onboarding</h1>
-          <p className="text-sm text-slate-500 font-medium tracking-tight ml-1 italic">Register new patients into the CareWell Homeopathic registry.</p>
+          <p className="text-sm text-slate-500 font-medium tracking-tight ml-1">Register new patients into the CareWell Homeopathic registry.</p>
         </div>
       </div>
 
@@ -171,7 +171,7 @@ export default function OnboardingPage() {
                     rows={4}
                     placeholder="Asthma, Diabetes, Known Allergies, Surgical History..."
                   />
-                  <p className="text-[11px] text-slate-400 mt-3 font-medium italic flex items-center gap-2">
+                  <p className="text-[11px] text-slate-400 mt-3 font-medium flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-brand-accent" /> Constitutional data for classical evaluation.
                   </p>
                 </div>
@@ -182,7 +182,7 @@ export default function OnboardingPage() {
           {/* Submission */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-10 pt-10 border-t border-slate-100 mt-16">
             <div className="text-left max-w-sm">
-              <p className="text-base font-black text-slate-900 tracking-tight uppercase italic mb-1">Secure Registration</p>
+              <p className="text-base font-extrabold text-slate-900 tracking-tight uppercase mb-1">Secure Registration</p>
               <p className="text-sm text-slate-500 font-medium leading-relaxed">By registering, you confirm the clinical data is accurate and follows institutional compliance.</p>
             </div>
             

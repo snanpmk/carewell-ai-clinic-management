@@ -41,7 +41,7 @@ export default function ProtocolPage() {
               <h2 className="text-xl font-bold">Standardized Framework</h2>
             </div>
             <p className="text-slate-600 leading-relaxed font-medium">
-              The data architecture of our Chronic Evaluation module is strictly modeled after the <span className="text-slate-900 font-bold italic">Standard Homeopathic Case Study Record for House Surgeons (Govt. of Kerala)</span>. By following this government-recognized format, we ensure that practitioners maintain clinical depth while utilizing AI to handle the heavy lifting of synthesis.
+              The data architecture of our Chronic Evaluation module is strictly modeled after the <span className="text-slate-900 font-bold">Standard Homeopathic Case Study Record for House Surgeons (Govt. of Kerala)</span>. By following this government-recognized format, we ensure that practitioners maintain clinical depth while utilizing AI to handle the heavy lifting of synthesis.
             </p>
           </section>
 

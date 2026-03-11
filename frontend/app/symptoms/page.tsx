@@ -79,7 +79,7 @@ export default function SymptomsPage() {
             </div>
           </div>
           <div className="text-center">
-            <p className="text-xl font-black text-white uppercase italic tracking-tight">AI Clinical Synthesis</p>
+            <p className="text-xl font-extrabold text-white uppercase tracking-tight">AI Clinical Synthesis</p>
             <p className="text-sm text-slate-300 font-medium mt-2">Distilling symptoms into clinical drafts...</p>
           </div>
         </div>

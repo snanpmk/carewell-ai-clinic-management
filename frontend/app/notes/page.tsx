@@ -115,11 +115,11 @@ export default function NotesPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <p className="eyebrow text-slate-400 mb-1">Diagnosis</p>
-                    <p className="font-black text-slate-900 tracking-tight uppercase italic">{symptomData.diagnosis || "UNSPECIFIED"}</p>
+                    <p className="font-extrabold text-slate-900 tracking-tight uppercase">{symptomData.diagnosis || "UNSPECIFIED"}</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <p className="eyebrow text-slate-400 mb-1">Prescription</p>
-                    <p className="font-black text-slate-900 tracking-tight uppercase italic">{symptomData.prescription || "UNSPECIFIED"}</p>
+                    <p className="font-extrabold text-slate-900 tracking-tight uppercase">{symptomData.prescription || "UNSPECIFIED"}</p>
                   </div>
                 </div>
               )}

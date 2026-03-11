@@ -121,7 +121,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
               </div>
               <div className="min-w-0">
                 <p className="eyebrow !text-slate-400">Profile</p>
-                <p className="text-lg font-black text-slate-900 tracking-tight uppercase truncate">
+                <p className="text-lg font-extrabold text-slate-900 tracking-tight uppercase truncate">
                   {patient.age}Y • {patient.gender}
                 </p>
               </div>
@@ -133,7 +133,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
               </div>
               <div className="min-w-0">
                 <p className="eyebrow !text-slate-400">Clinical ID</p>
-                <p className={clsx("text-lg font-black text-slate-900 tracking-tight uppercase truncate", privacyMode && "blur-sm")}>
+                <p className={clsx("text-lg font-extrabold text-slate-900 tracking-tight uppercase truncate", privacyMode && "blur-sm")}>
                   {patient._id.substring(0, 12)}
                 </p>
               </div>
@@ -145,7 +145,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
               </div>
               <div>
                 <p className="eyebrow !text-slate-400">Vitals Status</p>
-                <p className="text-lg font-black text-slate-900 tracking-tight uppercase">
+                <p className="text-lg font-extrabold text-slate-900 tracking-tight uppercase">
                   {latestChronicCase?.physicalExamination?.vitals?.bp || 'No BP'}
                 </p>
               </div>
@@ -157,7 +157,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
               </div>
               <div>
                 <p className="eyebrow !text-slate-400">Engagement</p>
-                <p className="text-lg font-black text-slate-900 tracking-tight uppercase">
+                <p className="text-lg font-extrabold text-slate-900 tracking-tight uppercase">
                   {visits.length} VISITS
                 </p>
               </div>
@@ -178,8 +178,8 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
 
                 <div className="space-y-6">
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Primary Diagnosis</p>
-                    <p className="text-xl font-black text-slate-900 tracking-tight uppercase italic leading-tight">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Primary Diagnosis</p>
+                    <p className="text-xl font-extrabold text-slate-900 tracking-tight uppercase leading-tight">
                       {latestChronicCase?.summaryDiagnosis?.diseaseDiagnosis || patient.existingConditions || "No diagnosis recorded"}
                     </p>
                   </div>
@@ -187,18 +187,18 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                   {latestChronicCase?.physicalFeatures?.constitution && (
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Thermal State</p>
-                        <p className="font-black text-brand-primary uppercase italic text-sm">{latestChronicCase.physicalFeatures.constitution.thermal || "Not set"}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Thermal State</p>
+                        <p className="font-bold text-brand-primary uppercase text-sm">{latestChronicCase.physicalFeatures.constitution.thermal || "Not set"}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Temperament</p>
-                        <p className="font-black text-brand-accent uppercase italic text-sm">{latestChronicCase.physicalFeatures.constitution.temperament || "Not set"}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Temperament</p>
+                        <p className="font-bold text-brand-accent uppercase text-sm">{latestChronicCase.physicalFeatures.constitution.temperament || "Not set"}</p>
                       </div>
                     </div>
                   )}
 
                   <div className="pt-6 border-t border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Anthropometry (Latest)</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Anthropometry (Latest)</p>
                     <div className="grid grid-cols-2 gap-y-4">
                       <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-slate-200" />
@@ -236,7 +236,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                 <button
                   onClick={() => setActiveTab("timeline")}
                   className={clsx(
-                    "px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 flex items-center gap-2",
+                    "px-8 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 flex items-center gap-2",
                     activeTab === "timeline" 
                       ? "bg-white text-slate-900 shadow-xl border border-slate-100" 
                       : "text-slate-400 hover:text-slate-600"
@@ -247,7 +247,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                 <button
                   onClick={() => setActiveTab("management")}
                   className={clsx(
-                    "px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 flex items-center gap-2",
+                    "px-8 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 flex items-center gap-2",
                     activeTab === "management" 
                       ? "bg-white text-slate-900 shadow-xl border border-slate-100" 
                       : "text-slate-400 hover:text-slate-600"
