@@ -77,8 +77,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Logo Section */}
         <div className="h-20 flex items-center px-6 mb-4">
           <div className="flex items-center gap-3">
-             <div className="p-2 bg-brand-primary/10 rounded-xl border border-brand-primary/20 shadow-inner">
-               <Image src="/logo.svg" alt="Logo" width={24} height={24} className="brightness-110" />
+             <div className="w-10 h-10 rounded-full bg-white border border-brand-primary/20 shadow-inner overflow-hidden flex items-center justify-center shrink-0">
+               <Image src="/logo.svg" alt="Logo" width={40} height={40} className="w-full h-full object-cover brightness-110" />
              </div>
              <div className="flex flex-col">
                <span className="text-lg font-bold text-white tracking-tight leading-none">Carewell</span>

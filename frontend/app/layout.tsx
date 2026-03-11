@@ -51,7 +51,12 @@ export default function RootLayout({
           <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
             <ClientLayout>
               {children}
-              <Toaster position="top-right" richColors closeButton />
+              <Toaster
+                position="top-right"
+                richColors
+                closeButton
+                theme="light"
+                          />
             </ClientLayout>
           </GoogleOAuthProvider>
         </QueryProvider>

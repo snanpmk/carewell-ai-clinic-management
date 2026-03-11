@@ -54,6 +54,8 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     },
   });
 
+
+
   const selectedPatientId = useWatch({
     control,
     name: "patient" as const,
@@ -156,14 +158,17 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     { value: "Other", label: "Other" },
   ], []);
 
+  const onFormError = () => {
+    toast.error("Required fields missing: Please provide Patient Name, Age, and Sex.");
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="contents">
+    <form onSubmit={handleSubmit(onSubmit, onFormError)} className="contents">
       <StepLayout
         title="Administrative Data"
         subtitle="Patient Demographics & Identification"
         isFirstStep
         isSubmitting={isSubmitting}
-        error={Object.keys(errors).length > 0 ? "Please check the required fields below." : undefined}
       >
         <div className="space-y-4">
           {/* Patient Selection */}

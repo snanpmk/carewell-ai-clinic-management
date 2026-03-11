@@ -21,8 +21,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const publicRoutes = ["/auth", "/privacy", "/protocol"];
     if (mounted) {
-      if (!isAuthenticated && pathname !== "/auth") {
+      if (!isAuthenticated && !publicRoutes.includes(pathname)) {
         router.push("/auth");
       } else if (isAuthenticated && pathname === "/auth") {
         router.push("/");
@@ -64,7 +65,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated || pathname === "/auth") {
+  const publicRoutes = ["/auth", "/privacy", "/protocol"];
+  if (!isAuthenticated || publicRoutes.includes(pathname)) {
      return <div className="flex-1 flex flex-col min-h-screen bg-white">{children}</div>;
   }
 
@@ -73,7 +75,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <Image src="/logo.svg" alt="Logo" width={32} height={32} />
+          <div className="w-9 h-9 rounded-full overflow-hidden border border-slate-200 shadow-sm flex items-center justify-center bg-white">
+            <Image src="/logo.svg" alt="Logo" width={36} height={36} className="w-full h-full object-cover" />
+          </div>
           <span className="font-semibold text-slate-900 tracking-tight">Carewell</span>
         </div>
         <button 

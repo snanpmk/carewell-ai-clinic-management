@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Clinic = require("../models/Clinic");
+const Invitation = require("../models/Invitation");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const nodemailer = require("nodemailer");
@@ -48,10 +49,26 @@ const registerClinic = async (req, res) => {
     const picture = profileImage || payload.picture;
 
     // Check if user already exists
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email }).populate("clinic");
 
     if (userExists) {
-      return res.status(400).json({ success: false, error: "Doctor already registered with this email" });
+      if (userExists.role === "primary") {
+        return res.status(400).json({ success: false, error: "You have already registered a clinic with this email." });
+      } else {
+        return res.status(400).json({ 
+          success: false, 
+          error: `You are already registered as a doctor in "${userExists.clinic?.name || 'another clinic'}".` 
+        });
+      }
+    }
+
+    // Check for pending invitations
+    const pendingInvitation = await Invitation.findOne({ email, status: "pending" }).populate("clinic");
+    if (pendingInvitation) {
+      return res.status(400).json({ 
+        success: false, 
+        error: `You have a pending invitation to join "${pendingInvitation.clinic?.name || 'a clinic'}". Please accept the invitation instead of registering a new clinic.` 
+      });
     }
 
     // Create Clinic

@@ -9,6 +9,7 @@ import { BadgeSelect } from "@/components/ui/BadgeSelect";
 import { DynamicTable } from "@/components/ui/DynamicTable";
 import StepLayout from "../StepLayout";
 import { Microscope, Search, Target } from "lucide-react";
+import { toast } from "sonner";
 
 export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
   const { register, handleSubmit, control, formState: { isSubmitting } } = useForm({
@@ -30,8 +31,12 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
     nextStep();
   };
 
+  const onFormError = () => {
+    toast.error("Required fields missing in Analysis & Diagnosis.");
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="contents">
+    <form onSubmit={handleSubmit(onSubmit, onFormError)} className="contents">
       <StepLayout
         title="Analysis & Diagnosis"
         subtitle="Clinical Synthesis & Homeopathic Totality"

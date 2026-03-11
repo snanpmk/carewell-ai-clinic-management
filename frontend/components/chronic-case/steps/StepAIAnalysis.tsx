@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/Textarea";
 import StepLayout from "../StepLayout";
 import { useMutation } from "@tanstack/react-query";
 import { ChronicCase } from "@/types/chronicCase";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
   const { register, handleSubmit, setValue, watch } = useForm<ChronicCase>({
@@ -41,8 +43,16 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
           repertorization: result.repertorization,
         }
       });
+      toast.success("AI Synthesis complete. Findings have been drafted.");
     }
   });
+
+  useEffect(() => {
+    if (analysisMutation.error) {
+      toast.error((analysisMutation.error as any).message || "AI Analysis failed");
+      analysisMutation.reset();
+    }
+  }, [analysisMutation.error, analysisMutation]);
 
   const runAnalysis = () => {
     analysisMutation.mutate(caseData);
@@ -60,14 +70,13 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
         subtitle="AI-Assisted Synthesis & Totality"
         onBack={prevStep}
         nextLabel="Final Management"
-        error={analysisMutation.error?.message}
         headerActions={
           <Button
             type="button"
             onClick={runAnalysis}
             disabled={analysisMutation.isPending}
             variant="primary"
-            className="shadow-md shadow-indigo-500/20 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 border-none px-6"
+            className="px-6"
             leftIcon={analysisMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
           >
             {analysisMutation.isPending ? "Analyzing..." : "Draft Totality"}
@@ -101,24 +110,24 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
 
             {/* Read-only Repertorization Display */}
             {repertorization && repertorization.length > 0 && (
-              <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100/60">
-                <h3 className="eyebrow text-slate-900! flex items-center gap-2 mb-4">
-                  <ListTree className="w-4 h-4 text-indigo-500" /> Suggested Rubrics
+              <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                <h3 className="eyebrow text-slate-900 flex items-center gap-2 mb-4">
+                  <ListTree className="w-4 h-4 text-brand-primary" /> Suggested Rubrics
                 </h3>
                 <div className="space-y-3">
                   {repertorization.map((item: Record<string, unknown>, index: number) => (
-                    <div key={index} className="bg-white p-3 rounded-xl border border-indigo-50/80 shadow-sm text-xs">
+                    <div key={index} className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm text-xs">
                       <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-2">
                         <div className="flex-1">
                           <span className="font-bold text-slate-700">Symptom: </span>
                           <span className="text-slate-600">{item.symptom as string}</span>
                         </div>
                         <div className="flex-1">
-                          <span className="font-bold text-indigo-600">Rubric: </span>
-                          <span className="text-indigo-700 font-medium">{item.rubric as string}</span>
+                          <span className="font-bold text-brand-primary">Rubric: </span>
+                          <span className="text-brand-primary font-medium">{item.rubric as string}</span>
                         </div>
                       </div>
-                      <p className="text-slate-500 italic border-t border-slate-50 pt-2 mt-1">
+                      <p className="text-slate-500 border-t border-slate-100 pt-2 mt-1 font-medium">
                         &quot;{item.explanation as string}&quot;
                       </p>
                     </div>

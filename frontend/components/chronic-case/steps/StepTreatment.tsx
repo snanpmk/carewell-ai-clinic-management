@@ -63,8 +63,12 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
     saveMutation.mutate(finalizedCase);
   };
 
+  const onFormError = () => {
+    toast.error("Please ensure the prescription details are complete.");
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="contents">
+    <form onSubmit={handleSubmit(onSubmit, onFormError)} className="contents">
       <StepLayout
         title="Management & Treatment"
         subtitle="Plan of Treatment & First Prescription"
@@ -106,13 +110,16 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
               <div className="eyebrow text-brand-accent flex items-center gap-3">
                 <Pill className="w-4 h-4" /> Final Selection (Prescriptions)
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={() => append({ medicine: "", potency: "", dose: "" })}
-                className="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20"
+                variant="primary"
+                size="sm"
+                className="h-9 rounded-lg"
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
               >
-                <Plus className="w-3.5 h-3.5" /> Add Medicine
-              </button>
+                Add Medicine
+              </Button>
             </div>
 
             <Textarea 
