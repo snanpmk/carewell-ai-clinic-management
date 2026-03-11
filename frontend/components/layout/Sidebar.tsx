@@ -8,26 +8,25 @@ import {
   Users, 
   FilePlus, 
   Settings, 
-  Sparkles,
   Stethoscope,
-  HeartPulse,
   ChevronRight,
   LogOut,
   Shield,
-  ShieldAlert
+  ShieldAlert,
+  User as UserIcon
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUIStore } from "@/store/useUIStore";
 import Image from "next/image";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 const navItems = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard, color: "text-brand-primary" },
-  { name: "Appointments", href: "/appointments", icon: Calendar, color: "text-brand-accent" },
-  { name: "Patients", href: "/patients", icon: Users, color: "text-brand-primary" },
-  { name: "Acute Consultation", href: "/consultation/acute", icon: FilePlus, color: "text-brand-accent" },
-  { name: "Chronic Case", href: "/consultation/chronic", icon: Stethoscope, color: "text-brand-primary" },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Appointments", href: "/appointments", icon: Calendar },
+  { name: "Patients", href: "/patients", icon: Users },
+  { name: "Acute Visit", href: "/consultation/acute", icon: FilePlus },
+  { name: "Chronic Case", href: "/consultation/chronic", icon: Stethoscope },
 ];
 
 const secondaryItems = [
@@ -38,6 +37,7 @@ interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
+
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -55,50 +55,46 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-slate-900/40 z-40 lg:hidden backdrop-blur-sm transition-opacity"
           onClick={onClose}
         />
       )}
 
       <aside
         className={clsx(
-          "fixed inset-y-0 left-0 w-64 bg-slate-950 text-slate-300 flex flex-col border-r border-slate-900 z-50 transition-transform duration-200 lg:translate-x-0",
+          "fixed inset-y-0 left-0 w-64 bg-slate-950 text-slate-400 flex flex-col border-r border-slate-900 z-50 transition-transform duration-300 ease-in-out lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Mobile Close */}
         <button
           onClick={onClose}
-          className="lg:hidden absolute top-6 right-4 text-slate-500 hover:text-white"
+          className="lg:hidden absolute top-6 right-4 p-2 text-slate-500 hover:text-white transition-colors"
         >
           <ChevronRight className="w-6 h-6 rotate-180" />
         </button>
 
-        {/* Logo */}
-        <div className="h-20 flex items-center px-6 border-b border-slate-900">
-          {/* <Stethoscope className="w-6 h-6 text-brand-primary" /> */}
-          <Image src="/logo.svg" alt="Logo" width={40} height={40} />
-
-          <div className="ml-3">
-            <h1 className="text-lg font-semibold text-brand-primary! tracking-tight">
-              Carewell
-            </h1>
-
-            <p className="text-xs text-slate-400">
-              Homoeopathic Clinic
-            </p>
+        {/* Logo Section */}
+        <div className="h-20 flex items-center px-6 mb-4">
+          <div className="flex items-center gap-3">
+             <div className="p-2 bg-brand-primary/10 rounded-xl border border-brand-primary/20 shadow-inner">
+               <Image src="/logo.svg" alt="Logo" width={24} height={24} className="brightness-110" />
+             </div>
+             <div className="flex flex-col">
+               <span className="text-lg font-bold text-white tracking-tight leading-none">Carewell</span>
+               <span className="text-[10px] font-semibold text-brand-primary uppercase tracking-[0.2em] mt-1">AI Clinical</span>
+             </div>
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex-1 overflow-y-auto px-3 py-6 space-y-8">
-
-          {/* Clinic Section */}
-          <div>
-            <p className="px-3 mb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Clinic
+        {/* Navigation Content */}
+        <div className="flex-1 overflow-y-auto px-4 space-y-8 no-scrollbar">
+          
+          {/* Main Workspace */}
+          <div className="space-y-1">
+            <p className="px-3 mb-4 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">
+              Workspace
             </p>
-
             <nav className="space-y-1">
               {navItems.map((item) => {
                 const isActive =
@@ -110,13 +106,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     key={item.href}
                     href={item.href}
                     className={clsx(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition",
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group relative",
                       isActive
-                        ? "bg-brand-primary/10 text-white border-l-2 border-brand-primary"
-                        : "text-slate-400 hover:text-white hover:bg-slate-900"
+                        ? "text-white bg-white/5"
+                        : "hover:text-slate-200 hover:bg-white/5"
                     )}
                   >
-                    <item.icon className="w-5 h-5" />
+                    {isActive && (
+                      <div className="absolute left-0 w-1 h-5 bg-brand-primary rounded-r-full" />
+                    )}
+                    <item.icon className={clsx(
+                      "w-5 h-5 transition-colors",
+                      isActive ? "text-brand-primary" : "text-slate-500 group-hover:text-slate-300"
+                    )} />
                     <span className="flex-1">{item.name}</span>
                   </Link>
                 );
@@ -124,107 +126,89 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </nav>
           </div>
 
-          {/* System Section */}
-          <div>
-            <p className="px-3 mb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              System
+          {/* System & Tools */}
+          <div className="space-y-1">
+            <p className="px-3 mb-4 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">
+              Management
             </p>
-
             <nav className="space-y-1">
               {secondaryItems.map((item) => {
                 const isActive = pathname === item.href;
-
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={clsx(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition",
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group relative",
                       isActive
-                        ? "bg-brand-primary/10 text-white border-l-2 border-brand-primary"
-                        : "text-slate-400 hover:text-white hover:bg-slate-900"
+                        ? "text-white bg-white/5"
+                        : "hover:text-slate-200 hover:bg-white/5"
                     )}
                   >
-                    <item.icon className="w-5 h-5" />
+                    {isActive && (
+                      <div className="absolute left-0 w-1 h-5 bg-brand-primary rounded-r-full" />
+                    )}
+                    <item.icon className={clsx(
+                      "w-5 h-5 transition-colors",
+                      isActive ? "text-brand-primary" : "text-slate-500 group-hover:text-slate-300"
+                    )} />
                     <span className="flex-1">{item.name}</span>
                   </Link>
                 );
               })}
 
-              {/* Privacy Mode */}
+              {/* Privacy Mode Toggle */}
               <button
                 onClick={togglePrivacyMode}
                 className={clsx(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition",
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group relative",
                   privacyMode
-                    ? "bg-orange-500/10 text-orange-400"
-                    : "text-slate-400 hover:text-white hover:bg-slate-900"
+                    ? "text-orange-400 bg-orange-400/5"
+                    : "hover:text-slate-200 hover:bg-white/5"
                 )}
               >
                 {privacyMode ? (
                   <ShieldAlert className="w-5 h-5" />
                 ) : (
-                  <Shield className="w-5 h-5" />
+                  <Shield className="w-5 h-5 text-slate-500 group-hover:text-slate-300" />
                 )}
-
                 <span className="flex-1 text-left">Privacy Mode</span>
-
                 {privacyMode && (
-                  <Badge
-                    label="ON"
-                    variant="warning"
-                    className="text-[10px]"
-                  />
+                  <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse shadow-[0_0_8px_rgba(251,146,60,0.5)]" />
                 )}
               </button>
             </nav>
           </div>
         </div>
 
-        {/* User Profile */}
-        <div className="border-t border-slate-900 p-4">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-900 transition">
-
-            {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
-              {user?.profileImage ? (
-                <Image
-                  src={user.profileImage}
-                  alt={user.name || "User"}
-                  width={40}
-                  height={40}
-                  className="object-cover"
-                />
-              ) : (
-                <span className="text-sm font-semibold text-white">
-                  {user?.name?.charAt(0) || "D"}
-                </span>
-              )}
+        {/* User Profile Section */}
+        <div className="p-4 space-y-3 mt-auto">
+          <div className="bg-slate-900/50 rounded-xl border border-slate-900 p-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400">
+                <UserIcon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  {user?.role === "primary" ? "Administrator" : "Practitioner"}
+                </p>
+                <p className="text-[9px] font-medium text-slate-600 uppercase tracking-wider mt-0.5">
+                  Clinic Staff
+                </p>
+              </div>
             </div>
-
-            {/* User Info */}
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium text-white truncate">
-                {user?.name || "Doctor"}
-              </p>
-
-              <p className="text-xs text-slate-400">
-                {user?.role === "primary"
-                  ? "Primary Doctor"
-                  : "Doctor"}
-              </p>
-            </div>
-
-            {/* Logout */}
-            <button
-              onClick={handleLogout}
-              className="p-2 text-slate-400 hover:text-red-400"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-
           </div>
+
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            fullWidth
+            size="sm"
+            className="text-red-400 hover:text-red-500 hover:bg-red-400/10 border-red-400/5 hover:border-red-400/20 rounded-xl justify-center h-10 min-w-0"
+            leftIcon={<LogOut className="w-4 h-4" />}
+          >
+            Sign Out
+          </Button>
         </div>
       </aside>
     </>
