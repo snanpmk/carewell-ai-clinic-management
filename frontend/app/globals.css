@@ -37,15 +37,15 @@ body {
 
 /* ── Typography Standards ─────────────────────────────────────────────────── */
 h1 {
-  @apply text-3xl md:text-4xl font-black text-slate-900 tracking-tight;
+  @apply text-3xl md:text-4xl  tracking-tight;
 }
 
 h2 {
-  @apply text-xl md:text-2xl font-black text-slate-900 tracking-tight;
+  @apply text-xl md:text-2xl  tracking-tight;
 }
 
 h3 {
-  @apply text-lg md:text-xl font-black text-slate-900 tracking-tight;
+  @apply text-lg md:text-xl  tracking-tight;
 }
 
 .eyebrow {
