@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Card } from "@/components/ui/Card";
-import { Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2, CheckCircle2 } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2, CheckCircle2, Trash2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import apiClient from "@/services/apiClient";
 import { Input } from "@/components/ui/Input";
@@ -51,6 +51,28 @@ export default function SettingsPage() {
   });
 
   const team = teamResponse?.data || [];
+  const queryClient = useQueryClient();
+
+  const removeDoctorMutation = useMutation({
+    mutationFn: async (doctorId: string) => {
+      const { data } = await apiClient.delete(`/api/auth/doctors/${doctorId}`);
+      return data;
+    },
+    onSuccess: (res) => {
+      toast.success(res.message || "Doctor removed successfully.");
+      queryClient.invalidateQueries({ queryKey: ["clinic-doctors"] });
+    },
+    onError: (err: any) => {
+      const errorMsg = err.response?.data?.error || err.message || "Failed to remove doctor.";
+      toast.error(errorMsg);
+    }
+  });
+
+  const handleRemoveDoctor = (doctorId: string, doctorName: string) => {
+    if (window.confirm(`Are you sure you want to remove Dr. ${doctorName} from the clinic? They will lose access immediately.`)) {
+      removeDoctorMutation.mutate(doctorId);
+    }
+  };
 
   const {
     register,
@@ -265,7 +287,19 @@ export default function SettingsPage() {
                       variant={doc.role === "primary" ? "warning" : "primary"} 
                       className="px-2 py-0.5"
                     />
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    <div className="flex items-center gap-3">
+                      {isPrimary && doc.role !== "primary" && (
+                        <button
+                          onClick={() => handleRemoveDoctor(doc._id, doc.name)}
+                          disabled={removeDoctorMutation.isPending}
+                          className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-300 disabled:opacity-50"
+                          title="Remove Practitioner"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    </div>
                   </div>
                 </div>
               ))}
