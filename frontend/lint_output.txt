@@ -1,0 +1,134 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/app/auth/page.tsx
+  10:32  warning  'ShieldCheck' is defined but never used   @typescript-eslint/no-unused-vars
+  10:45  warning  'Zap' is defined but never used           @typescript-eslint/no-unused-vars
+  38:22  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/app/consultation/acute/page.tsx
+    5:26  warning  'User' is defined but never used                  @typescript-eslint/no-unused-vars
+  159:27  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  183:9   warning  'onFormError' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/app/onboarding/page.tsx
+  20:35  warning  'UserPlus' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/app/privacy/page.tsx
+   4:56   warning  'Globe' is defined but never used                                @typescript-eslint/no-unused-vars
+  44:190  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/app/protocol/page.tsx
+   4:10  warning  'ClipboardCheck' is defined but never used                       @typescript-eslint/no-unused-vars
+   4:31  warning  'UserCheck' is defined but never used                            @typescript-eslint/no-unused-vars
+  80:53  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  80:67  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/app/settings/page.tsx
+  65:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  95:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/app/symptoms/page.tsx
+  32:45  warning  'Loader2' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/chronic-case/StepLayout.tsx
+  38:3  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/chronic-case/steps/StepAIAnalysis.tsx
+  27:27  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/chronic-case/steps/StepAIAnalysis.tsx:27:27
+  25 |   });
+  26 |
+> 27 |   const repertorization = watch("homeopathicDiagnosis.repertorization");
+     |                           ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  28 |
+  29 |   const analysisMutation = useMutation({
+  30 |     mutationFn: analyzeChronicCaseWithAI,  react-hooks/incompatible-library
+  52:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/chronic-case/steps/StepFemaleHistory.tsx
+  7:10  warning  'Select' is defined but never used    @typescript-eslint/no-unused-vars
+  8:10  warning  'Textarea' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/chronic-case/steps/StepTreatment.tsx
+  19:51  warning  'nextStep' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/dashboard/DashboardCalendar.tsx
+   4:21  warning  'DayProps' is defined but never used            @typescript-eslint/no-unused-vars
+  10:36  warning  'Users' is defined but never used               @typescript-eslint/no-unused-vars
+  60:34  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  61:41  warning  'className' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/dashboard/DashboardHeader.tsx
+   4:10  warning  'Plus' is defined but never used           @typescript-eslint/no-unused-vars
+   4:16  warning  'UserPlus' is defined but never used       @typescript-eslint/no-unused-vars
+   4:26  warning  'Calendar' is defined but never used       @typescript-eslint/no-unused-vars
+  11:11  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/dashboard/DashboardQuickActions.tsx
+   6:3   warning  'Search' is defined but never used         @typescript-eslint/no-unused-vars
+  11:3   warning  'MessageSquare' is defined but never used  @typescript-eslint/no-unused-vars
+  14:10  warning  'Card' is defined but never used           @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/dashboard/DashboardRecentActivity.tsx
+  4:31  warning  'Activity' is defined but never used    @typescript-eslint/no-unused-vars
+  4:41  warning  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+  4:53  warning  'User' is defined but never used        @typescript-eslint/no-unused-vars
+  6:10  warning  'Badge' is defined but never used       @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/dashboard/DashboardStatsGrid.tsx
+   3:59  warning  'TrendingDown' is defined but never used    @typescript-eslint/no-unused-vars
+   3:73  warning  'Minus' is defined but never used           @typescript-eslint/no-unused-vars
+   3:80  warning  'Activity' is defined but never used        @typescript-eslint/no-unused-vars
+  14:9   warning  'stats' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/layout/ClientLayout.tsx
+  20:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/layout/ClientLayout.tsx:20:5
+  18 |
+  19 |   useEffect(() => {
+> 20 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  21 |   }, []);
+  22 |
+  23 |   const isPublicRoute = useMemo(() => {  react-hooks/set-state-in-effect
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/patients/PatientsHeader.tsx
+  4:10  warning  'Plus' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/patients/profile/ChronicCaseDetails.tsx
+   5:3   warning  'User' is defined but never used      @typescript-eslint/no-unused-vars
+   5:34  warning  'History' is defined but never used   @typescript-eslint/no-unused-vars
+   7:3   warning  'MapPin' is defined but never used    @typescript-eslint/no-unused-vars
+   7:17  warning  'Heart' is defined but never used     @typescript-eslint/no-unused-vars
+   7:24  warning  'Zap' is defined but never used       @typescript-eslint/no-unused-vars
+   7:29  warning  'FileText' is defined but never used  @typescript-eslint/no-unused-vars
+  10:10  warning  'clsx' is defined but never used      @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/patients/profile/PatientManagementHistory.tsx
+  4:26  warning  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/ui/BadgeSelect.tsx
+  4:10  warning  'Plus' is defined but never used  @typescript-eslint/no-unused-vars
+  4:16  warning  'X' is defined but never used     @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/ui/CommandPalette.tsx
+  23:9  warning  'aiEnabled' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/sinanpmk/Projects/carewell-ai-notes-app/frontend/components/ui/DynamicTable.tsx
+  7:18  warning  'T' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 55 problems (10 errors, 45 warnings)
+

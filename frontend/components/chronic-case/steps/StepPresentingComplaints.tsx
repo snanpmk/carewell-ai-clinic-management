@@ -40,8 +40,8 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Complaints & History"
-        subtitle="Symptom Mapping & Pathological Progression"
+        title="Presenting Complaints"
+        subtitle="Mapping the complete symptom totality and clinical history"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
@@ -49,7 +49,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
           {/* Section 3: Presenting Complaints */}
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="eyebrow text-brand-primary flex items-center gap-3">
+              <div className="eyebrow flex items-center gap-3">
                 <Activity className="w-4 h-4" /> Granular Symptom Analysis
               </div>
               <Button 
@@ -65,11 +65,11 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
 
             <div className="space-y-10">
               {fields.map((field, index) => (
-                <div key={field.id} className="bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100 relative group animate-in fade-in duration-500">
+                <div key={field.id} className="bg-slate-50/50 p-8 rounded-2xl border border-slate-100 relative group animate-in fade-in duration-500">
                   <button 
                     type="button" 
                     onClick={() => remove(index)}
-                    className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -83,7 +83,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
                         {...register(`presentingComplaints.${index}.complaintType`)} 
                       />
                       <div className="p-5 bg-white rounded-2xl border border-slate-100 space-y-4">
-                        <div className="eyebrow !text-[9px] !text-brand-accent flex items-center gap-2">
+                        <div className="eyebrow !text-[9px] flex items-center gap-2">
                           <MapPin className="w-3 h-3" /> Anatomical Location
                         </div>
                         <div className="grid grid-cols-2 gap-3">
@@ -107,7 +107,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
                           rows={4}
                         />
                         <div className="p-5 bg-white rounded-2xl border border-slate-100 space-y-4">
-                          <div className="eyebrow !text-[9px] !text-brand-primary flex items-center gap-2">
+                          <div className="eyebrow !text-[9px] flex items-center gap-2">
                             <Zap className="w-3 h-3" /> Modalities
                           </div>
                           <Input label="Aggravation (<)" {...register(`presentingComplaints.${index}.modalities.aggravation`)} />
@@ -136,7 +136,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
 
           {/* Section 4: HPI */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Layers className="w-4 h-4" /> History of Present Illness (HPI)
             </div>
             <Textarea 

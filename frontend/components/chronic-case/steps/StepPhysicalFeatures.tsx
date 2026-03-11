@@ -36,15 +36,15 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Physical Constitution"
-        subtitle="Appearance, Generals & Reactivity"
+        title="Physical Profile"
+        subtitle="Physical appearance, functional generals, and environmental reactivity"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-12">
           {/* Appearance & Regional Snapshot */}
           <div className="space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <User className="w-4 h-4" /> Physical Appearance
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -58,7 +58,7 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
 
           {/* Functional Generals */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Zap className="w-4 h-4" /> Functional Generals
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -73,7 +73,7 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
 
           {/* Reactions to Factors Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Wind className="w-4 h-4" /> Reactivity to Environmental Factors
             </div>
             <DynamicTable 
@@ -93,7 +93,7 @@ export default function StepPhysicalFeatures({ caseData, updateCaseData, nextSte
 
           {/* Constitution & Tendencies */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Thermometer className="w-4 h-4" /> Constitutional Profile
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

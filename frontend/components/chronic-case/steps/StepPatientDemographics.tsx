@@ -134,9 +134,10 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
     else if (selectedPatientId && !existingCases) {
       const patient = (memoPatients as Patient[]).find((p: Patient) => p._id === selectedPatientId);
       if (patient) {
-        setValue("demographics.name", patient.name);
-        setValue("demographics.age", patient.age);
-        setValue("demographics.sex", patient.sex || "");
+        setValue("demographics.name", patient.name, { shouldValidate: true });
+        setValue("demographics.age", patient.age, { shouldValidate: true });
+        setValue("demographics.sex", patient.sex || "", { shouldValidate: true });
+        setValue("demographics.address", patient.address || "", { shouldValidate: true });
       }
     }
   }, [selectedPatientId, existingCases, memoPatients, setValue, reset, updateCaseData, caseData.patient]);
@@ -165,33 +166,33 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
   return (
     <form onSubmit={handleSubmit(onSubmit, onFormError)} className="contents">
       <StepLayout
-        title="Administrative Data"
+        title="Administration"
         subtitle="Patient Demographics & Identification"
         isFirstStep
         isSubmitting={isSubmitting}
       >
         <div className="space-y-4">
           {/* Patient Selection */}
-          <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-200/80 space-y-3">
-            <h3 className="eyebrow text-slate-900! flex items-center gap-2 mb-4">
-              <User className="w-4 h-4 text-blue-500" /> Choose Registered Patient
+          <div className="bg-slate-50/30 p-6 rounded-2xl border border-slate-200/60 mb-8">
+            <h3 className="eyebrow flex items-center gap-2 mb-6">
+              <User className="w-3.5 h-3.5 text-brand-primary" /> Registered Patient Registry
             </h3>
             <div className="max-w-md relative">
               {allPatientsLoading ? (
-                <div className="h-10 w-full bg-slate-100 animate-pulse rounded-lg" />
+                <div className="h-12 w-full bg-slate-100 animate-pulse rounded-2xl" />
               ) : (
                 <>
                   <Select
-                    label="Select Patient"
+                    label="Select Active Patient"
                     options={patientOptions}
-                    placeholder="Select Patient"
+                    placeholder="Search registry..."
                     required
                     {...register("patient")}
                     error={errors.patient?.message as string}
                     privacyBlur={privacyMode}
                   />
                   {isLoadingExisting && (
-                    <div className="absolute right-10 top-[38px]">
+                    <div className="absolute right-10 top-[42px]">
                       <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />
                     </div>
                   )}
@@ -200,7 +201,7 @@ export default function StepPatientDemographics({ caseData, updateCaseData, next
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 text-sm pt-4">
             <div className="md:col-span-2">
               <Input
                 label="Full Patient Name"

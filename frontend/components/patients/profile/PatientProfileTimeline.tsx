@@ -35,7 +35,7 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
   return (
     <>
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl font-black text-slate-900 flex items-center gap-4 tracking-tight uppercase italic">
+        <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-4 tracking-tight uppercase italic">
           <div className="p-3 bg-brand-primary/10 rounded-2xl border border-brand-primary/20 shadow-inner">
             <Clock className="w-6 h-6 text-brand-primary" />
           </div>
@@ -45,11 +45,11 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
 
       <div className="space-y-8">
         {visits.length === 0 ? (
-          <div className="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] p-24 text-center shadow-sm">
-            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-24 text-center shadow-sm">
+            <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <FileText className="w-10 h-10 text-slate-200" />
             </div>
-            <p className="eyebrow">Empty Medical Record</p>
+            <p className="eyebrow uppercase tracking-widest text-[10px] text-slate-400 font-bold">Empty Medical Record</p>
             <p className="text-slate-400 text-sm mt-3 font-medium">No past visits found for this patient.</p>
           </div>
         ) : (
@@ -63,7 +63,7 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
               const remedies = c.analysisAndDiagnosis?.finalDiagnosis?.homeopathicDiagnosis || "No prescription finalized.";
 
               return (
-                <div key={visit._id} className="bg-slate-950 border border-slate-900 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group transition-all duration-500">
+                <div key={visit._id} className="bg-slate-950 border border-slate-900 rounded-2xl p-10 shadow-2xl relative overflow-hidden group transition-all duration-500">
                   <div className="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-brand-primary to-brand-accent opacity-100" />
                   <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-brand-primary/10 transition-all duration-700" />
                   
@@ -73,14 +73,14 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                         <Sparkles className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Chronic Evaluation</h3>
-                        <p className="eyebrow !text-brand-accent mt-1.5 opacity-100">
+                        <h3 className="text-xl font-semibold text-white tracking-tight uppercase italic">Chronic Evaluation</h3>
+                        <p className="eyebrow !text-brand-accent mt-1.5 opacity-100 uppercase tracking-widest text-[10px]">
                            {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 relative z-10">
-                      <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-white/10 text-brand-accent border border-white/10 shadow-inner">
+                      <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-[0.2em] bg-white/10 text-brand-accent border border-white/10 shadow-inner">
                           Gov Spec v1.0
                       </span>
                       <button 
@@ -100,10 +100,10 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                         {aiEnabled && (
                           <>
                             <div>
-                              <div className="eyebrow mb-4 flex items-center gap-2 !text-slate-300">
+                              <div className="eyebrow mb-4 flex items-center gap-2 !text-slate-300 uppercase tracking-widest text-[10px] font-bold">
                                   <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
                               </div>
-                              <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner backdrop-blur-md">
+                              <div className="p-6 bg-white/5 rounded-2xl border border-white/5 shadow-inner backdrop-blur-md">
                                 <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
                               </div>
                             </div>
@@ -111,25 +111,25 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                         )}
                         
                         {!aiEnabled && (
-                          <div className="p-10 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-center h-full">
+                          <div className="p-10 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-center h-full">
                              <FileText className="w-10 h-10 text-white/5 mb-4" />
-                             <p className="eyebrow !text-white/20">Clinical data archive</p>
+                             <p className="eyebrow !text-white/20 uppercase tracking-widest text-[10px] font-bold">Clinical data archive</p>
                           </div>
                         )}
                       </div>
                       
                       <div className="space-y-8">
-                        <div className="bg-linear-to-br from-white/5 to-transparent rounded-[2rem] p-8 border border-white/10 relative shadow-2xl h-full flex flex-col justify-center">
+                        <div className="bg-linear-to-br from-white/5 to-transparent rounded-2xl p-8 border border-white/10 relative shadow-2xl h-full flex flex-col justify-center">
                            <div className="absolute top-6 right-6 text-white/5">
                              <FileText className="w-12 h-12" />
                            </div>
-                           <p className="eyebrow !text-brand-accent mb-6">Management Plan</p>
-                           <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-2 uppercase italic">
+                           <p className="eyebrow !text-brand-accent mb-6 uppercase tracking-widest text-[10px] font-bold">Management Plan</p>
+                           <p className="text-2xl font-semibold text-white leading-tight mb-4 tracking-tight line-clamp-2 uppercase italic">
                              {remedies}
                            </p>
                            <button 
                              onClick={() => toggleCase(visit._id)}
-                             className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:text-brand-accent transition-colors mt-4 flex items-center gap-2"
+                             className="text-[10px] font-semibold uppercase tracking-widest text-brand-primary hover:text-brand-accent transition-colors mt-4 flex items-center gap-2"
                            >
                              View Full Case Analysis <ChevronDown className="w-3 h-3" />
                            </button>
@@ -168,22 +168,22 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
             }
 
             return (
-              <div key={visit._id} className="bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/40 group relative overflow-hidden transition-all duration-500 hover:shadow-2xl">
+              <div key={visit._id} className="bg-white border border-slate-200 rounded-2xl p-10 shadow-xl shadow-slate-200/40 group relative overflow-hidden transition-all duration-500 hover:shadow-2xl">
                 <div className="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-brand-primary/20 to-brand-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 pb-8 border-b border-slate-100">
                   <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 bg-slate-50 border border-slate-200 shadow-inner rounded-2xl flex items-center justify-center text-slate-400 font-black text-xl group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
+                    <div className="w-14 h-14 bg-slate-50 border border-slate-200 shadow-inner rounded-2xl flex items-center justify-center text-slate-400 font-semibold text-xl group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
                       {visits.length - idx}
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase italic">Acute Consultation</h3>
-                      <p className="eyebrow mt-1.5">
+                      <h3 className="text-xl font-semibold text-slate-900 tracking-tight uppercase italic">Acute Consultation</h3>
+                      <p className="eyebrow mt-1.5 uppercase tracking-widest text-[10px] text-slate-400 font-bold">
                          {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
                     </div>
                   </div>
-                  <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] bg-slate-100 text-slate-500 border border-slate-200 shadow-inner group-hover:bg-brand-primary/10 group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
+                  <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-[0.2em] bg-slate-100 text-slate-500 border border-slate-200 shadow-inner group-hover:bg-brand-primary/10 group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
                       {visit.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -191,14 +191,14 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-8">
                     <div>
-                      <div className="eyebrow mb-4 flex items-center gap-2">
+                      <div className="eyebrow mb-4 flex items-center gap-2 uppercase tracking-widest text-[10px] text-slate-400 font-bold">
                          <Activity className="w-4 h-4 text-brand-primary" /> Presenting Symptoms
                       </div>
-                      <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 shadow-inner">
+                      <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
                         <p className="text-sm md:text-base font-medium text-slate-700 leading-relaxed italic">&quot;{visit.symptoms}&quot;</p>
                         {visit.diagnosis && (
                           <div className="mt-6 pt-5 border-t border-slate-200/60 flex items-center gap-3">
-                            <span className="px-3 py-1.5 bg-brand-primary/5 text-brand-primary text-[10px] uppercase tracking-[0.2em] font-black rounded-lg border border-brand-primary/10">
+                            <span className="px-3 py-1.5 bg-brand-primary/5 text-brand-primary text-[10px] uppercase tracking-[0.2em] font-semibold rounded-lg border border-brand-primary/10">
                               Assessment: <span className="text-slate-900 ml-1">{visit.diagnosis}</span>
                             </span>
                           </div>
@@ -208,10 +208,10 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
 
                     {aiEnabled && aiNotes && !!aiNotes["assessment"] && (
                        <div>
-                          <div className="eyebrow mb-4 flex items-center gap-2">
+                          <div className="eyebrow mb-4 flex items-center gap-2 uppercase tracking-widest text-[10px] text-slate-400 font-bold">
                              <Sparkles className="w-4 h-4 text-brand-accent" /> Clinical Reasoning
                           </div>
-                          <div className="p-6 bg-brand-primary/5 rounded-3xl border border-brand-primary/10 shadow-inner">
+                          <div className="p-6 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 shadow-inner">
                             <p className="text-sm font-medium text-slate-600 leading-relaxed italic border-l-4 border-brand-primary/20 pl-4">
                               {aiNotes["assessment"] as string}
                             </p>
@@ -221,17 +221,17 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                   </div>
                   
                   <div className="space-y-8">
-                    <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-8 border border-slate-800 relative shadow-2xl h-full flex flex-col justify-center">
+                    <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl p-8 border border-slate-800 relative shadow-2xl h-full flex flex-col justify-center">
                        <div className="absolute top-6 right-6 text-white/5">
                          <FileText className="w-12 h-12" />
                        </div>
-                      <p className="eyebrow !text-brand-accent mb-6">Prescription</p>
-                      <p className="text-2xl font-black text-white leading-tight mb-4 tracking-tight line-clamp-3 uppercase italic">
+                      <p className="eyebrow !text-brand-accent mb-6 uppercase tracking-widest text-[10px] font-bold">Prescription</p>
+                      <p className="text-2xl font-semibold text-white leading-tight mb-4 tracking-tight line-clamp-3 uppercase italic">
                         {visit.prescription || "No prescription recorded."}
                       </p>
 
                       <div className="mt-6 pt-6 border-t border-white/5">
-                         <p className="eyebrow !text-slate-400 mb-3">Advice & Follow-up</p>
+                         <p className="eyebrow !text-slate-400 mb-3 uppercase tracking-widest text-[10px] font-bold">Advice & Follow-up</p>
                          <p className="text-sm text-slate-200 font-medium leading-relaxed italic">
                            {adviceText}
                          </p>
@@ -240,7 +240,7 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                       {visit.additionalNotes && (
                         <div className="mt-6 pt-6 border-t border-white/5">
                           <p className="text-xs text-slate-300 font-medium italic">
-                            <span className="eyebrow !text-slate-400 not-italic mr-2">Note:</span> {visit.additionalNotes}
+                            <span className="eyebrow !text-slate-400 not-italic mr-2 uppercase tracking-widest text-[10px] font-bold">Note:</span> {visit.additionalNotes}
                           </p>
                         </div>
                       )}

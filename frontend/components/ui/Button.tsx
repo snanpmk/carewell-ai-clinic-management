@@ -32,7 +32,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={isLoading || disabled}
         className={clsx(
-          "inline-flex items-center justify-center gap-2 font-black uppercase tracking-widest transition-all duration-300 active:scale-[0.98]",
+          "inline-flex items-center justify-center gap-2 font-semibold transition-all duration-300 active:scale-[0.98]",
           fullWidth ? "w-full" : "w-auto min-w-[120px]",
           "disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 focus:outline-none focus:ring-4 focus:ring-brand-primary/20",
           variants[variant],

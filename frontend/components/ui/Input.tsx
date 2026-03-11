@@ -30,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={clsx(
-              "w-full rounded-2xl border  py-4 pr-4 text-sm font-bold text-slate-900 transition-all focus:outline-none focus:bg-white placeholder:text-slate-300",
+              "w-full rounded-2xl border py-4 pr-4 text-sm font-semibold text-slate-900 transition-all focus:outline-none focus:bg-white placeholder:text-slate-300",
               leftIcon ? "pl-12" : "pl-4",
               error
                 ? "border-red-400 bg-red-50 focus:border-red-500"
@@ -40,7 +40,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
         </div>
-        {error && <p className="text-xs font-bold text-red-500 ml-1">{error}</p>}
+        {error && <p className="text-[11px] font-semibold text-red-500 ml-1 uppercase tracking-wider">{error}</p>}
       </div>
     );
   }

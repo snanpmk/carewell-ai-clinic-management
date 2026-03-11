@@ -92,6 +92,7 @@ export const treatmentSchema = z.object({
       medicines: z.array(z.object({
         medicine: z.string().min(1, "Medicine is required"),
         potency: z.string().min(1, "Potency is required"),
+        form: z.string().min(1, "Form is required"),
         dose: z.string().min(1, "Dose is required"),
       })).min(1, "At least one medicine is required"),
     }),

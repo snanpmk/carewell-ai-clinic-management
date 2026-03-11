@@ -4,16 +4,15 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Card } from "@/components/ui/Card";
-import { Mail, ShieldCheck, ArrowRight, User as UserIcon, Loader2, CheckCircle2, Trash2 } from "lucide-react";
+import { Mail, ArrowRight, User as UserIcon, Loader2, CheckCircle2, Trash2, Users, Sparkles, Power } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import apiClient from "@/services/apiClient";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-
+import { Select } from "@/components/ui/Select";
 import { useForm } from "react-hook-form";
-import { Sparkles, Power } from "lucide-react";
 import clsx from "clsx";
 
 export default function SettingsPage() {
@@ -42,9 +41,9 @@ export default function SettingsPage() {
   };
 
   const { data: teamResponse, isLoading: isLoadingTeam } = useQuery({
-    queryKey: ["clinic-doctors"],
+    queryKey: ["clinic-members"],
     queryFn: async () => {
-      const { data } = await apiClient.get('/api/auth/clinic-doctors');
+      const { data } = await apiClient.get('/api/auth/clinic-members');
       return data;
     },
     enabled: !!user,
@@ -53,24 +52,24 @@ export default function SettingsPage() {
   const team = teamResponse?.data || [];
   const queryClient = useQueryClient();
 
-  const removeDoctorMutation = useMutation({
-    mutationFn: async (doctorId: string) => {
-      const { data } = await apiClient.delete(`/api/auth/doctors/${doctorId}`);
+  const removeMemberMutation = useMutation({
+    mutationFn: async (memberId: string) => {
+      const { data } = await apiClient.delete(`/api/auth/members/${memberId}`);
       return data;
     },
     onSuccess: (res) => {
-      toast.success(res.message || "Doctor removed successfully.");
-      queryClient.invalidateQueries({ queryKey: ["clinic-doctors"] });
+      toast.success(res.message || "Member removed successfully.");
+      queryClient.invalidateQueries({ queryKey: ["clinic-members"] });
     },
-    onError: (err: any) => {
-      const errorMsg = err.response?.data?.error || err.message || "Failed to remove doctor.";
+    onError: (err: unknown) => {
+      const errorMsg = (err as { response?: { data?: { error?: string } } }).response?.data?.error || (err as Error).message || "Failed to remove member.";
       toast.error(errorMsg);
     }
   });
 
-  const handleRemoveDoctor = (doctorId: string, doctorName: string) => {
-    if (window.confirm(`Are you sure you want to remove Dr. ${doctorName} from the clinic? They will lose access immediately.`)) {
-      removeDoctorMutation.mutate(doctorId);
+  const handleRemoveMember = (memberId: string, memberName: string) => {
+    if (window.confirm(`Are you sure you want to remove ${memberName} from the clinic? They will lose access immediately.`)) {
+      removeMemberMutation.mutate(memberId);
     }
   };
 
@@ -80,12 +79,12 @@ export default function SettingsPage() {
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: { email: "" },
+    defaultValues: { email: "", role: "doctor" as "doctor" | "staff" },
   });
 
   const inviteMutation = useMutation({
-    mutationFn: async (inviteEmail: string) => {
-      const { data } = await apiClient.post(`/api/auth/invite`, { email: inviteEmail });
+    mutationFn: async (payload: { email: string; role: "doctor" | "staff" }) => {
+      const { data } = await apiClient.post(`/api/auth/invite`, payload);
       return data;
     },
     onSuccess: () => {
@@ -93,14 +92,14 @@ export default function SettingsPage() {
       reset();
     },
     onError: (err: unknown) => {
-      const errorMsg = err instanceof Error ? err.message : "Failed to send invite.";
+      const errorMsg = (err as { response?: { data?: { error?: string } } }).response?.data?.error || (err as Error).message || "Failed to send invite.";
       setMessage({ type: "error", text: errorMsg });
     }
   });
 
-  const onSubmit = (data: { email: string }) => {
+  const onSubmit = (data: { email: string; role: "doctor" | "staff" }) => {
     setMessage(null);
-    inviteMutation.mutate(data.email);
+    inviteMutation.mutate(data);
   };
 
   return (
@@ -108,7 +107,7 @@ export default function SettingsPage() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4">
         <div>
           <div className="flex items-center gap-4 mb-2">
-            <h1>Settings & Team</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Settings & Team</h1>
           </div>
           <p className="text-sm text-slate-500 font-medium tracking-tight ml-1">Manage your clinic preferences and staff access.</p>
         </div>
@@ -116,9 +115,9 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 px-4">
         {/* Profile Card */}
-        <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
+        <Card className="p-10 border-slate-200 rounded-2xl shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
-          <div className="eyebrow text-brand-primary mb-10 flex items-center gap-4">
+          <div className="eyebrow text-brand-primary mb-10 flex items-center gap-4 uppercase tracking-[0.2em] text-[10px] font-bold">
              <div className="w-10 h-px bg-brand-primary/30" /> Personal Identity
           </div>
           
@@ -129,16 +128,16 @@ export default function SettingsPage() {
                 {user?.profileImage ? (
                   <Image src={user.profileImage} alt={user.name || "User"} width={96} height={96} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300 font-extrabold text-3xl">{user?.name?.charAt(0) || "U"}</div>
+                  <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300 font-semibold text-3xl">{user?.name?.charAt(0) || "U"}</div>
                 )}
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight uppercase">{user?.name}</h2>
+              <h2 className="text-2xl font-semibold text-slate-900 tracking-tight uppercase">{user?.name}</h2>
               <p className="text-sm font-bold text-slate-500 mt-1">{user?.email}</p>
               <div className="mt-4">
                  <Badge 
-                   label={user?.role === "primary" ? "Primary Administrator" : "Clinic Staff"} 
+                   label={user?.role === "primary" ? "Primary Administrator" : user?.role === 'staff' ? 'Reception Staff' : 'Practitioner'} 
                    variant={user?.role === "primary" ? "warning" : "primary"} 
                    className="px-3 py-1"
                  />
@@ -147,23 +146,23 @@ export default function SettingsPage() {
           </div>
 
           <div className="pt-8 border-t border-slate-100">
-             <p className="eyebrow text-slate-400 mb-2">Clinic Affiliation</p>
-             <p className="text-lg font-extrabold text-slate-900 tracking-tight uppercase">{typeof user?.clinic === 'object' ? (user.clinic.name as React.ReactNode) : 'Carewell Clinic'}</p>
+             <p className="eyebrow text-slate-400 mb-2 uppercase tracking-[0.2em] text-[10px] font-bold">Clinic Affiliation</p>
+             <p className="text-lg font-semibold text-slate-900 tracking-tight uppercase">{typeof user?.clinic === 'object' ? (user.clinic.name as React.ReactNode) : 'Carewell Clinic'}</p>
           </div>
         </Card>
 
         {/* AI Control Card - Only for Primary Doctors */}
         {isPrimary && (
-          <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
+          <Card className="p-10 border-slate-200 rounded-2xl shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
             
-            <div className="eyebrow text-brand-primary mb-10 flex items-center gap-4">
+            <div className="eyebrow text-brand-primary mb-10 flex items-center gap-4 uppercase tracking-[0.2em] text-[10px] font-bold">
                <div className="w-10 h-px bg-brand-primary/30" /> Intelligence & Automation
             </div>
 
             <div className="flex items-center justify-between gap-6 mb-8">
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight uppercase">AI Clinical Assistance</h2>
+                <h2 className="text-2xl font-semibold text-slate-900 tracking-tight uppercase">AI Clinical Assistance</h2>
                 <p className="text-sm font-medium text-slate-500 mt-2 leading-relaxed">
                   Toggle AI features including smart symptom analysis, clinical drafting, and automated history summarization for all practitioners.
                 </p>
@@ -184,7 +183,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
               <div className={clsx(
                 "p-3 rounded-2xl",
                 aiEnabled ? "bg-brand-primary/10 text-brand-primary" : "bg-slate-200/50 text-slate-400"
@@ -205,27 +204,36 @@ export default function SettingsPage() {
 
         {/* Invite Card - Only for Primary Doctors */}
         {isPrimary && (
-          <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
+          <Card className="p-10 border-slate-200 rounded-2xl shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-accent/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
             
-            <div className="eyebrow text-brand-accent mb-10 flex items-center gap-4">
+            <div className="eyebrow text-brand-accent mb-10 flex items-center gap-4 uppercase tracking-[0.2em] text-[10px] font-bold">
                <div className="w-10 h-px bg-brand-accent/30" /> Expansion & Team
             </div>
 
             <p className="text-sm font-medium text-slate-500 mb-10 leading-relaxed max-w-sm">
-              Empower your clinic by inviting associate doctors. They will gain access to your shared medical registry and AI tools.
+              Empower your clinic by inviting associate doctors or reception staff to join your clinical workspace.
             </p>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              <Input
-                label="New Doctor Email"
-                type="email"
-                {...register("email")}
-                placeholder="doctor@carewell.com"
-                leftIcon={<Mail className="w-5 h-5" />}
-                error={errors.email?.message}
-                className="h-14"
-              />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Member Email"
+                  type="email"
+                  {...register("email")}
+                  placeholder="name@carewell.com"
+                  leftIcon={<Mail className="w-5 h-5" />}
+                  error={errors.email?.message}
+                />
+                <Select
+                  label="Role Selection"
+                  options={[
+                    { label: "Associate Doctor", value: "doctor" },
+                    { label: "Reception / Staff", value: "staff" },
+                  ]}
+                  {...register("role")}
+                />
+              </div>
 
               {message && (
                 <div className={`p-5 rounded-2xl text-sm font-bold uppercase tracking-widest flex items-center gap-4 animate-in fade-in slide-in-from-top-2 ${
@@ -251,49 +259,49 @@ export default function SettingsPage() {
 
       {/* Team List Card */}
       <div className="px-4">
-        <Card className="p-10 border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden">
-          <div className="eyebrow text-slate-400 mb-10 flex items-center gap-4">
-             <div className="w-10 h-px bg-slate-200" /> Active Practitioners
+        <Card className="p-10 border-slate-200 rounded-2xl shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden">
+          <div className="eyebrow text-slate-400 mb-10 flex items-center gap-4 uppercase tracking-[0.2em] text-[10px] font-bold">
+             <div className="w-10 h-px bg-slate-200" /> Active Clinic Members
           </div>
 
           {isLoadingTeam ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
               <Loader2 className="w-10 h-10 animate-spin text-brand-primary" />
-              <p className="eyebrow text-slate-400">Syncing team registry...</p>
+              <p className="eyebrow text-slate-400 uppercase tracking-[0.2em] text-[10px] font-bold">Syncing member registry...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {team.map((doc: { _id: string; profileImage?: string; name: string; email: string; role: string }) => (
-                <div key={doc._id} className="flex flex-col p-6 rounded-[2rem] bg-slate-50 border border-slate-100 hover:border-brand-primary/20 hover:bg-white transition-all duration-300 group shadow-sm hover:shadow-xl">
+              {team.map((member: { _id: string; profileImage?: string; name: string; email: string; role: string }) => (
+                <div key={member._id} className="flex flex-col p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-brand-primary/20 hover:bg-white transition-all duration-300 group shadow-sm hover:shadow-xl">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="relative w-14 h-14 shrink-0">
                       <div className="absolute inset-0 bg-linear-to-tr from-brand-primary to-brand-accent rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity" />
                       <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-white border border-slate-200 flex items-center justify-center group-hover:rotate-3 transition-transform">
-                        {doc.profileImage ? (
-                          <Image src={doc.profileImage} alt={doc.name} width={56} height={56} className="w-full h-full object-cover" />
+                        {member.profileImage ? (
+                          <Image src={member.profileImage} alt={member.name} width={56} height={56} className="w-full h-full object-cover" />
                         ) : (
                           <UserIcon className="w-6 h-6 text-slate-300" />
                         )}
                       </div>
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-bold text-slate-900 text-base tracking-tight truncate uppercase">{doc.name}</h4>
-                      <p className="text-xs font-bold text-slate-400 truncate">{doc.email}</p>
+                      <h4 className="font-bold text-slate-900 text-base tracking-tight truncate uppercase">{member.name}</h4>
+                      <p className="text-xs font-bold text-slate-400 truncate">{member.email}</p>
                     </div>
                   </div>
                   <div className="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center">
                     <Badge 
-                      label={doc.role === "primary" ? "Primary" : "Associate"} 
-                      variant={doc.role === "primary" ? "warning" : "primary"} 
+                      label={member.role === "primary" ? "Admin" : member.role === "staff" ? "Staff" : "Doctor"} 
+                      variant={member.role === "primary" ? "warning" : member.role === "staff" ? "secondary" : "primary"} 
                       className="px-2 py-0.5"
                     />
                     <div className="flex items-center gap-3">
-                      {isPrimary && doc.role !== "primary" && (
+                      {isPrimary && member.role !== "primary" && (
                         <button
-                          onClick={() => handleRemoveDoctor(doc._id, doc.name)}
-                          disabled={removeDoctorMutation.isPending}
+                          onClick={() => handleRemoveMember(member._id, member.name)}
+                          disabled={removeMemberMutation.isPending}
                           className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-300 disabled:opacity-50"
-                          title="Remove Practitioner"
+                          title="Remove Member"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -304,9 +312,9 @@ export default function SettingsPage() {
                 </div>
               ))}
               {team.length === 0 && (
-                 <div className="col-span-full text-center py-20 bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
-                    <UserIcon className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                    <p className="eyebrow text-slate-400">No associate practitioners found.</p>
+                 <div className="col-span-full text-center py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <Users className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                    <p className="eyebrow text-slate-400 uppercase tracking-[0.2em] text-[10px] font-bold">No clinic members found.</p>
                  </div>
               )}
             </div>

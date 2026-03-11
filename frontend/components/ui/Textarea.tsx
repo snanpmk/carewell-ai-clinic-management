@@ -51,7 +51,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               props.onInput?.(e);
             }}
             className={clsx(
-              "w-full rounded-2xl border-2 px-4 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-300 transition-all focus:outline-none focus:bg-white overflow-hidden resize-none",
+              "w-full rounded-2xl border-2 px-4 py-3 text-sm font-semibold text-slate-900 placeholder:text-slate-300 transition-all focus:outline-none focus:bg-white overflow-hidden resize-none",
               error
                 ? "border-red-400 bg-red-50 focus:border-red-500"
                 : "border-slate-200 bg-white focus:border-brand-primary hover:border-slate-300",
@@ -60,7 +60,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             {...props}
           />
         </div>
-        {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
+        {error && <p className="text-[11px] font-semibold text-red-500 mt-1 uppercase tracking-wider">{error}</p>}
       </div>
     );
   }

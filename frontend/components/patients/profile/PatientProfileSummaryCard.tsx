@@ -10,7 +10,7 @@ interface PatientProfileSummaryCardProps {
 
 export function PatientProfileSummaryCard({ visitsCount, summaryLoading, aiSummary }: PatientProfileSummaryCardProps) {
   return (
-    <div className="bg-linear-to-br from-brand-secondary to-slate-900 rounded-3xl p-8 shadow-2xl shadow-brand-secondary/20 relative overflow-hidden text-white group transition-all duration-500">
+    <div className="bg-linear-to-br from-brand-secondary to-slate-900 rounded-2xl p-8 shadow-2xl shadow-brand-secondary/20 relative overflow-hidden text-white group transition-all duration-500">
       {/* Decorative Glows */}
       <div className="absolute -top-10 -right-10 w-48 h-48 bg-brand-primary/20 rounded-full blur-3xl group-hover:bg-brand-primary/30 transition-all duration-700 pointer-events-none" />
       <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-brand-accent/10 rounded-full blur-2xl group-hover:bg-brand-accent/20 transition-all duration-700 pointer-events-none" />
@@ -20,8 +20,8 @@ export function PatientProfileSummaryCard({ visitsCount, summaryLoading, aiSumma
           <Sparkles className="w-6 h-6 text-brand-accent animate-pulse" />
         </div>
         <div>
-          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-brand-accent! leading-none mb-1.5">AI Insights</h3>
-          <p className="text-lg font-black text-white tracking-tight uppercase italic">Clinical Trajectory</p>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-accent! leading-none mb-1.5">AI Insights</h3>
+          <p className="text-lg font-semibold text-white tracking-tight uppercase italic">Clinical Trajectory</p>
         </div>
       </div>
       
@@ -33,7 +33,7 @@ export function PatientProfileSummaryCard({ visitsCount, summaryLoading, aiSumma
         ) : summaryLoading ? (
           <div className="flex items-center gap-3 bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-md">
             <Loader2 className="w-5 h-5 animate-spin text-brand-accent" /> 
-            <span className="text-sm font-black uppercase tracking-widest text-brand-accent/90">Distilling history...</span>
+            <span className="text-sm font-semibold uppercase tracking-widest text-brand-accent/90">Distilling history...</span>
           </div>
         ) : aiSummary ? (
           <div className="relative px-4">

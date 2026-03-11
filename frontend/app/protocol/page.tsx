@@ -77,7 +77,7 @@ export default function ProtocolPage() {
               <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
                 <Scale className="w-5 h-5 text-brand-primary" />
               </div>
-              <h2 className="text-xl font-bold">The "House Surgeon" Model</h2>
+              <h2 className="text-xl font-bold">The &quot;House Surgeon&quot; Model</h2>
             </div>
             <p className="text-slate-600 leading-relaxed pl-12 font-medium">
               Operationally, the AI functions similarly to a high-performing House Surgeon: it collects, organizes, and drafts clinical findings. However, the attending doctor (The User) holds absolute sovereignty. Every AI suggestion must be reviewed and digitally signed off by the practitioner before being committed to the permanent record.

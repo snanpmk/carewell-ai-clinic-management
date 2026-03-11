@@ -45,3 +45,28 @@ export const acceptInviteWithGoogle = async (payload: {
   const { data } = await apiClient.post("/api/auth/accept-invite", payload);
   return data;
 };
+
+export const getMe = async () => {
+  const { data } = await apiClient.get("/api/auth/me");
+  return data;
+};
+
+export const getClinicMembers = async () => {
+  const { data } = await apiClient.get("/api/auth/clinic-members");
+  return data;
+};
+
+export const inviteMember = async (email: string, role: "doctor" | "staff") => {
+  const { data } = await apiClient.post("/api/auth/invite", { email, role });
+  return data;
+};
+
+export const toggleAI = async (aiEnabled: boolean) => {
+  const { data } = await apiClient.put("/api/auth/toggle-ai", { aiEnabled });
+  return data;
+};
+
+export const removeMember = async (id: string) => {
+  const { data } = await apiClient.delete(`/api/auth/members/${id}`);
+  return data;
+};

@@ -25,16 +25,16 @@ export default function StepInitialPresentation({ caseData, updateCaseData, next
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Initial Presentation"
-        subtitle="Patient Narrative & Physician Observations"
+        title="Opening Narrative"
+        subtitle="Capturing the patient's own words and initial clinical impressions"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 bg-brand-primary/10 text-brand-primary text-[9px] font-black uppercase tracking-widest rounded-lg border border-brand-primary/20 italic">Ipsisima Verba</span>
-              <p className="eyebrow !text-slate-400">Exact Patient Expressions</p>
+              <span className="px-3 py-1 bg-brand-primary/10 text-brand-primary text-[9px] font-bold uppercase tracking-widest rounded-2xl border border-brand-primary/20 italic">Ipsisima Verba</span>
+              <p className="eyebrow">Exact Patient Expressions</p>
             </div>
             <Textarea 
               label="Patient's Narration" 

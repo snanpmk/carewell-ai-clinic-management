@@ -38,15 +38,15 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Mental Profile"
-        subtitle="Life Space Investigation & Disposition"
+        title="Mental State"
+        subtitle="Life space investigation and mental disposition"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-12">
           {/* Mental Features */}
           <div className="space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Brain className="w-4 h-4" /> Mental & Behavioural Features
             </div>
             <Controller
@@ -64,7 +64,7 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
 
           {/* Emotional Upsets Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <CloudRain className="w-4 h-4" /> Historical Emotional Upsets
             </div>
             <DynamicTable 
@@ -83,7 +83,7 @@ export default function StepLifeSpace({ caseData, updateCaseData, nextStep, prev
 
           {/* Reaction Patterns Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Zap className="w-4 h-4" /> Reaction Patterns
             </div>
             <DynamicTable 

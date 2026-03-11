@@ -37,51 +37,51 @@ export default function ChronicCaseStepper({
               key={step.id} 
               onClick={() => isClickable && onStepClick?.(index)}
               className={clsx(
-                "flex flex-col gap-2 p-3 rounded-2xl transition-all duration-500 relative border h-full group",
+                "flex flex-col gap-2 p-3 rounded-2xl transition-all duration-300 relative border h-full group",
                 isClickable ? "cursor-pointer" : "cursor-not-allowed",
                 isActive 
-                  ? "bg-white border-brand-primary shadow-xl shadow-brand-primary/10 ring-4 ring-brand-primary/5 z-10" 
+                  ? "bg-white border-brand-primary/50 shadow-md shadow-brand-primary/10 z-10" 
                   : isCompleted 
-                  ? "bg-brand-primary/5 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/10" 
-                  : "bg-slate-50 border-slate-100 text-slate-400 opacity-60"
+                  ? "bg-brand-primary/5 border-brand-primary/10 text-brand-primary hover:bg-brand-primary/10" 
+                  : "bg-slate-50/50 border-slate-100 text-slate-400 opacity-60"
               )}
             >
               <div className="flex items-center justify-between">
                 {/* Number/Check Indicator */}
                 <div className={clsx(
-                  "w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-500 text-[10px] font-black group-hover:scale-110",
-                  isActive ? "bg-brand-primary text-white shadow-lg rotate-6" : 
+                  "w-5 h-5 rounded-lg flex items-center justify-center transition-all duration-300 text-[10px] font-bold",
+                  isActive ? "bg-brand-primary text-white shadow-md shadow-brand-primary/20" : 
                   isCompleted ? "bg-brand-primary text-white" : "bg-slate-200 text-slate-400"
                 )}>
                   {isCompleted ? (
-                    <Check className="w-3.5 h-3.5 stroke-[4]" />
+                    <Check className="w-3 h-3 stroke-[3]" />
                   ) : (
                     <span>{index + 1}</span>
                   )}
                 </div>
 
                 {isActive && (
-                  <span className="flex h-2 w-2 relative">
+                  <span className="flex h-1.5 w-1.5 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-primary"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-primary"></span>
                   </span>
                 )}
               </div>
 
               <div className="mt-1">
                 <p className={clsx(
-                  "text-[10px] font-black uppercase tracking-wider leading-tight",
+                  "text-[10px] font-bold uppercase tracking-wider leading-tight",
                   isActive ? "text-slate-900" : isCompleted ? "text-brand-primary" : "text-inherit"
                 )}>
                   {step.title}
                 </p>
                 {isActive ? (
-                  <p className="text-[8px] font-bold text-brand-primary uppercase mt-1">Current Stage</p>
+                  <p className="text-[8px] font-semibold text-brand-primary uppercase mt-1">Current</p>
                 ) : isCompleted ? (
-                  <p className="text-[8px] font-bold text-emerald-500 uppercase mt-1">Validated</p>
+                  <p className="text-[8px] font-semibold text-emerald-500 uppercase mt-1">Done</p>
                 ) : (
-                  <p className="text-[8px] font-bold text-slate-300 uppercase mt-1">
-                    {isUpdateMode ? "Click to Edit" : "Waiting"}
+                  <p className="text-[8px] font-semibold text-slate-300 uppercase mt-1 tracking-tight">
+                    {isUpdateMode ? "Edit" : "Queue"}
                   </p>
                 )}
               </div>

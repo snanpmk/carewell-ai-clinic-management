@@ -11,16 +11,18 @@ import { Loader2, UploadCloud, ShieldCheck, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
+import { jwtDecode } from "jwt-decode";
+import { clsx } from "clsx";
 
 const authSchema = z.object({
   clinicName: z.string().min(2, "Clinic name is required").optional(),
   clinicAddress: z.string().optional(),
   doctorPhone: z.string().min(5, "Phone number is required"),
-  doctorLicense: z.string().min(2, "Medical license is required"),
+  doctorLicense: z.string().optional(), // Made optional to support staff roles
 });
 
 type AuthFormValues = z.infer<typeof authSchema>;
@@ -29,6 +31,18 @@ function AuthContent() {
   const searchParams = useSearchParams();
   const inviteToken = searchParams.get("inviteToken");
   const isInvite = !!inviteToken;
+
+  const invitedRole = useMemo(() => {
+    if (!inviteToken) return null;
+    try {
+      const decoded = jwtDecode(inviteToken) as { role: string };
+      return decoded.role as "doctor" | "staff";
+    } catch {
+      return null;
+    }
+  }, [inviteToken]);
+
+  const isStaffInvite = invitedRole === "staff";
 
   const [isLogin, setIsLogin] = useState(!isInvite);
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -113,11 +127,15 @@ function AuthContent() {
     const values = getValues();
 
     if (isInvite) {
+      if (!isStaffInvite && !values.doctorLicense) {
+        toast.error("Medical license number is required for practitioners.");
+        return;
+      }
       acceptInviteMutation.mutate({
         credential,
         inviteToken: inviteToken!,
         doctorPhone: values.doctorPhone,
-        doctorLicense: values.doctorLicense,
+        doctorLicense: values.doctorLicense || "STAFF",
       });
     } else if (isLogin) {
       loginMutation.mutate(credential);
@@ -136,7 +154,7 @@ function AuthContent() {
         clinicName: values.clinicName,
         clinicAddress: values.clinicAddress,
         doctorPhone: values.doctorPhone,
-        doctorLicense: values.doctorLicense,
+        doctorLicense: values.doctorLicense || "",
         credential,
         profileImage: uploadedImageUrl,
       });
@@ -162,38 +180,39 @@ function AuthContent() {
               <Image src="/logo.svg" alt="Carewell Logo" width={40} height={40} className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-xl text-white tracking-tight leading-none">Carewell</span>
-              <span className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em] mt-1">Advanced AI Clinical</span>
+              <span className="font-semibold text-xl text-white tracking-tight leading-none">Carewell</span>
+              <span className="text-[10px] font-medium text-white/50 uppercase tracking-[0.2em] mt-1">Advanced AI Clinical</span>
             </div>
           </div>
         </div>
 
         <div className="relative z-10 max-w-xl">
-          <div className="inline-flex items-center gap-2   text-[10px] font-bold text-brand-accent uppercase tracking-[0.2em] mb-8">
-            Practitioner-Centric Design
+          <div className="inline-flex items-center gap-2 text-[10px] font-bold text-brand-accent uppercase tracking-[0.2em] mb-8">
+             <div className="w-4 h-px bg-brand-accent/40" />
+             Practitioner-Centric Design
           </div>
 
-          <h1 className="text-5xl font-bold leading-[1.1] tracking-tight mb-8 text-white">
-            Experience the <span className="text-brand-accent text-glow-accent">Next Era</span> of Clinical Precision.
+          <h1 className="text-5xl font-light leading-[1.1] tracking-tight mb-8 text-white">
+            Experience the <span className="text-brand-accent font-semibold">Next Era</span> of Clinical Precision.
           </h1>
-          <p className="text-lg text-white/60 font-medium leading-relaxed mb-12">
-            Automate your documentation and unlock deep medical insights with the world's most advanced AI clinical assistant. Designed to think with you, not for you.
+          <p className="text-lg text-white/50 font-light leading-relaxed mb-12">
+            Automate your documentation and unlock deep medical insights with the world&apos;s most advanced AI clinical assistant. Designed to think with you, not for you.
           </p>
 
           <div className="flex items-center gap-10 pt-4">
              <div>
-               <p className="text-3xl font-bold text-white tracking-tighter">98%</p>
-               <p className="text-[10px] text-white/40 font-semibold uppercase tracking-widest mt-1">Synthesis Accuracy</p>
+               <p className="text-3xl font-light text-white tracking-tighter">98%</p>
+               <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest mt-1">Synthesis Accuracy</p>
              </div>
-             <div className="w-px h-12 bg-white/10" />
+             <div className="w-px h-12 bg-white/5" />
              <div>
-               <p className="text-3xl font-bold text-white tracking-tighter">15m</p>
-               <p className="text-[10px] text-white/40 font-semibold uppercase tracking-widest mt-1">Saved per Session</p>
+               <p className="text-3xl font-light text-white tracking-tighter">15m</p>
+               <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest mt-1">Saved per Session</p>
              </div>
-             <div className="w-px h-12 bg-white/10" />
+             <div className="w-px h-12 bg-white/5" />
              <div>
-               <p className="text-3xl font-bold text-white tracking-tighter">Secure</p>
-               <p className="text-[10px] text-white/40 font-semibold uppercase tracking-widest mt-1">Enterprise Grade</p>
+               <p className="text-3xl font-light text-white tracking-tighter text-glow-accent">Secure</p>
+               <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest mt-1">Enterprise Grade</p>
              </div>
           </div>
         </div>
@@ -219,12 +238,12 @@ function AuthContent() {
           </div>
 
           <div className="text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">
-              {isInvite ? "Accept Invitation" : isLogin ? "Welcome Back" : "Register Clinic"}
+            <h2 className="text-3xl md:text-4xl font-light text-slate-900 tracking-tight mb-3">
+              {isInvite ? "Accept" : isLogin ? "Welcome" : "Register"} <span className="font-semibold text-brand-primary">{isInvite ? (isStaffInvite ? "Clinic Member" : "Practitioner") : isLogin ? "Back" : "Clinic"}</span>
             </h2>
-            <p className="text-sm text-slate-500 font-medium mb-10 leading-relaxed">
+            <p className="text-sm text-slate-500 font-medium mb-12 leading-relaxed">
               {isInvite 
-                ? "Accept your secure invitation to join the clinical network."
+                ? `Accept your secure invitation to join as ${isStaffInvite ? 'reception staff' : 'an associate practitioner'}.`
                 : isLogin 
                 ? "Enter your credentials to access your clinical dashboard." 
                 : "Initialize your clinic registry and administrative profile."}
@@ -232,57 +251,59 @@ function AuthContent() {
           </div>
 
           {!isLogin && (
-            <form className="space-y-6 mb-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <form className="space-y-8 mb-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
               {!isInvite && (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <Input
                     label="Clinic Name"
                     {...register("clinicName")}
                     error={errors.clinicName?.message}
                     placeholder="Carewell Wellness Center"
-                    className="h-12"
+                    className="h-14"
                   />
                   <Input
                     label="Full Clinic Address"
                     {...register("clinicAddress")}
                     placeholder="Street, City, Zip Code"
-                    className="h-12"
+                    className="h-14"
                   />
                 </div>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className={clsx("grid grid-cols-1 gap-6", isStaffInvite ? "sm:grid-cols-1" : "sm:grid-cols-2")}>
                 <Input
-                  label="Contact Phone"
+                  label={isStaffInvite ? "Staff Contact Phone" : "Contact Phone"}
                   {...register("doctorPhone")}
                   error={errors.doctorPhone?.message}
                   placeholder="+1 (555) 000-0000"
-                  className="h-12"
+                  className="h-14"
                 />
-                <Input
-                  label="Medical License #"
-                  {...register("doctorLicense")}
-                  error={errors.doctorLicense?.message}
-                  placeholder="MD-00000"
-                  className="h-12"
-                />
+                {!isStaffInvite && (
+                  <Input
+                    label="Medical License #"
+                    {...register("doctorLicense")}
+                    error={errors.doctorLicense?.message}
+                    placeholder="MD-00000"
+                    className="h-14"
+                  />
+                )}
               </div>
 
               {!isInvite && (
                 <div className="pt-2">
-                  <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block ml-1">Profile Identification</label>
-                  <label className="flex items-center gap-4 w-full bg-white border border-slate-200 rounded-xl p-4 cursor-pointer hover:border-brand-primary transition-all group shadow-sm">
+                  <label className="eyebrow mb-3 block ml-1">Profile Identification</label>
+                  <label className="flex items-center gap-5 w-full bg-white border border-slate-200 rounded-2xl p-4 cursor-pointer hover:border-brand-primary transition-all group shadow-sm hover:shadow-md">
                     <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-                    <div className="w-12 h-12 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-105 transition-transform relative">
+                    <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-105 transition-transform relative">
                       {imagePreview ? (
                         <Image src={imagePreview} alt="Preview" fill className="object-cover" />
                       ) : (
-                        <UploadCloud className="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors" />
+                        <UploadCloud className="w-6 h-6 text-slate-300 group-hover:text-brand-primary transition-colors" />
                       )}
                     </div>
-                    <div className="text-[11px] font-bold text-slate-600 flex-1 min-w-0">
-                      <p className="truncate">{profileImage ? profileImage.name : "Select Profile Image"}</p>
-                      <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-tight">Optional • JPG, PNG</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-slate-700 truncate">{profileImage ? profileImage.name : "Select Profile Image"}</p>
+                      <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-wider">Optional • JPG, PNG</p>
                     </div>
                   </label>
                 </div>

@@ -40,10 +40,12 @@ export default function StepLayout({
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-500">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-100 mb-8">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-          <p className="text-xs font-medium text-slate-500 mt-0.5">{subtitle}</p>
+          <h2 className="text-xl font-light text-slate-900 tracking-tight">
+            Section <span className="font-semibold">{title}</span>
+          </h2>
+          <p className="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">{subtitle}</p>
         </div>
         {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
       </div>

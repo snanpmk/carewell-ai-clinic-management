@@ -154,15 +154,15 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Case Administration"
-        subtitle="Clinical Registry & Administrative Data"
+        title="Administrative Overview"
+        subtitle="Patient registry and clinical metadata"
         isFirstStep
         isSubmitting={isSubmitting}
       >
         <div className="space-y-8">
-          <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-200/80 space-y-6">
+          <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-200/80 space-y-6">
             <div className="flex items-center justify-between">
-              <div className="eyebrow !text-slate-900! flex items-center gap-2">Patient Registry Lookup</div>
+              <div className="eyebrow flex items-center gap-2">Patient Registry Lookup</div>
               {isLoadingExisting && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
             </div>
             <div className="max-w-md">
@@ -177,7 +177,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           </div>
 
           <div className="pt-6 border-t border-slate-100">
-            <div className="eyebrow text-brand-primary mb-6">Patient Identification</div>
+            <div className="eyebrow mb-6">Patient Identification</div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Input label="Full Name" {...register("demographics.name")} />
               <Input label="Age" type="number" {...register("demographics.age")} />
@@ -190,7 +190,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           </div>
 
           <div className="pt-6 border-t border-slate-100">
-            <div className="eyebrow text-brand-accent mb-6">Initial Clinical Summary</div>
+            <div className="eyebrow mb-6">Initial Clinical Summary</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input label="Disease Diagnosis" {...register("summaryDiagnosis.diseaseDiagnosis")} />
               <Input label="Homeopathic Diagnosis" {...register("summaryDiagnosis.homeopathicDiagnosis")} />

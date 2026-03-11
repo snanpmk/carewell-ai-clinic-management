@@ -189,12 +189,12 @@ const getMe = async (req, res) => {
   }
 };
 
-// @desc    Invite a new doctor to the clinic
+// @desc    Invite a new member (doctor/staff) to the clinic
 // @route   POST /api/auth/invite
 // @access  Private (Primary Doctor only)
-const inviteDoctor = async (req, res) => {
+const inviteMember = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, role } = req.body;
 
     if (!email) {
       return res.status(400).json({ success: false, error: "Email is required." });
@@ -205,19 +205,20 @@ const inviteDoctor = async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase();
+    const assignedRole = role === "staff" ? "staff" : "doctor";
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: normalizedEmail }).populate("clinic");
     if (existingUser) {
       return res.status(400).json({ 
         success: false, 
-        error: `This doctor is already registered in ${existingUser.clinic?._id.toString() === req.user.clinic.toString() ? 'your' : 'another'} clinic.` 
+        error: `This user is already registered in ${existingUser.clinic?._id.toString() === req.user.clinic.toString() ? 'your' : 'another'} clinic.` 
       });
     }
 
     // Generate an invite token valid for 7 days
     const inviteToken = jwt.sign(
-      { clinicId: req.user.clinic, email: normalizedEmail },
+      { clinicId: req.user.clinic, email: normalizedEmail, role: assignedRole },
       process.env.JWT_SECRET || "fallback_secret",
       { expiresIn: "7d" }
     );
@@ -230,7 +231,7 @@ const inviteDoctor = async (req, res) => {
     // Create or update invitation in DB
     await Invitation.findOneAndUpdate(
       { email: normalizedEmail, clinic: req.user.clinic },
-      { invitedBy: req.user.id, status: "pending" },
+      { invitedBy: req.user.id, status: "pending", role: assignedRole },
       { upsert: true, new: true }
     );
 
@@ -241,10 +242,10 @@ const inviteDoctor = async (req, res) => {
       subject: `Invitation to join ${clinic?.name || "Carewell Clinic"}`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-          <h2 style="color: #2563EB;">You've been invited!</h2>
-          <p>Dr. ${req.user.name} has invited you to join <strong>${clinic?.name || "the clinic"}</strong> on Carewell AI.</p>
+          <h2 style="color: #008D96;">You've been invited!</h2>
+          <p>Dr. ${req.user.name} has invited you to join <strong>${clinic?.name || "the clinic"}</strong> as a <strong>${assignedRole}</strong> on Carewell AI.</p>
           <p>Click the link below to accept the invitation and sign in securely with your Google account:</p>
-          <a href="${inviteUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2563EB; color: #fff; text-decoration: none; border-radius: 8px; margin-top: 10px; font-weight: bold;">Accept Invitation</a>
+          <a href="${inviteUrl}" style="display: inline-block; padding: 12px 24px; background-color: #008D96; color: #fff; text-decoration: none; border-radius: 8px; margin-top: 10px; font-weight: bold;">Accept Invitation</a>
           <p style="margin-top: 20px; font-size: 12px; color: #777;">If you did not expect this, please ignore it.</p>
         </div>
       `,
@@ -259,7 +260,7 @@ const inviteDoctor = async (req, res) => {
 
     res.status(200).json({ success: true, message: "Invitation sent successfully." });
   } catch (error) {
-    console.error("Invite Doctor Error:", error);
+    console.error("Invite Member Error:", error);
     res.status(500).json({ success: false, error: "Server Error during invitation" });
   }
 };
@@ -311,7 +312,7 @@ const acceptInvite = async (req, res) => {
           await doctor.save();
        }
     } else {
-       // Register new doctor directly into the clinic
+       // Register new member directly into the clinic
        doctor = await User.create({
          name: payload.name,
          email: googleEmail,
@@ -319,7 +320,7 @@ const acceptInvite = async (req, res) => {
          profileImage: payload.picture,
          phone: doctorPhone || "",
          licenseNumber: doctorLicense || "",
-         role: "doctor",
+         role: decodedInvite.role || "doctor",
          clinic: decodedInvite.clinicId,
        });
     }
@@ -349,21 +350,21 @@ const acceptInvite = async (req, res) => {
   }
 };
 
-// @desc    Get all doctors belonging to the current user's clinic
-// @route   GET /api/auth/clinic-doctors
+// @desc    Get all members belonging to the current user's clinic
+// @route   GET /api/auth/clinic-members
 // @access  Private
-const getClinicDoctors = async (req, res) => {
+const getClinicMembers = async (req, res) => {
   try {
-    const doctors = await User.find({ clinic: req.user.clinic })
+    const members = await User.find({ clinic: req.user.clinic })
       .select("-password")
-      .sort({ role: -1, createdAt: 1 }); // Primary first, then by creation date
+      .sort({ role: 1, createdAt: 1 });
 
     res.status(200).json({
       success: true,
-      data: doctors,
+      data: members,
     });
   } catch (error) {
-    console.error("Get Clinic Doctors Error:", error);
+    console.error("Get Clinic Members Error:", error.message);
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
@@ -399,46 +400,43 @@ const toggleAI = async (req, res) => {
   }
 };
 
-// @desc    Remove a doctor from the clinic
-// @route   DELETE /api/auth/doctors/:id
+// @desc    Remove a member from the clinic
+// @route   DELETE /api/auth/members/:id
 // @access  Private (Primary Doctor only)
-const removeDoctor = async (req, res) => {
+const removeMember = async (req, res) => {
   try {
-    const doctorId = req.params.id;
+    const memberId = req.params.id;
 
     if (req.user.role !== "primary") {
-      return res.status(403).json({ success: false, error: "Only primary doctors can remove other doctors." });
+      return res.status(403).json({ success: false, error: "Only primary doctors can remove members." });
     }
 
-    const doctorToRemove = await User.findById(doctorId);
+    const memberToRemove = await User.findById(memberId);
 
-    if (!doctorToRemove) {
-      return res.status(404).json({ success: false, error: "Doctor not found." });
+    if (!memberToRemove) {
+      return res.status(404).json({ success: false, error: "Member not found." });
     }
 
-    // Verify the doctor belongs to the same clinic
-    if (doctorToRemove.clinic.toString() !== req.user.clinic.toString()) {
-      return res.status(403).json({ success: false, error: "You can only remove doctors from your own clinic." });
+    // Verify the member belongs to the same clinic
+    if (memberToRemove.clinic.toString() !== req.user.clinic.toString()) {
+      return res.status(403).json({ success: false, error: "You can only remove members from your own clinic." });
     }
 
     // Prevent primary doctor from removing themselves
-    if (doctorToRemove.role === "primary") {
-      return res.status(400).json({ success: false, error: "Primary doctors cannot be removed. Transfer primary ownership first or delete the clinic." });
+    if (memberToRemove.role === "primary") {
+      return res.status(400).json({ success: false, error: "Primary doctors cannot be removed." });
     }
 
-    // Option 1: Delete the user entirely
-    await User.findByIdAndDelete(doctorId);
-
-    // Option 2: Clean up any related invitations (optional)
-    await Invitation.deleteMany({ email: doctorToRemove.email, clinic: req.user.clinic });
+    await User.findByIdAndDelete(memberId);
+    await Invitation.deleteMany({ email: memberToRemove.email, clinic: req.user.clinic });
 
     res.status(200).json({
       success: true,
-      message: `Dr. ${doctorToRemove.name} has been removed from the clinic.`,
+      message: `${memberToRemove.name} has been removed from the clinic.`,
     });
   } catch (error) {
-    console.error("Remove Doctor Error:", error);
-    res.status(500).json({ success: false, error: "Server Error during doctor removal" });
+    console.error("Remove Member Error:", error.message);
+    res.status(500).json({ success: false, error: "Server Error during member removal" });
   }
 };
 
@@ -446,9 +444,9 @@ module.exports = {
   registerClinic,
   loginDoctor,
   getMe,
-  inviteDoctor,
+  inviteMember,
   acceptInvite,
-  getClinicDoctors,
+  getClinicMembers,
   toggleAI,
-  removeDoctor,
+  removeMember,
 };

@@ -23,8 +23,8 @@ export default function StepMedicalHistory({ caseData, updateCaseData, nextStep,
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Medical & Family History"
-        subtitle="Historical Pathologies & Genetic Background"
+        title="Medical History"
+        subtitle="Historical pathologies and genetic background"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
@@ -32,10 +32,10 @@ export default function StepMedicalHistory({ caseData, updateCaseData, nextStep,
           {/* Section 5: Previous Illness */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-brand-primary/10 rounded-xl text-brand-primary">
+              <div className="p-2 bg-brand-primary/10 rounded-2xl text-brand-primary">
                 <History className="w-5 h-5" />
               </div>
-              <p className="eyebrow !text-slate-900!">Previous Clinical Events</p>
+              <p className="eyebrow">Previous Clinical Events</p>
             </div>
             <DynamicTable 
               control={control}
@@ -56,10 +56,10 @@ export default function StepMedicalHistory({ caseData, updateCaseData, nextStep,
           {/* Section 6: Family History */}
           <div className="space-y-6 pt-10 border-t border-slate-100">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-brand-accent/10 rounded-xl text-brand-accent">
+              <div className="p-2 bg-brand-accent/10 rounded-2xl text-brand-accent">
                 <Users className="w-5 h-5" />
               </div>
-              <p className="eyebrow !text-slate-900!">Genetic & Family Archive</p>
+              <p className="eyebrow">Genetic & Family Archive</p>
             </div>
             <DynamicTable 
               control={control}

@@ -7,6 +7,11 @@ const clinicSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    clinicId: {
+      type: String,
+      unique: true,
+      sparse: true, // For existing clinics
+    },
     address: {
       type: String,
       trim: true,

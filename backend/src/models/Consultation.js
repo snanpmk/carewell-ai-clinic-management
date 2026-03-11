@@ -36,6 +36,16 @@ const consultationSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    opNumber: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    status: {
+      type: String,
+      enum: ["Scheduled", "In-Progress", "Completed"],
+      default: "Completed", // Default to Completed for legacy data
+    },
     prescription: {
       type: String,
       trim: true,

@@ -26,8 +26,10 @@ export interface SaveConsultationPayload {
   diagnosis?: string;
   prescription?: string;
   additionalNotes?: string;
-  aiGeneratedNotes: ConsultationNotes;
-  doctorEditedNotes: ConsultationNotes;
+  aiGeneratedNotes: ConsultationNotes | string;
+  doctorEditedNotes: ConsultationNotes | string;
+  opNumber?: string;
+  status?: "Scheduled" | "In-Progress" | "Completed";
 }
 
 /**
@@ -45,6 +47,14 @@ export const generateNotes = async (
  */
 export const saveConsultation = async (data: SaveConsultationPayload) => {
   const response = await apiClient.post("/api/consultations", data);
+  return response.data;
+};
+
+/**
+ * Update an existing consultation record.
+ */
+export const updateConsultation = async (id: string, data: Partial<SaveConsultationPayload>) => {
+  const response = await apiClient.put(`/api/consultations/${id}`, data);
   return response.data;
 };
 

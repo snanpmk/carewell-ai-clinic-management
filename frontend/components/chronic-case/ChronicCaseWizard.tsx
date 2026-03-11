@@ -86,11 +86,17 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
   const ActiveStep = filteredSteps[currentStepIndex].component;
 
   return (
-    <div className="flex flex-col mx-auto w-full space-y-4 animate-in fade-in duration-500 pb-8">
-      <div className="flex flex-col gap-0.5">
-        <h1 className="text-2xl">Chronic Case Builder</h1>
-        <p className="text-xs text-slate-500 font-medium tracking-tight">
-          Government-standardized clinical record repository
+    <div className="flex flex-col mx-auto w-full space-y-6 animate-in fade-in duration-500 pb-8">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="h-px w-8 bg-brand-primary/40" />
+          <span className="eyebrow text-brand-primary/70">Clinical Intelligence</span>
+        </div>
+        <h1 className="text-3xl font-light text-slate-900 tracking-tight">
+          Chronic Case <span className="font-semibold text-brand-primary">Builder</span>
+        </h1>
+        <p className="text-sm text-slate-500 max-w-md leading-relaxed">
+          Initialize a standardized clinical record with AI-assisted symptom synthesis.
         </p>
       </div>
 
@@ -102,7 +108,7 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
       />
 
       <div className="w-full">
-        <div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 flex flex-col relative overflow-visible">
+        <div className="bg-white border border-slate-200/60 rounded-3xl shadow-sm flex flex-col relative overflow-visible">
           <div className="p-6 sm:p-10">
             <AnimatePresence mode="wait">
               <motion.div

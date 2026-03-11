@@ -41,7 +41,7 @@ export default function PrivacyPage() {
               <h2 className="text-xl font-bold">End-to-End Encryption</h2>
             </div>
             <p className="text-slate-600 leading-relaxed pl-12 font-medium">
-              Every clinical note, symptom analysis, and patient profile is encrypted both in transit and at rest. We utilize industry-standard AES-256 encryption to ensure that your clinic's data remains exclusively yours.
+              Every clinical note, symptom analysis, and patient profile is encrypted both in transit and at rest. We utilize industry-standard AES-256 encryption to ensure that your clinic&apos;s data remains exclusively yours.
             </p>
           </section>
 

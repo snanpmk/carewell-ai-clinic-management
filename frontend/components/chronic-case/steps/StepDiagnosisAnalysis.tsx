@@ -38,15 +38,15 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
   return (
     <form onSubmit={handleSubmit(onSubmit, onFormError)} className="contents">
       <StepLayout
-        title="Analysis & Diagnosis"
-        subtitle="Clinical Synthesis & Homeopathic Totality"
+        title="Clinical Analysis"
+        subtitle="Final clinical synthesis and homeopathic totality"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-12">
           {/* Analysis Table */}
           <div className="space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Search className="w-4 h-4" /> Symptom Analysis
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -67,7 +67,7 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Laboratory Findings */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Microscope className="w-4 h-4" /> Investigations & Labs
             </div>
             <Textarea 
@@ -80,7 +80,7 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Totality & Miasm */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Target className="w-4 h-4" /> Evaluation of Totality
             </div>
             <Textarea 
@@ -104,7 +104,7 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Repertorization Table */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-slate-900! flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               Repertorial Analysis
             </div>
             <Input label="Name of Repertory" {...register("analysisAndDiagnosis.repertorization.repertoryName")} placeholder="e.g. Kent, Synthesis..." />
@@ -124,7 +124,7 @@ export default function StepDiagnosisAnalysis({ caseData, updateCaseData, nextSt
 
           {/* Final Diagnosis */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               Final Conclusions
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

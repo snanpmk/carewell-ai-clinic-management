@@ -366,6 +366,7 @@ export interface ChronicCase {
       medicines?: Array<{
         medicine?: string;
         potency?: string;
+        form?: string;
         dose?: string;
       }>;
     };

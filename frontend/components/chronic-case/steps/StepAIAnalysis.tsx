@@ -49,7 +49,7 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
 
   useEffect(() => {
     if (analysisMutation.error) {
-      toast.error((analysisMutation.error as any).message || "AI Analysis failed");
+      toast.error((analysisMutation.error as Error).message || "AI Analysis failed");
       analysisMutation.reset();
     }
   }, [analysisMutation.error, analysisMutation]);
@@ -66,8 +66,8 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Analytical Drafting"
-        subtitle="AI-Assisted Synthesis & Totality"
+        title="Intelligent Synthesis"
+        subtitle="AI-assisted clinical synthesis and homeopathic totality"
         onBack={prevStep}
         nextLabel="Final Management"
         headerActions={
@@ -110,8 +110,8 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
 
             {/* Read-only Repertorization Display */}
             {repertorization && repertorization.length > 0 && (
-              <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
-                <h3 className="eyebrow text-slate-900 flex items-center gap-2 mb-4">
+              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                <h3 className="eyebrow flex items-center gap-2 mb-4">
                   <ListTree className="w-4 h-4 text-brand-primary" /> Suggested Rubrics
                 </h3>
                 <div className="space-y-3">

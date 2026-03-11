@@ -7,9 +7,13 @@ import { getAllPatients } from "@/services/patientService";
 
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardStatsGrid } from "@/components/dashboard/DashboardStatsGrid";
+import { DashboardCalendar } from "@/components/dashboard/DashboardCalendar";
 import { DashboardRecentActivity, DashboardConsultationItem } from "@/components/dashboard/DashboardRecentActivity";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function DashboardPage() {
+  const { user } = useAuthStore();
+  const isStaff = user?.role === "staff";
   const { data: consultationsRes, isLoading: isLoadingConsultations } = useQuery({
     queryKey: ["consultations"],
     queryFn: getAllConsultations,
@@ -56,9 +60,24 @@ export default function DashboardPage() {
             totalConsultations={totalConsultations}
             appointmentsToday={appointmentsToday}
           />
-          <DashboardRecentActivity 
-            recentConsultations={recentConsultations}
-          />
+          {isStaff ? (
+            <div className="bg-white border border-slate-200 rounded-2xl p-12 shadow-sm text-center space-y-6">
+               <div className="w-20 h-20 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary mx-auto">
+                  <Loader2 className="w-8 h-8 animate-spin" />
+               </div>
+               <div className="max-w-md mx-auto">
+                  <h2 className="text-2xl font-light text-slate-900 tracking-tight">Reception <span className="font-semibold text-brand-primary">Terminal</span></h2>
+                  <p className="text-slate-500 mt-2">Clinical feeds and insights are restricted to practitioners. Please use the Patient Registry to manage appointments and check-ins.</p>
+               </div>
+            </div>
+          ) : (
+            <>
+              <DashboardCalendar consultations={allConsultations} />
+              <DashboardRecentActivity 
+                recentConsultations={recentConsultations}
+              />
+            </>
+          )}
         </>
       )}
     </div>

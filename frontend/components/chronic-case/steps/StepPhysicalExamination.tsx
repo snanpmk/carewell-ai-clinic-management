@@ -42,15 +42,15 @@ export default function StepPhysicalExamination({ caseData, updateCaseData, next
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Physical Examination"
-        subtitle="Objective Vitals & Systemic Clinical Findings"
+        title="Clinical Examination"
+        subtitle="Objective vitals and systemic clinical findings"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-12">
           {/* General Examination */}
           <div className="space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <FileSearch className="w-4 h-4" /> General Examination
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -67,7 +67,7 @@ export default function StepPhysicalExamination({ caseData, updateCaseData, next
 
           {/* Vitals */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Activity className="w-4 h-4" /> Vitals & Anthropometry
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -83,7 +83,7 @@ export default function StepPhysicalExamination({ caseData, updateCaseData, next
 
           {/* Systemic Examination */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Stethoscope className="w-4 h-4" /> Systemic Examination
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

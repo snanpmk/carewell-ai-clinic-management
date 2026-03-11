@@ -49,7 +49,7 @@ h3 {
 }
 
 .eyebrow {
-  @apply text-[11px] font-black uppercase tracking-widest text-slate-500;
+  @apply text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400;
 }
 
 /* ── Page Entry Animation ─────────────────────────────────────────────────── */
@@ -78,4 +78,52 @@ h3 {
 
 .animate-shimmer {
   animation: shimmer 2s linear infinite;
+}
+
+/* ── React Day Picker custom styling ─────────────────────────────────────── */
+.rdp-root {
+  --rdp-accent-color: var(--color-brand-primary);
+  --rdp-accent-background-color: var(--color-brand-primary-light);
+  --rdp-day-font: inherit;
+  --rdp-font-family: inherit;
+  --rdp-background-color: transparent;
+  width: 100%;
+}
+.rdp-month, .rdp-months {
+  width: 100%;
+}
+.rdp-table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+}
+.rdp-day {
+  display: table-cell !important;
+  vertical-align: middle;
+  text-align: center;
+  height: auto;
+  width: 14.28%;
+  padding: 4px;
+}
+.rdp-caption_label {
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+}
+.rdp-head_cell {
+  color: var(--color-slate-400);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.625rem;
+  padding-bottom: 0.75rem;
+}
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: var(--color-slate-50);
+}
+.custom-day-picker .rdp-month {
+  width: 100%;
 }

@@ -32,15 +32,15 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Personal & Social History"
-        subtitle="Life Situation, Development & Habits"
+        title="Personal Profile"
+        subtitle="Life situation, developmental milestones, and habits"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-12">
           {/* A. Life Situation & Family */}
           <div className="space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Users2 className="w-4 h-4" /> Life Situation & Family Status
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -55,7 +55,7 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
 
           {/* B. Development Milestones & Birth */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Baby className="w-4 h-4" /> Development & Birth Archive
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -68,7 +68,7 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
               <Input label="Walking" {...register("personalHistory.developmentMilestones.walking")} />
               <Input label="Talking" {...register("personalHistory.developmentMilestones.talking")} />
             </div>
-            <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6">
               <Select 
                 label="Birth Type" 
                 options={["Normal", "Abnormal", "Premature"].map(v => ({label: v, value: v}))} 
@@ -82,7 +82,7 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
 
           {/* C. Habits & Hobbies */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Coffee className="w-4 h-4" /> Habits & Addictions
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -108,7 +108,7 @@ export default function StepPersonalHistory({ caseData, updateCaseData, nextStep
 
           {/* Domestic & Sexual Relations */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <div className="eyebrow text-red-500 flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Heart className="w-4 h-4" /> Relational Dynamics
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

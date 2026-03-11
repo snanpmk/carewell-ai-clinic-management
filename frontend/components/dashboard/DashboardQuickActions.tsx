@@ -58,7 +58,7 @@ export function DashboardQuickActions() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Quick Operations</h2>
+        <h2 className="text-xs font-semibold text-slate-400">Quick Operations</h2>
       </div>
       <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-6 gap-4">
         {actions.map((action, i) => (
@@ -67,10 +67,10 @@ export function DashboardQuickActions() {
             onClick={() => router.push(action.path)}
             className="group flex flex-col items-center gap-3 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-brand-primary/20 transition-all active:scale-95"
           >
-            <div className={`p-3 rounded-xl ${action.color} group-hover:scale-110 transition-transform`}>
+            <div className={`p-2.5 rounded-xl ${action.color} group-hover:scale-110 transition-transform`}>
               {action.icon}
             </div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover:text-brand-primary transition-colors">
+            <span className="text-[11px] font-semibold text-slate-600 group-hover:text-brand-primary transition-colors">
               {action.label}
             </span>
           </button>

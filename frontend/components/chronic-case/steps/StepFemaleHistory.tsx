@@ -28,15 +28,15 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
       <StepLayout
-        title="Female History"
-        subtitle="Menstrual & Obstetrical Archive"
+        title="Gynaecological History"
+        subtitle="Menstrual characteristics and obstetrical history"
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
         <div className="space-y-12">
           {/* Section 11: Menstrual History */}
           <div className="space-y-8">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Calendar className="w-4 h-4" /> Menstrual Cycle Details
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -46,8 +46,8 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
               <Input label="Duration (Days)" {...register("femaleHistory.menstrual.duration")} />
             </div>
             
-            <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-6">
-              <div className="eyebrow !text-[9px] !text-brand-accent">Flow Characteristics</div>
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-6">
+              <div className="eyebrow !text-[9px]">Flow Characteristics</div>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <Input label="Quantity" {...register("femaleHistory.menstrual.flowDetails.quantity")} />
                 <Input label="Colour" {...register("femaleHistory.menstrual.flowDetails.colour")} />
@@ -75,7 +75,7 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
 
           {/* Section 12: Obstetrical History */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
-            <div className="eyebrow text-brand-accent flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <Baby className="w-4 h-4" /> Obstetrical & Pregnancy Archive
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -100,8 +100,8 @@ export default function StepFemaleHistory({ caseData, updateCaseData, nextStep, 
               ]}
             />
 
-            <div className="p-6 bg-brand-primary/5 rounded-3xl border border-brand-primary/10">
-              <div className="eyebrow !text-[9px] !text-brand-primary mb-4 flex items-center gap-2">
+            <div className="p-6 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+              <div className="eyebrow !text-[9px] mb-4 flex items-center gap-2">
                 <Activity className="w-3 h-3" /> Present Pregnancy Status
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

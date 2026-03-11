@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { Pill, ShieldAlert, Save, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
 import StepLayout from "../StepLayout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { treatmentSchema, TreatmentFormData } from "@/lib/validations/chronicCase";
@@ -30,9 +32,10 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
             ? caseData.management.firstPrescription.medicines.map(m => ({
                 medicine: m.medicine || "",
                 potency: m.potency || "",
+                form: m.form || "Pills",
                 dose: m.dose || ""
               }))
-            : [{ medicine: "", potency: "", dose: "" }],
+            : [{ medicine: "", potency: "", form: "Pills", dose: "" }],
         },
       }
     }
@@ -70,8 +73,8 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
   return (
     <form onSubmit={handleSubmit(onSubmit, onFormError)} className="contents">
       <StepLayout
-        title="Management & Treatment"
-        subtitle="Plan of Treatment & First Prescription"
+        title="Treatment Plan"
+        subtitle="Management strategy and initial prescription details"
         onBack={prevStep}
         isLastStep
         isSubmitting={isSubmitting}
@@ -81,7 +84,7 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
         <div className="space-y-12">
           {/* Plan of Treatment */}
           <div className="space-y-6">
-            <div className="eyebrow text-brand-primary flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               Treatment Strategy
             </div>
             <Textarea 
@@ -94,7 +97,7 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
 
           {/* Restrictions */}
           <div className="pt-10 border-t border-slate-100 space-y-6">
-            <div className="eyebrow text-red-500 flex items-center gap-3">
+            <div className="eyebrow flex items-center gap-3">
               <ShieldAlert className="w-4 h-4" /> Dietary & Regimen Restrictions
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -107,15 +110,15 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
           {/* First Prescription */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
             <div className="flex items-center justify-between">
-              <div className="eyebrow text-brand-accent flex items-center gap-3">
+              <div className="eyebrow flex items-center gap-3">
                 <Pill className="w-4 h-4" /> Final Selection (Prescriptions)
               </div>
               <Button
                 type="button"
-                onClick={() => append({ medicine: "", potency: "", dose: "" })}
+                onClick={() => append({ medicine: "", potency: "", form: "Pills", dose: "" })}
                 variant="primary"
                 size="sm"
-                className="h-9 rounded-lg"
+                className="h-9 rounded-2xl"
                 leftIcon={<Plus className="w-3.5 h-3.5" />}
               >
                 Add Medicine
@@ -132,8 +135,8 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
             <div className="space-y-4">
               {fields.map((field, index) => (
                 <div key={field.id} className="relative group animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-inner">
-                    <div className="md:col-span-5">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-inner">
+                    <div className="md:col-span-4">
                       <Input 
                         label={`Medicine ${index + 1}`} 
                         {...register(`management.firstPrescription.medicines.${index}.medicine` as const)} 
@@ -141,7 +144,7 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
                         error={(errors.management?.firstPrescription?.medicines as Array<{ medicine?: { message?: string } }>)?.[index]?.medicine?.message}
                       />
                     </div>
-                    <div className="md:col-span-3">
+                    <div className="md:col-span-2">
                       <Input 
                         label="Potency" 
                         {...register(`management.firstPrescription.medicines.${index}.potency` as const)} 
@@ -150,6 +153,21 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
                       />
                     </div>
                     <div className="md:col-span-3">
+                      <Select 
+                        label="Form" 
+                        options={[
+                          { label: "Pills / Globules", value: "Pills" },
+                          { label: "Liquid / Droplets", value: "Liquid" },
+                          { label: "Powder / Trituration", value: "Powder" },
+                          { label: "Tablets", value: "Tablets" },
+                          { label: "Mother Tincture", value: "Q" },
+                          { label: "External / Ointment", value: "External" }
+                        ]}
+                        {...register(`management.firstPrescription.medicines.${index}.form` as const)} 
+                        error={(errors.management?.firstPrescription?.medicines as Array<{ form?: { message?: string } }>)?.[index]?.form?.message}
+                      />
+                    </div>
+                    <div className="md:col-span-2">
                       <Input 
                         label="Dosage" 
                         {...register(`management.firstPrescription.medicines.${index}.dose` as const)} 
@@ -162,7 +180,7 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
                         <button
                           type="button"
                           onClick={() => remove(index)}
-                          className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                          className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>

@@ -19,7 +19,7 @@ export function Badge({ label, variant = "neutral", className }: BadgeProps) {
   return (
     <span
       className={clsx(
-        "inline-flex items-center justify-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest",
+        "inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-tight",
         colorMap[variant],
         className
       )}

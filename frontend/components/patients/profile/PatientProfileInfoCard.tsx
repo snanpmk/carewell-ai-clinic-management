@@ -2,6 +2,7 @@
 
 import { User, Phone, MapPin } from "lucide-react";
 import { useUIStore } from "@/store/useUIStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { clsx } from "clsx";
 
 interface PatientContent {
@@ -18,20 +19,22 @@ interface PatientProfileInfoCardProps {
 
 export function PatientProfileInfoCard({ patient }: PatientProfileInfoCardProps) {
   const { privacyMode } = useUIStore();
+  const { user } = useAuthStore();
+  const isStaff = user?.role === "staff";
 
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl shadow-slate-200/50 text-center relative overflow-hidden group transition-all duration-300">
+    <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl shadow-slate-200/50 text-center relative overflow-hidden group transition-all duration-300">
       <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
       
       <div className="relative w-28 h-28 mx-auto mb-6 group-hover:scale-105 transition-transform duration-500">
-        <div className="absolute -inset-1.5 bg-linear-to-tr from-brand-primary to-brand-accent rounded-[2rem] opacity-25 blur-sm group-hover:opacity-40 transition-opacity" />
-        <div className="relative w-28 h-28 bg-linear-to-br from-brand-primary to-brand-accent rounded-[2rem] flex items-center justify-center border-4 border-white shadow-2xl shadow-brand-primary/20 rotate-3 group-hover:rotate-0 transition-all duration-500">
-          <span className="text-4xl font-black text-white italic drop-shadow-sm">{patient.name.charAt(0).toUpperCase()}</span>
+        <div className="absolute -inset-1.5 bg-linear-to-tr from-brand-primary to-brand-accent rounded-2xl opacity-25 blur-sm group-hover:opacity-40 transition-opacity" />
+        <div className="relative w-28 h-28 bg-linear-to-br from-brand-primary to-brand-accent rounded-2xl flex items-center justify-center border-4 border-white shadow-2xl shadow-brand-primary/20 rotate-3 group-hover:rotate-0 transition-all duration-500">
+          <span className="text-4xl font-semibold text-white italic drop-shadow-sm">{patient.name.charAt(0).toUpperCase()}</span>
         </div>
       </div>
 
       <h2 className={clsx(
-        "text-2xl font-black text-slate-900 tracking-tight transition-all uppercase",
+        "text-2xl font-semibold text-slate-900 tracking-tight transition-all uppercase",
         privacyMode && "blur-md select-none"
       )}>{patient.name}</h2>
       
@@ -41,8 +44,8 @@ export function PatientProfileInfoCard({ patient }: PatientProfileInfoCardProps)
             <User className="w-5 h-5" />
           </div>
           <div>
-            <p className="eyebrow leading-none mb-1.5">Demographics</p>
-            <p className="font-black text-slate-800 tracking-tight text-base uppercase">{patient.age} YRS / {patient.gender}</p>
+            <p className="eyebrow leading-none mb-1.5 uppercase tracking-widest text-[10px] text-slate-400">Demographics</p>
+            <p className="font-semibold text-slate-800 tracking-tight text-base uppercase">{patient.age} YRS / {patient.gender}</p>
           </div>
         </div>
         
@@ -51,19 +54,19 @@ export function PatientProfileInfoCard({ patient }: PatientProfileInfoCardProps)
             <Phone className="w-5 h-5" />
           </div>
           <div>
-            <p className="eyebrow leading-none mb-1.5">Contact</p>
-            <p className={clsx("font-black text-slate-800 tracking-tight text-base transition-all uppercase", privacyMode && "blur-sm select-none")}>{patient.phone}</p>
+            <p className="eyebrow leading-none mb-1.5 uppercase tracking-widest text-[10px] text-slate-400">Contact</p>
+            <p className={clsx("font-semibold text-slate-800 tracking-tight text-base transition-all uppercase", privacyMode && "blur-sm select-none")}>{patient.phone}</p>
           </div>
         </div>
         
-        {patient.address && (
+        {patient.address && !isStaff && (
           <div className="flex items-center gap-4 text-sm group/item">
             <div className="p-3 bg-slate-100 rounded-2xl text-slate-500 group-hover/item:bg-slate-200 transition-colors">
               <MapPin className="w-5 h-5" />
             </div>
             <div>
-              <p className="eyebrow leading-none mb-1.5">Residence</p>
-              <p className={clsx("font-black text-slate-800 tracking-tight text-sm text-balance leading-tight transition-all uppercase", privacyMode && "blur-sm select-none")}>{patient.address}</p>
+              <p className="eyebrow leading-none mb-1.5 uppercase tracking-widest text-[10px] text-slate-400">Residence</p>
+              <p className={clsx("font-semibold text-slate-800 tracking-tight text-sm text-balance leading-tight transition-all uppercase", privacyMode && "blur-sm select-none")}>{patient.address}</p>
             </div>
           </div>
         )}

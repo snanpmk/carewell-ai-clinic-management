@@ -23,7 +23,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={inputId}
             ref={ref}
             className={clsx(
-              "w-full rounded-2xl border-2 px-4 py-4 text-sm font-bold text-slate-900 bg-white transition-all appearance-none cursor-pointer focus:outline-none focus:bg-white",
+              "w-full rounded-2xl border-2 px-4 py-4 text-sm font-semibold text-slate-900 bg-white transition-all appearance-none cursor-pointer focus:outline-none focus:bg-white",
               error
                 ? "border-red-400 bg-red-50 focus:border-red-500"
                 : "border-slate-200 bg-white focus:border-brand-primary hover:border-slate-300",
@@ -48,7 +48,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </svg>
           </div>
         </div>
-        {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
+        {error && <p className="text-[11px] font-semibold text-red-500 mt-1 uppercase tracking-wider">{error}</p>}
       </div>
     );
   }

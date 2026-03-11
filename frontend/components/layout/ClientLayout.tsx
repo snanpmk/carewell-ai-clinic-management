@@ -17,19 +17,31 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
-  useEffect(() => {
+  const isPublicRoute = useMemo(() => {
     const publicRoutes = ["/auth", "/privacy", "/protocol"];
+    return publicRoutes.includes(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
     if (mounted) {
-      if (!isAuthenticated && !publicRoutes.includes(pathname)) {
+      if (!isAuthenticated && !isPublicRoute) {
         router.push("/auth");
       } else if (isAuthenticated && pathname === "/auth") {
         router.push("/");
+      } else if (isAuthenticated && user?.role === "staff") {
+        // Staff restricted routes
+        const clinicalPrefixes = ["/consultation", "/notes", "/ai-tools", "/symptoms", "/protocol"];
+        const isClinicalRoute = clinicalPrefixes.some(prefix => pathname?.startsWith(prefix));
+        if (pathname === "/" || isClinicalRoute) {
+          router.push("/patients");
+        }
       }
     }
-  }, [isAuthenticated, pathname, router, mounted]);
+  }, [isAuthenticated, pathname, router, mounted, isPublicRoute, user?.role]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -114,7 +126,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                 
                 <div className="flex flex-col">
                   <h3 className="text-[15px] font-extrabold text-slate-900 leading-tight tracking-tight">
-                    {greeting}, Dr. {user?.name?.split(' ')[0] || "Practitioner"}
+                    {greeting}, {user?.role === 'staff' ? '' : 'Dr. '}{user?.name?.split(' ')[0] || "Practitioner"}
                   </h3>
                   <div className="flex items-center gap-2.5 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     <CalendarIcon className="w-3 h-3 text-brand-primary/60" />
