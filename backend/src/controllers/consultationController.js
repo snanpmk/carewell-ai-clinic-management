@@ -58,7 +58,7 @@ const getConsultationsByPatient = async (req, res) => {
       patientId: req.params.patientId,
       clinic: req.clinicId,
     })
-      .populate("doctorId", "name profileImage")
+      .populate("doctorId", "name profileImage licenseNumber")
       .sort({ consultationDate: -1 })
       .select("-__v");
 
@@ -76,8 +76,8 @@ const getConsultationsByPatient = async (req, res) => {
 const getAllConsultations = async (req, res) => {
   try {
     const consultations = await Consultation.find({ clinic: req.clinicId })
-      .populate("patientId", "name age phone")
-      .populate("doctorId", "name profileImage")
+      .populate("patientId", "name age phone gender")
+      .populate("doctorId", "name profileImage licenseNumber")
       .sort({ consultationDate: -1 })
       .select("-__v");
 

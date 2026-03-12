@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Carewell AI",
+    title: "Carewell Homeo Clinic",
   },
   formatDetection: {
     telephone: false,
@@ -56,7 +56,7 @@ export default function RootLayout({
                 richColors
                 closeButton
                 theme="light"
-                          />
+              />
             </ClientLayout>
           </GoogleOAuthProvider>
         </QueryProvider>

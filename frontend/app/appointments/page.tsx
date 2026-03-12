@@ -1,11 +1,12 @@
 "use client";
 
-import { Calendar, Search, Filter, Loader2, FileText, ChevronRight, Stethoscope } from "lucide-react";
+import { Calendar, Search, Filter, Loader2, FileText, ChevronRight, Stethoscope, Printer } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getAllConsultations } from "@/services/consultationService";
 import { useAuthStore } from "@/store/useAuthStore";
+import { generatePrescriptionPDF } from "@/lib/pdfGenerator";
 
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -27,17 +28,100 @@ export default function AppointmentsPage() {
     consultationDate: string;
     severity?: string;
     symptoms: string;
+    modalities?: string;
+    generals?: string;
+    mentals?: string;
+    diagnosis?: string;
+    prescription?: string;
     status?: "Scheduled" | "In-Progress" | "Completed";
     opNumber?: string;
+    aiGeneratedNotes?: string | Record<string, any>;
+    doctorEditedNotes?: string | Record<string, any>;
     patientId?: {
       _id: string;
       name: string;
+      age?: number;
+      gender?: string;
+      phone?: string;
     };
     doctorId?: {
       _id: string;
       name: string;
+      licenseNumber?: string;
     };
   }
+
+  const handlePrint = (apt: ConsultationRecord) => {
+    if (!apt.patientId) return;
+
+    let adviceText = "";
+    let aiNotes: Record<string, any> | null = null;
+
+    try {
+      if (typeof apt.aiGeneratedNotes === "string" && apt.aiGeneratedNotes) aiNotes = JSON.parse(apt.aiGeneratedNotes);
+      else if (typeof apt.aiGeneratedNotes === "object") aiNotes = apt.aiGeneratedNotes;
+    } catch {}
+
+    try {
+      if (typeof apt.doctorEditedNotes === "string" && apt.doctorEditedNotes) {
+        if (apt.doctorEditedNotes.startsWith("{")) {
+          const parsed = JSON.parse(apt.doctorEditedNotes);
+          adviceText = parsed.advice || "";
+        } else {
+          adviceText = apt.doctorEditedNotes;
+        }
+      } else if (typeof apt.doctorEditedNotes === "object" && apt.doctorEditedNotes !== null) {
+        adviceText = apt.doctorEditedNotes.advice || "";
+      }
+    } catch {}
+
+    if (!adviceText) adviceText = aiNotes?.advice || "";
+
+    // Parse medicines
+    let prescriptions: any[] = [];
+    const p = apt.prescription;
+    if (p) {
+      try {
+        const rxArr = typeof p === "string" && p.startsWith("[") ? JSON.parse(p) : (Array.isArray(p) ? p : null);
+        if (Array.isArray(rxArr)) {
+          prescriptions = rxArr.map((m: any) => ({
+            medicine: m.medicine || "",
+            potency: m.potency || "",
+            form: m.form || "Pills",
+            dosage: m.dosage || m.dose || ""
+          }));
+        } else {
+           const items = (p as string).split(", ").map(item => {
+             const parts = item.match(/(.+)\s+(\w+)\s+\((\w+)\)\s+-\s+(.+)/);
+             if (parts) return { medicine: parts[1], potency: parts[2], form: parts[3], dosage: parts[4] };
+             return { medicine: item, potency: "", form: "", dosage: "" };
+           });
+           prescriptions = items;
+        }
+      } catch (e) {
+        prescriptions = [{ medicine: p, potency: "", form: "", dosage: "" }];
+      }
+    }
+
+    generatePrescriptionPDF({
+      clinicName: user?.clinic?.name || "Carewell Clinic",
+      clinicAddress: user?.clinic?.address,
+      doctorName: apt.doctorId?.name || user?.name || "Doctor",
+      doctorLicense: apt.doctorId?.licenseNumber || user?.licenseNumber,
+      patientName: apt.patientId.name,
+      patientAge: apt.patientId.age,
+      patientGender: apt.patientId.gender,
+      date: new Date(apt.consultationDate).toLocaleDateString('en-IN'),
+      opNumber: apt.opNumber,
+      diagnosis: apt.diagnosis,
+      symptoms: apt.symptoms,
+      modalities: apt.modalities,
+      generals: apt.generals,
+      mentals: apt.mentals,
+      prescriptions: prescriptions,
+      advice: adviceText
+    });
+  };
 
   const allConsultations = response?.data || [];
 
@@ -209,14 +293,24 @@ export default function AppointmentsPage() {
                           </Button>
                         </>
                       ) : (
-                        <Button
-                          onClick={() => router.push(`/patients/${apt.patientId?._id}`)}
-                          variant="outline"
-                          className="h-14 px-8 rounded-2xl group/btn"
-                          rightIcon={<ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />}
-                        >
-                          {isStaff ? "Patient Profile" : "Clinical Profile"}
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            onClick={() => handlePrint(apt)}
+                            variant="outline"
+                            className="h-14 w-14 p-0 flex items-center justify-center rounded-2xl border-brand-primary/20 text-brand-primary hover:bg-brand-primary hover:text-white transition-all shadow-sm"
+                            title="Print Prescription"
+                          >
+                            <Printer className="w-5 h-5" />
+                          </Button>
+                          <Button
+                            onClick={() => router.push(`/patients/${apt.patientId?._id}`)}
+                            variant="outline"
+                            className="h-14 px-8 rounded-2xl group/btn"
+                            rightIcon={<ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />}
+                          >
+                            {isStaff ? "Patient Profile" : "Clinical Profile"}
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>

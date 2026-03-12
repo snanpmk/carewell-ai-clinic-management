@@ -16,13 +16,14 @@ import { Select } from "@/components/ui/Select";
 import StepLayout from "../StepLayout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { treatmentSchema, TreatmentFormData } from "@/lib/validations/chronicCase";
+import { useEffect } from "react";
 
 export default function StepTreatment({ caseData, nextStep, prevStep }: StepProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [submitStatus, setSubmitStatus] = useState<"Draft" | "Active" | "Completed">("Active");
 
-  const { register, handleSubmit, control, formState: { isSubmitting, errors } } = useForm<TreatmentFormData>({
+  const { register, handleSubmit, control, reset, formState: { isSubmitting, errors } } = useForm<TreatmentFormData>({
     resolver: zodResolver(treatmentSchema),
     defaultValues: {
       management: {
@@ -44,6 +45,30 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
       }
     }
   });
+
+  useEffect(() => {
+    if (caseData.management) {
+      reset({
+        management: {
+          plan: caseData.management.plan || "",
+          restrictions: caseData.management.restrictions || { diet: "", regimen: "", medicinal: "" },
+          firstPrescription: {
+            basis: caseData.management.firstPrescription?.basis || "",
+            medicines: caseData.management.firstPrescription?.medicines?.length 
+              ? caseData.management.firstPrescription.medicines.map(m => ({
+                  medicine: m.medicine || "",
+                  potency: m.potency || "",
+                  form: m.form || "Pills",
+                  dose: m.dose || "",
+                  quantity: m.quantity || "",
+                  indication: m.indication || "",
+                }))
+              : [{ medicine: "", potency: "", form: "Pills", dose: "", quantity: "", indication: "" }],
+          },
+        }
+      });
+    }
+  }, [caseData, reset]);
 
   const { fields, append, remove } = useFieldArray({
     control,

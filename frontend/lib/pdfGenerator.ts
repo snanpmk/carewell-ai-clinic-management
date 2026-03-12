@@ -1,12 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-
-// Extend jsPDF with autotable
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
+import autoTable from 'jspdf-autotable';
 
 interface PrescriptionData {
   clinicName: string;
@@ -20,6 +13,9 @@ interface PrescriptionData {
   opNumber?: string;
   diagnosis?: string;
   symptoms?: string;
+  modalities?: string;
+  generals?: string;
+  mentals?: string;
   prescriptions: Array<{
     medicine: string;
     potency: string;
@@ -89,11 +85,11 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
   // 4. Clinical Context
   let currentY = 80;
   
-  if (data.diagnosis || data.symptoms) {
+  if (data.diagnosis || data.symptoms || data.modalities || data.generals || data.mentals) {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 141, 150);
-    doc.text('CLINICAL ASSESSMENT', 15, currentY);
+    doc.text('CLINICAL DETAILS', 15, currentY);
     
     doc.setDrawColor(200, 200, 200);
     doc.line(15, currentY + 2, 60, currentY + 2);
@@ -101,15 +97,27 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
     currentY += 8;
     doc.setFontSize(9);
     doc.setTextColor(80, 80, 80);
-    doc.setFont('helvetica', 'normal');
+
+    const details = [
+      { label: 'Diagnosis:', value: data.diagnosis },
+      { label: 'Chief Complaint:', value: data.symptoms },
+      { label: 'Modalities:', value: data.modalities },
+      { label: 'Physical Generals:', value: data.generals },
+      { label: 'Mental State:', value: data.mentals },
+    ];
+
+    details.forEach(item => {
+      if (item.value) {
+        doc.setFont('helvetica', 'bold');
+        doc.text(item.label, 15, currentY);
+        doc.setFont('helvetica', 'normal');
+        const splitValue = doc.splitTextToSize(item.value, pageWidth - 50);
+        doc.text(splitValue, 45, currentY);
+        currentY += (splitValue.length * 5) + 2;
+      }
+    });
     
-    const assessmentText = data.diagnosis 
-      ? `Diagnosis: ${data.diagnosis}` 
-      : `Chief Complaint: ${data.symptoms}`;
-      
-    const splitAssessment = doc.splitTextToSize(assessmentText, pageWidth - 30);
-    doc.text(splitAssessment, 15, currentY);
-    currentY += (splitAssessment.length * 5) + 5;
+    currentY += 5;
   }
 
   // 5. Prescription Table
@@ -122,27 +130,42 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
   
   const tableData = data.prescriptions.map((p, index) => [
     index + 1,
-    p.medicine,
-    p.potency,
+    `${p.medicine} ${p.potency}`,
     p.form,
-    p.dosage
+    p.dosage,
+    p.quantity || '-',
+    p.indication || '-'
   ]);
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: currentY,
-    head: [['#', 'REMEDY / MEDICINE', 'POTENCY', 'FORM', 'DOSAGE / SCHEDULE']],
+    head: [['#', 'REMEDY & POTENCY', 'FORM', 'DOSAGE', 'QTY', 'INDICATION']],
     body: tableData,
     theme: 'striped',
-    headStyles: { fillColor: [0, 141, 150], textColor: [255, 255, 255], fontSize: 9, fontStyle: 'bold' },
-    bodyStyles: { fontSize: 9, textColor: [50, 50, 50] },
+    headStyles: { fillColor: [0, 141, 150], textColor: [255, 255, 255], fontSize: 8, fontStyle: 'bold' },
+    bodyStyles: { fontSize: 8, textColor: [50, 50, 50] },
     margin: { left: 15, right: 15 },
     columnStyles: {
-      0: { cellWidth: 10 },
-      1: { cellWidth: 'auto', fontStyle: 'bold' },
+      0: { cellWidth: 8 },
+      1: { cellWidth: 45, fontStyle: 'bold' },
+      2: { cellWidth: 25 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 20 },
+      5: { cellWidth: 'auto' },
+    },
+    didDrawPage: (dataArg) => {
+      // Keep track of Y position for next elements
+      currentY = dataArg.cursor ? dataArg.cursor.y : currentY;
     }
   });
 
   currentY = (doc as any).lastAutoTable.finalY + 15;
+
+  // Check for page overflow before drawing Advice
+  if (currentY > 240) {
+    doc.addPage();
+    currentY = 20;
+  }
 
   // 6. Advice / Instructions
   if (data.advice) {
@@ -178,6 +201,6 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
   doc.line(pageWidth - 60, footerY - 15, pageWidth - 15, footerY - 15);
 
   // Save PDF
-  const fileName = `Prescription_${data.patientName.replace(/\s+/g, '_')}_${data.date}.pdf`;
+  const fileName = `Prescription_${data.patientName.replace(/\s+/g, '_')}_${data.date.replace(/\//g, '-')}.pdf`;
   doc.save(fileName);
 };

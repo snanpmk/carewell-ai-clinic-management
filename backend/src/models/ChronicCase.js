@@ -406,9 +406,16 @@ const ChronicCaseSchema = new mongoose.Schema(
       },
       firstPrescription: {
         basis: String,
-        medicine: String,
-        potency: String,
-        dose: String,
+        medicines: [
+          {
+            medicine: String,
+            potency: String,
+            form: String,
+            dose: String,
+            quantity: String,
+            indication: String,
+          }
+        ],
       },
     },
 

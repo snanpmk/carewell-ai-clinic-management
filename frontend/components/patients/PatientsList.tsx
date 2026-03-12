@@ -1,14 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Users, ChevronRight, CalendarPlus } from "lucide-react";
+import { Users, ChevronRight, CalendarPlus, X, Loader2 } from "lucide-react";
 import { useUIStore } from "@/store/useUIStore";
 import { clsx } from "clsx";
 import { Button } from "@/components/ui/Button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { saveConsultation } from "@/services/consultationService";
+import { saveConsultation, getNextOPNumber } from "@/services/consultationService";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 
 export interface PatientItem {
   _id: string;
@@ -28,11 +32,33 @@ export function PatientsList({ patients }: PatientsListProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
 
+  const [schedulingPatient, setSchedulingPatient] = useState<PatientItem | null>(null);
+
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+    defaultValues: {
+      opNumber: "",
+      symptoms: ""
+    }
+  });
+
+  useEffect(() => {
+    if (schedulingPatient) {
+      getNextOPNumber().then(res => {
+        if (res.success) {
+          setValue("opNumber", res.data.opNumber);
+        }
+      });
+    } else {
+      reset();
+    }
+  }, [schedulingPatient, setValue, reset]);
+
   const scheduleMutation = useMutation({
     mutationFn: saveConsultation,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consultations"] });
       toast.success("Appointment scheduled successfully!");
+      setSchedulingPatient(null);
       router.push("/appointments");
     },
     onError: () => {
@@ -40,20 +66,13 @@ export function PatientsList({ patients }: PatientsListProps) {
     }
   });
 
-  const handleSchedule = (patient: PatientItem) => {
-    const opNumber = window.prompt(`Enter OP Number for ${patient.name}:`);
-    if (!opNumber) return;
-
-    const symptoms = window.prompt("Enter purpose of visit / primary symptoms (required):");
-    if (!symptoms || symptoms.length < 3) {
-      toast.error("Valid symptoms are required to schedule an appointment.");
-      return;
-    }
+  const onSubmit = (data: { opNumber: string; symptoms: string }) => {
+    if (!schedulingPatient) return;
 
     scheduleMutation.mutate({
-      patientId: patient._id,
-      opNumber,
-      symptoms,
+      patientId: schedulingPatient._id,
+      opNumber: data.opNumber,
+      symptoms: data.symptoms,
       status: "Scheduled",
       aiGeneratedNotes: { chiefComplaint: "", assessment: "", advice: "" },
       doctorEditedNotes: { chiefComplaint: "", assessment: "", advice: "" },
@@ -113,7 +132,7 @@ export function PatientsList({ patients }: PatientsListProps) {
                   <td className="px-6 py-5 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button
-                        onClick={() => handleSchedule(patient)}
+                        onClick={() => setSchedulingPatient(patient)}
                         variant="outline"
                         size="sm"
                         className="h-9 px-4 rounded-xl text-[10px] border-indigo-100 text-indigo-600 hover:bg-indigo-50"
@@ -147,27 +166,29 @@ export function PatientsList({ patients }: PatientsListProps) {
            </div>
         ) : (
           patients.map((patient) => (
-            <Link 
+            <div 
               key={patient._id}
-              href={`/patients/${patient._id}`}
               className="flex flex-col p-6 hover:bg-slate-50 transition-all active:bg-slate-100 group"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-linear-to-br from-brand-primary to-brand-accent text-white flex items-center justify-center font-semibold shadow-lg shadow-brand-primary/10 shrink-0 text-lg">
                   {patient.name?.charAt(0).toUpperCase() || "?"}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0" onClick={() => router.push(`/patients/${patient._id}`)}>
                   <h4 className={clsx(
-                    "text-lg font-light text-slate-900 truncate tracking-tight group-hover:text-brand-primary transition-all",
+                    "text-lg font-semibold text-slate-900 truncate tracking-tight group-hover:text-brand-primary transition-all",
                     privacyMode && "blur-sm select-none"
-                  )}><span className="font-semibold">{patient.name}</span></h4>
+                  )}>{patient.name}</h4>
                   <div className="flex items-center gap-2 mt-1 px-2.5 py-0.5 w-max rounded-full bg-slate-50 border border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     <span>{patient.age} YRS</span>
                     <span className="w-1 h-1 rounded-full bg-slate-200" />
                     <span>{patient.gender}</span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-slate-300 group-hover:translate-x-0.5 transition-transform group-hover:text-brand-primary" />
+                <ChevronRight 
+                  onClick={() => router.push(`/patients/${patient._id}`)}
+                  className="w-5 h-5 text-slate-300 group-hover:translate-x-0.5 transition-transform group-hover:text-brand-primary cursor-pointer" 
+                />
               </div>
               <div className="mt-5 text-sm flex items-center justify-between border-t border-slate-50 pt-4">
                 <div className="flex flex-col gap-0.5">
@@ -177,7 +198,7 @@ export function PatientsList({ patients }: PatientsListProps) {
                 <Button
                   onClick={(e) => {
                     e.preventDefault();
-                    handleSchedule(patient);
+                    setSchedulingPatient(patient);
                   }}
                   variant="outline"
                   size="sm"
@@ -188,10 +209,79 @@ export function PatientsList({ patients }: PatientsListProps) {
                   Schedule
                 </Button>
               </div>
-            </Link>
+            </div>
           ))
         )}
       </div>
+
+      {/* Schedule Appointment Modal */}
+      {schedulingPatient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md animate-in zoom-in-95 duration-300 border border-slate-200">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-inner">
+                  <CalendarPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-none">Schedule Appointment</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">For {schedulingPatient.name}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSchedulingPatient(null)}
+                className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">OP Number</label>
+                <Input 
+                  {...register("opNumber", { required: "OP Number is required" })}
+                  placeholder="e.g. OP-2026-001"
+                  error={errors.opNumber?.message}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Purpose of Visit / Symptoms</label>
+                <Textarea 
+                  {...register("symptoms", { 
+                    required: "Symptoms are required",
+                    minLength: { value: 3, message: "Please enter at least 3 characters" }
+                  })}
+                  placeholder="Reason for visit..."
+                  rows={3}
+                  error={errors.symptoms?.message}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSchedulingPatient(null)}
+                  className="flex-1 py-3 rounded-xl bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest hover:bg-slate-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={scheduleMutation.isPending}
+                  className="flex-1 py-3 rounded-xl bg-brand-primary text-white text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-brand-primary/20 flex items-center justify-center gap-2"
+                >
+                  {scheduleMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Schedule Visit"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

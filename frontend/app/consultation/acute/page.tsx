@@ -245,6 +245,9 @@ function ConsultationForm() {
       opNumber: values.opNumber,
       diagnosis: values.diagnosis,
       symptoms: values.symptoms,
+      modalities: values.modalities,
+      generals: values.generals,
+      mentals: values.mentals,
       prescriptions: values.prescriptions.map(p => ({
         medicine: p.medicine,
         potency: p.potency,
