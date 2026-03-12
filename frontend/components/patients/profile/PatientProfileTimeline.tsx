@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Clock, FileText, Sparkles, ChevronDown, ChevronUp, Pill, Stethoscope, Hash, Info, Printer } from "lucide-react";
+import { Activity, Clock, FileText, Sparkles, ChevronDown, ChevronUp, Pill, Printer } from "lucide-react";
 import { ChronicCase } from "@/types/chronicCase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useState } from "react";
@@ -37,9 +37,25 @@ export interface UnifiedVisitItem {
   opNumber?: string;
 }
 
+interface Patient {
+  name: string;
+  age: number;
+  gender: string;
+}
+
+interface MedicineItem {
+  medicine: string;
+  potency: string;
+  form: string;
+  dosage: string;
+  dose?: string;
+  name?: string;
+  quantity?: string;
+}
+
 interface PatientProfileTimelineProps {
   visits: UnifiedVisitItem[];
-  patient: any;
+  patient: Patient;
 }
 
 export function PatientProfileTimeline({ visits, patient }: PatientProfileTimelineProps) {
@@ -53,30 +69,38 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
 
   const handlePrintVisit = (visit: UnifiedVisitItem) => {
     let adviceText = "";
-    let aiNotes: Record<string, any> | null = null;
+    let aiNotes: Record<string, string> | null = null;
 
     try {
-      if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes);
-      else if (typeof visit.aiGeneratedNotes === "object") aiNotes = visit.aiGeneratedNotes as Record<string, any>;
-    } catch {}
+      if (typeof visit.aiGeneratedNotes === "string") {
+        aiNotes = JSON.parse(visit.aiGeneratedNotes) as Record<string, string>;
+      } else if (typeof visit.aiGeneratedNotes === "object") {
+        aiNotes = visit.aiGeneratedNotes as Record<string, string>;
+      }
+    } catch {
+      // ignore
+    }
 
     try {
       if (typeof visit.doctorEditedNotes === "string") {
         if (visit.doctorEditedNotes.startsWith("{")) {
-          const parsed = JSON.parse(visit.doctorEditedNotes);
+          const parsed = JSON.parse(visit.doctorEditedNotes) as Record<string, string>;
           adviceText = parsed.advice || "";
         } else {
           adviceText = visit.doctorEditedNotes;
         }
       } else if (typeof visit.doctorEditedNotes === "object" && visit.doctorEditedNotes !== null) {
-        adviceText = (visit.doctorEditedNotes as Record<string, any>).advice as string || "";
+        const edited = visit.doctorEditedNotes as Record<string, string>;
+        adviceText = edited.advice || "";
       }
-    } catch {}
+    } catch {
+      // ignore
+    }
 
     if (!adviceText) adviceText = (aiNotes?.advice as string) || "";
 
     // Parse medicines from prescription string or array
-    let prescriptions: any[] = [];
+    let prescriptions: MedicineItem[] = [];
     const p = visit.prescription;
     
     if (visit.isChronic && visit.chronicData?.management?.firstPrescription?.medicines) {
@@ -88,10 +112,10 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
       }));
     } else if (p) {
       try {
-        const rxArr = typeof p === "string" && p.startsWith("[") ? JSON.parse(p) : (Array.isArray(p) ? p : null);
+        const rxArr = typeof p === "string" && p.startsWith("[") ? JSON.parse(p) as MedicineItem[] : (Array.isArray(p) ? p as MedicineItem[] : null);
         if (Array.isArray(rxArr)) {
-          prescriptions = rxArr.map((m: any) => ({
-            medicine: m.medicine || "",
+          prescriptions = rxArr.map((m: MedicineItem) => ({
+            medicine: m.medicine || m.name || "",
             potency: m.potency || "",
             form: m.form || "Pills",
             dosage: m.dosage || m.dose || ""
@@ -105,7 +129,7 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
            });
            prescriptions = items;
         }
-      } catch (e) {
+      } catch {
         prescriptions = [{ medicine: p, potency: "", form: "", dosage: "" }];
       }
     }
@@ -173,10 +197,10 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
                     <span className="text-[10px] text-slate-500 font-semibold">
                       {visit.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                     </span>
-                    {visit.doctor && (
+                    {(visit.doctorId || visit.doctor) && (
                       <>
                         <span className="w-1 h-1 rounded-full bg-slate-200" />
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Dr. {visit.doctor.name}</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Dr. {visit.doctorId?.name || visit.doctor?.name}</span>
                       </>
                     )}
                   </div>
@@ -234,7 +258,9 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
         try {
           if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes);
           else if (typeof visit.aiGeneratedNotes === "object") aiNotes = visit.aiGeneratedNotes as Record<string, unknown>;
-        } catch {}
+        } catch {
+          // ignore
+        }
 
         try {
           if (typeof visit.doctorEditedNotes === "string") {
@@ -245,9 +271,12 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
               adviceText = visit.doctorEditedNotes;
             }
           } else if (typeof visit.doctorEditedNotes === "object" && visit.doctorEditedNotes !== null) {
-            adviceText = (visit.doctorEditedNotes as Record<string, unknown>).advice as string || "";
+            const edited = visit.doctorEditedNotes as Record<string, string>;
+            adviceText = edited.advice || "";
           }
-        } catch {}
+        } catch {
+          // ignore
+        }
 
         if (!adviceText) adviceText = (aiNotes?.advice as string) || "";
 
@@ -353,10 +382,10 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
                     if (!p) return <p className="text-xs font-semibold text-slate-400 uppercase">No prescription recorded</p>;
 
                     try {
-                      const rxArr = typeof p === "string" && p.startsWith("[") ? JSON.parse(p) : (Array.isArray(p) ? p : null);
+                      const rxArr = typeof p === "string" && p.startsWith("[") ? JSON.parse(p) as MedicineItem[] : (Array.isArray(p) ? p as MedicineItem[] : null);
 
                       if (Array.isArray(rxArr)) {
-                        return rxArr.map((m: any, i: number) => (
+                        return rxArr.map((m: MedicineItem, i: number) => (
                           <div key={i} className="bg-white rounded-xl p-3 border border-slate-200/60 shadow-sm space-y-2">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-semibold text-slate-900 uppercase">{m.medicine} <span className="text-brand-primary ml-1">{m.potency}</span></p>
@@ -375,7 +404,9 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
                           </div>
                         ));
                       }
-                    } catch (e) {}
+                    } catch (e) {
+                      // ignore
+                    }
 
                     return (
                       <p className="text-sm font-semibold text-slate-700 leading-snug uppercase">

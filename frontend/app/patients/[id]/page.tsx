@@ -3,10 +3,10 @@
 import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
-  History, Pill, Calendar, CalendarPlus, ClipboardList, Edit3, 
-  PlusCircle, CheckCircle2, Activity, FileArchive, Clock, 
+  History, Pill, Edit3, 
+  CheckCircle2, Activity, FileArchive, Clock, 
   Loader2, Stethoscope, Heart, Scale, Sparkles,
-  Phone, MapPin, User, ChevronRight, Target
+  Phone, MapPin, Target
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -278,15 +278,15 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
               <div className="space-y-6">
                 <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm w-max">
                   {[
-                    { id: "timeline", label: "Clinical Timeline", icon: History },
-                    { id: "management", label: "Remedy History", icon: Pill },
+                    { id: "timeline", label: "Timeline", icon: History },
+                    { id: "management", label: "Medications", icon: Pill },
                   ].map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
                     return (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tab.id as "timeline" | "management")}
                         className={clsx(
                           "px-6 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest flex items-center gap-2.5 transition-all",
                           isActive ? "bg-slate-900 text-white shadow-md shadow-slate-200" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChronicCase } from "@/types/chronicCase";
 import ChronicCaseStepper from "./ChronicCaseStepper";
@@ -54,12 +54,6 @@ export default function ChronicCaseWizard({
   const { user } = useAuthStore();
   const aiEnabled = user?.clinic?.aiEnabled ?? true;
 
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [caseData, setCaseData] = useState<Partial<ChronicCase>>({
-    patient: patientId || "",
-    status: "Draft",
-  });
-
   // Load existing case if caseId provided (edit mode)
   const { data: fetchedCase, isLoading: caseLoading } = useQuery({
     queryKey: ["chronicCase", caseId],
@@ -67,11 +61,18 @@ export default function ChronicCaseWizard({
     enabled: !!caseId,
   });
 
-  useEffect(() => {
-    if (fetchedCase) {
-      setCaseData(fetchedCase);
-    }
-  }, [fetchedCase]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [caseData, setCaseData] = useState<Partial<ChronicCase>>({
+    patient: patientId || "",
+    status: "Draft",
+  });
+
+  // Sync when fetchedCase arrives (only once or when caseId changes)
+  const [lastFetchedId, setLastFetchedId] = useState<string | null>(null);
+  if (fetchedCase && fetchedCase._id !== lastFetchedId) {
+    setCaseData(fetchedCase);
+    setLastFetchedId(fetchedCase._id || null);
+  }
 
   // Filter steps based on conditions
   const filteredSteps = allSteps.filter((step) => {

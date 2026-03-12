@@ -248,6 +248,7 @@ export function PatientsList({ patients }: PatientsListProps) {
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Purpose of Visit / Symptoms</label>
                 <Textarea 
+                  label=""
                   {...register("symptoms", { 
                     required: "Symptoms are required",
                     minLength: { value: 3, message: "Please enter at least 3 characters" }

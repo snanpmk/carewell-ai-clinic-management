@@ -27,8 +27,14 @@ interface PrescriptionData {
   advice?: string;
 }
 
+interface jsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: {
+    finalY: number;
+  };
+}
+
 export const generatePrescriptionPDF = (data: PrescriptionData) => {
-  const doc = new jsPDF();
+  const doc = new jsPDF() as jsPDFWithAutoTable;
   const pageWidth = doc.internal.pageSize.getWidth();
   
   // 1. Header (Clinic Information)
@@ -153,13 +159,10 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
       4: { cellWidth: 20 },
       5: { cellWidth: 'auto' },
     },
-    didDrawPage: (dataArg) => {
-      // Keep track of Y position for next elements
-      currentY = dataArg.cursor ? dataArg.cursor.y : currentY;
-    }
   });
 
-  currentY = (doc as any).lastAutoTable.finalY + 15;
+  const finalY = doc.lastAutoTable?.finalY || currentY;
+  currentY = finalY + 15;
 
   // Check for page overflow before drawing Advice
   if (currentY > 240) {

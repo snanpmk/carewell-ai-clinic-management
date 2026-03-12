@@ -15,6 +15,7 @@ interface User {
   profileImage?: string;
   role?: string;
   clinic: Clinic;
+  licenseNumber?: string;
 }
 
 interface AuthState {

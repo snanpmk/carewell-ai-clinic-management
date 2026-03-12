@@ -1,7 +1,7 @@
 "use client";
 
 import { UnifiedVisitItem } from "./PatientProfileTimeline";
-import { Pill, Activity, ArrowRight } from "lucide-react";
+import { Pill } from "lucide-react";
 import { clsx } from "clsx";
 
 interface PatientManagementHistoryProps {
@@ -32,17 +32,25 @@ export function PatientManagementHistory({ visits }: PatientManagementHistoryPro
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">No prescription history found</p>
           </div>
         ) : (
-          prescriptionVisits.map((visit, idx) => {
+          prescriptionVisits.map((visit) => {
             const isChronic = visit.isChronic;
-            let medicineItems: any[] = [];
+            interface MedicineItem {
+              name: string;
+              potency: string;
+              dosage: string;
+              form: string;
+              dose?: string;
+              medicine?: string;
+            }
+            let medicineItems: MedicineItem[] = [];
             
             if (isChronic) {
               const meds = visit.chronicData?.management?.firstPrescription?.medicines || [];
               medicineItems = meds.map(m => ({
-                name: m.medicine,
-                potency: m.potency,
-                dosage: m.dose,
-                form: m.form
+                name: m.medicine || "",
+                potency: m.potency || "",
+                dosage: m.dose || "",
+                form: m.form || ""
               }));
             } else {
               try {
@@ -51,17 +59,17 @@ export function PatientManagementHistory({ visits }: PatientManagementHistoryPro
                   : (Array.isArray(visit.prescription) ? visit.prescription : null);
                 
                 if (Array.isArray(rxArr)) {
-                  medicineItems = rxArr.map((m: any) => ({
-                    name: m.medicine,
-                    potency: m.potency,
-                    dosage: m.dosage || m.dose,
-                    form: m.form
+                  medicineItems = rxArr.map((m: MedicineItem) => ({
+                    name: m.medicine || m.name || "",
+                    potency: m.potency || "",
+                    dosage: m.dosage || m.dose || "",
+                    form: m.form || ""
                   }));
                 } else {
-                  medicineItems = [{ name: visit.prescription, potency: "", dosage: "", form: "" }];
+                  medicineItems = [{ name: visit.prescription || "", potency: "", dosage: "", form: "" }];
                 }
-              } catch (e) {
-                medicineItems = [{ name: visit.prescription, potency: "", dosage: "", form: "" }];
+              } catch {
+                medicineItems = [{ name: visit.prescription || "", potency: "", dosage: "", form: "" }];
               }
             }
 
@@ -117,11 +125,6 @@ export function PatientManagementHistory({ visits }: PatientManagementHistoryPro
                         <div className="flex items-center gap-2">
                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Prescribed by Dr. {visit.doctorId?.name || visit.doctor?.name || "Practitioner"}</span>
                         </div>
-                        {idx < prescriptionVisits.length - 1 && (
-                          <div className="flex items-center gap-2 text-brand-primary animate-pulse opacity-50">
-                            <ArrowRight className="w-3.5 h-3.5 rotate-90 md:rotate-0" />
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
