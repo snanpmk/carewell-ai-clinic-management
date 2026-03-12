@@ -1,14 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Plus, UserPlus, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useAuthStore } from "@/store/useAuthStore";
 import { format } from "date-fns";
 
 export function DashboardHeader() {
   const router = useRouter();
-  const { user } = useAuthStore();
   const today = new Date();
 
   return (

@@ -2,12 +2,11 @@
 
 import { ChronicCase } from "@/types/chronicCase";
 import { 
-  User, Activity, ClipboardList, History, Brain, 
+  Activity, ClipboardList, Brain, 
   Thermometer, ShieldCheck, Pill, Microscope, 
-  MapPin, Baby, Heart, Zap, FileText, Stethoscope,
+  Baby, Stethoscope,
   ShieldAlert
 } from "lucide-react";
-import { clsx } from "clsx";
 
 interface ChronicCaseDetailsProps {
   data: ChronicCase;

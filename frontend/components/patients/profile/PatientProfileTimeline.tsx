@@ -404,7 +404,7 @@ export function PatientProfileTimeline({ visits, patient }: PatientProfileTimeli
                           </div>
                         ));
                       }
-                    } catch (e) {
+                    } catch {
                       // ignore
                     }
 

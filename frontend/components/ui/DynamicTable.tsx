@@ -4,7 +4,7 @@ import { useFieldArray, Control, UseFormRegister, FieldValues, ArrayPath, FieldA
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "./Button";
 
-interface Column<T extends FieldValues> {
+interface Column {
   header: string;
   accessor: string; 
   placeholder?: string;
@@ -15,7 +15,7 @@ interface DynamicTableProps<T extends FieldValues> {
   control: Control<T>;
   register: UseFormRegister<T>;
   name: ArrayPath<T>;
-  columns: Column<T>[];
+  columns: Column[];
   label: string;
   addLabel?: string;
   emptyRow: FieldArray<T, ArrayPath<T>>;

@@ -4,8 +4,6 @@ import { useForm } from "react-hook-form";
 import { StepProps } from "../ChronicCaseWizard";
 import { ChronicCase } from "@/types/chronicCase";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
-import { Textarea } from "@/components/ui/Textarea";
 import { DynamicTable } from "@/components/ui/DynamicTable";
 import StepLayout from "../StepLayout";
 import { Calendar, Baby, Activity } from "lucide-react";

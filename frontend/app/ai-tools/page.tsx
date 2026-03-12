@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, FileSearch, Mic, FileText, ArrowRight } from "lucide-react";
+import { FileSearch, Mic, FileText, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function AIToolsPage() {

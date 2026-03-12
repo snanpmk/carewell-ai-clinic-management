@@ -1,6 +1,5 @@
 "use client";
 
-import { Users, ClipboardList, CalendarCheck, TrendingUp, TrendingDown, Minus, Activity } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { clsx } from "clsx";
 
@@ -11,49 +10,6 @@ interface DashboardStatsGridProps {
 }
 
 export function DashboardStatsGrid({ totalPatients, totalConsultations, appointmentsToday }: DashboardStatsGridProps) {
-  const stats = [
-    { 
-      label: "Total Registry", 
-      value: totalPatients.toLocaleString(), 
-      icon: <Users className="w-5 h-5" />,
-      color: "text-brand-primary",
-      bg: "bg-brand-primary/10",
-      trend: "+12",
-      trendLabel: "New this month",
-      trendType: "up"
-    },
-    { 
-      label: "Clinical Notes", 
-      value: totalConsultations.toLocaleString(), 
-      icon: <ClipboardList className="w-5 h-5" />,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50",
-      trend: "+5",
-      trendLabel: "Since yesterday",
-      trendType: "up"
-    },
-    { 
-      label: "Appointments Today", 
-      value: appointmentsToday.toLocaleString(), 
-      icon: <CalendarCheck className="w-5 h-5" />,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
-      trend: appointmentsToday > 0 ? "Active" : "Quiet",
-      trendLabel: "Daily volume",
-      trendType: appointmentsToday > 0 ? "neutral" : "down"
-    },
-    { 
-      label: "Care Continuity", 
-      value: `${Math.floor((totalConsultations * 0.3) / (totalConsultations || 1) * 100)}%`, 
-      icon: <TrendingUp className="w-5 h-5" />,
-      color: "text-brand-accent",
-      bg: "bg-brand-accent/10",
-      trend: "Optimal",
-      trendLabel: "Patient retention",
-      trendType: "up"
-    },
-  ];
-
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

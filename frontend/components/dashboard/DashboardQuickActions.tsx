@@ -3,15 +3,12 @@
 import { useRouter } from "next/navigation";
 import { 
   Users, 
-  Search, 
   Settings, 
   BarChart3, 
   FileText, 
   BrainCircuit,
-  MessageSquare,
   Stethoscope
 } from "lucide-react";
-import { Card } from "@/components/ui/Card";
 
 export function DashboardQuickActions() {
   const router = useRouter();

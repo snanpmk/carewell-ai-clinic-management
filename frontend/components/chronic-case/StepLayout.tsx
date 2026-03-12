@@ -19,7 +19,6 @@ interface StepLayoutProps {
   isLastStep?: boolean;
   headerActions?: ReactNode;
   customActions?: ReactNode;
-  error?: string;
 }
 
 export default function StepLayout({
@@ -37,7 +36,6 @@ export default function StepLayout({
   isLastStep = false,
   headerActions,
   customActions,
-  error,
 }: StepLayoutProps) {
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-500">

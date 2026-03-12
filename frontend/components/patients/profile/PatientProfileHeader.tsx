@@ -2,16 +2,12 @@
 
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { useAuthStore } from "@/store/useAuthStore";
 
 interface PatientProfileHeaderProps {
   patientId: string;
 }
 
-export function PatientProfileHeader({ patientId }: PatientProfileHeaderProps) {
-  const { user } = useAuthStore();
-  const isStaff = user?.role === "staff";
-
+export function PatientProfileHeader({}: PatientProfileHeaderProps) {
   return (
     <div className="flex items-center gap-5 sm:gap-6 shrink-0">
       <Link 

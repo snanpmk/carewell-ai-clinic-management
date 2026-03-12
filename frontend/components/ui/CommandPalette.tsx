@@ -7,7 +7,6 @@ import { getAllPatients } from "@/services/patientService";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuthStore } from "@/store/useAuthStore";
 
 interface Patient {
   _id: string;
@@ -19,8 +18,6 @@ interface Patient {
 export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const router = useRouter();
-  const { user } = useAuthStore();
-  const aiEnabled = user?.clinic?.aiEnabled ?? true;
 
   const { data: response, isLoading } = useQuery({
     queryKey: ["patients"],

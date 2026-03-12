@@ -1,7 +1,6 @@
 "use client";
 
 import { clsx } from "clsx";
-import { Plus, X } from "lucide-react";
 
 interface BadgeSelectProps {
   options: string[];

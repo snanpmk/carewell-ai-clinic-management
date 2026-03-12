@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { DayPicker, DayProps } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { format, isSameDay, isToday } from "date-fns";
 import { Card } from "@/components/ui/Card";
 import { DashboardConsultationItem } from "./DashboardRecentActivity";
 import { clsx } from "clsx";
-import { Calendar as CalendarIcon, Users, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, Clock } from "lucide-react";
 
 interface DashboardCalendarProps {
   consultations: DashboardConsultationItem[];
@@ -70,7 +70,7 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
             components={{
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               DayButton: (props: any) => {
-                const { day, modifiers, className, ...buttonProps } = props;
+                const { day, modifiers, ...buttonProps } = props;
                 const dateKey = format(day.date, "yyyy-MM-dd");
                 const count = appointmentCounts[dateKey] || 0;
 

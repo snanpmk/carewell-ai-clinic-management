@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck, Lock, EyeOff, Server, ArrowLeft, Globe } from "lucide-react";
+import { ShieldCheck, Lock, EyeOff, Server, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 
 export default function PrivacyPage() {

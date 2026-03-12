@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ClipboardCheck, Zap, UserCheck, Scale, ArrowLeft, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
+import { Zap, Scale, ArrowLeft, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 
 export default function ProtocolPage() {

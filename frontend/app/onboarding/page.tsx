@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
-import { User, Phone, ArrowRight, UserPlus, Sparkles } from "lucide-react";
+import { User, Phone, ArrowRight, Sparkles } from "lucide-react";
 
 // ── Validation Schema ──────────────────────────────────────────────────────
 const schema = z.object({

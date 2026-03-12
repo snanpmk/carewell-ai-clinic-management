@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, MapPin, User, Stethoscope, FilePlus } from "lucide-react";
+import { Phone, MapPin, Stethoscope, FilePlus } from "lucide-react";
 import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,6 @@ export function PatientProfileInfoCard({
   patient,
   patientId,
   visitsCount,
-  chronicCount,
   bp,
 }: PatientProfileInfoCardProps) {
   const { privacyMode } = useUIStore();

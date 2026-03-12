@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { Suspense, useEffect } from "react";
-import { Sparkles, Save, User, FileText, Loader2, Activity, Pill, Trash2, Plus, Printer } from "lucide-react";
+import { Sparkles, Save, FileText, Loader2, Activity, Pill, Trash2, Plus, Printer } from "lucide-react";
 import { useForm, useWatch, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -190,10 +190,6 @@ function ConsultationForm() {
       saveMutation.reset();
     }
   });
-
-  const onFormError = () => {
-    toast.error("Required fields missing: Please provide Symptoms and a valid Prescription.");
-  };
 
   const onGenerate = (data: FormData) => {
     if (aiEnabled) {

@@ -4,9 +4,9 @@ import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   History, Pill, Edit3, 
-  CheckCircle2, Activity, FileArchive, Clock, 
+  Activity, Clock, 
   Loader2, Stethoscope, Heart, Scale, Sparkles,
-  Phone, MapPin, Target
+  Phone, MapPin
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

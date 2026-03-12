@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Search, Filter, Loader2, FileText, ChevronRight, Stethoscope, Printer, Clock } from "lucide-react";
+import { Calendar, Search, Loader2, FileText, ChevronRight, Printer, Clock } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -36,8 +36,8 @@ export default function AppointmentsPage() {
     prescription?: string;
     status?: "Scheduled" | "In-Progress" | "Completed";
     opNumber?: string;
-    aiGeneratedNotes?: string | Record<string, any>;
-    doctorEditedNotes?: string | Record<string, any>;
+    aiGeneratedNotes?: string | Record<string, unknown>;
+    doctorEditedNotes?: string | Record<string, unknown>;
     patientId?: {
       _id: string;
       name: string;
@@ -110,7 +110,7 @@ export default function AppointmentsPage() {
            });
            prescriptions = items;
         }
-      } catch (e) {
+      } catch {
         prescriptions = [{ medicine: p, potency: "", form: "", dosage: "" }];
       }
     }
@@ -135,7 +135,7 @@ export default function AppointmentsPage() {
     });
   };
 
-  const allConsultations = response?.data || [];
+  const allConsultations: ConsultationRecord[] = response?.data || [];
 
   const filteredConsultations = allConsultations.filter((apt: ConsultationRecord) => {
     const query = searchQuery.toLowerCase();
@@ -232,7 +232,7 @@ export default function AppointmentsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredConsultations.map((apt) => (
+                  filteredConsultations.map((apt: ConsultationRecord) => (
                     <tr key={apt._id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">

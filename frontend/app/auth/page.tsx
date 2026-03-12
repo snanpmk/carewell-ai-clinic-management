@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, UploadCloud, ShieldCheck, Zap } from "lucide-react";
+import { Loader2, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";

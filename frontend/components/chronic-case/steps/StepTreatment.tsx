@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { treatmentSchema, TreatmentFormData } from "@/lib/validations/chronicCase";
 import { useEffect } from "react";
 
-export default function StepTreatment({ caseData, nextStep, prevStep }: StepProps) {
+export default function StepTreatment({ caseData, prevStep }: StepProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [submitStatus, setSubmitStatus] = useState<"Draft" | "Active" | "Completed">("Active");
