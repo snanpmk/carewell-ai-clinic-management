@@ -6,6 +6,7 @@ const {
   getPatientChronicCases,
   updateChronicCase,
   deleteChronicCase,
+  addFollowUp,
 } = require("../controllers/chronicCaseController");
 const { protect } = require("../middleware/auth");
 
@@ -20,6 +21,9 @@ router.get("/patient/:patientId", protect, getPatientChronicCases);
 
 // @route   PUT /api/chronicCases/:id
 router.put("/:id", protect, updateChronicCase);
+
+// @route   POST /api/chronicCases/:id/followup
+router.post("/:id/followup", protect, addFollowUp);
 
 // @route   DELETE /api/chronicCases/:id
 router.delete("/:id", protect, deleteChronicCase);

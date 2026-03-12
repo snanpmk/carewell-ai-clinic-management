@@ -15,7 +15,7 @@ const ChronicCaseSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Draft", "Completed"],
+      enum: ["Draft", "Active", "Completed", "Closed"],
       default: "Draft",
     },
 

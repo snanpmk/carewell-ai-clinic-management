@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChronicCase } from "@/types/chronicCase";
 import ChronicCaseStepper from "./ChronicCaseStepper";
 import { useAuthStore } from "@/store/useAuthStore";
+import { getChronicCase } from "@/services/chronicCaseService";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 import StepAdministration from "./steps/StepAdministration";
 import StepInitialPresentation from "./steps/StepInitialPresentation";
@@ -41,7 +44,13 @@ const allSteps = [
   { id: "treatment", title: "Plan & Prescription", component: StepTreatment },
 ];
 
-export default function ChronicCaseWizard({ patientId }: { patientId?: string }) {
+export default function ChronicCaseWizard({
+  patientId,
+  caseId,
+}: {
+  patientId?: string;
+  caseId?: string;
+}) {
   const { user } = useAuthStore();
   const aiEnabled = user?.clinic?.aiEnabled ?? true;
 
@@ -51,11 +60,22 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
     status: "Draft",
   });
 
+  // Load existing case if caseId provided (edit mode)
+  const { data: fetchedCase, isLoading: caseLoading } = useQuery({
+    queryKey: ["chronicCase", caseId],
+    queryFn: () => getChronicCase(caseId!),
+    enabled: !!caseId,
+  });
+
+  useEffect(() => {
+    if (fetchedCase) {
+      setCaseData(fetchedCase);
+    }
+  }, [fetchedCase]);
+
   // Filter steps based on conditions
-  const filteredSteps = allSteps.filter(step => {
-    // 1. Hide AI step if disabled
+  const filteredSteps = allSteps.filter((step) => {
     if (step.id === "ai" && !aiEnabled) return false;
-    // 2. Hide Female History if patient is Male
     if (step.id === "female" && caseData.demographics?.sex === "Male") return false;
     return true;
   });
@@ -63,27 +83,37 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
   const nextStep = () => {
     if (currentStepIndex < filteredSteps.length - 1) {
       setCurrentStepIndex((prev) => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const prevStep = () => {
     if (currentStepIndex > 0) {
       setCurrentStepIndex((prev) => prev - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const goToStep = (index: number) => {
     setCurrentStepIndex(index);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const updateCaseData = (updates: Partial<ChronicCase>) => {
     setCaseData((prev) => ({ ...prev, ...updates }));
   };
 
+  if (caseId && caseLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-slate-400">
+        <Loader2 className="w-10 h-10 animate-spin text-brand-primary mb-4" />
+        <p className="text-sm font-medium">Loading case record…</p>
+      </div>
+    );
+  }
+
   const ActiveStep = filteredSteps[currentStepIndex].component;
+  const isEditMode = !!caseData._id;
 
   return (
     <div className="flex flex-col mx-auto w-full space-y-6 animate-in fade-in duration-500 pb-8">
@@ -93,18 +123,29 @@ export default function ChronicCaseWizard({ patientId }: { patientId?: string })
           <span className="eyebrow text-brand-primary/70">Clinical Intelligence</span>
         </div>
         <h1 className="text-3xl font-light text-slate-900 tracking-tight">
-          Chronic Case <span className="font-semibold text-brand-primary">Builder</span>
+          {isEditMode ? (
+            <>
+              Edit Case{" "}
+              <span className="font-semibold text-brand-primary">Record</span>
+            </>
+          ) : (
+            <>
+              Chronic Case <span className="font-semibold text-brand-primary">Builder</span>
+            </>
+          )}
         </h1>
         <p className="text-sm text-slate-500 max-w-md leading-relaxed">
-          Initialize a standardized clinical record with AI-assisted symptom synthesis.
+          {isEditMode
+            ? "Update the patient's chronic case record. Navigate between sections freely."
+            : "Initialize a standardized clinical record with AI-assisted symptom synthesis."}
         </p>
       </div>
 
-      <ChronicCaseStepper 
-        steps={filteredSteps} 
-        currentStepIndex={currentStepIndex} 
+      <ChronicCaseStepper
+        steps={filteredSteps}
+        currentStepIndex={currentStepIndex}
         onStepClick={goToStep}
-        isUpdateMode={!!caseData._id}
+        isUpdateMode={isEditMode}
       />
 
       <div className="w-full">

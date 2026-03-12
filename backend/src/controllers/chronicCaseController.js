@@ -98,6 +98,33 @@ const updateChronicCase = async (req, res) => {
 };
 
 /**
+ * @desc    Add a follow-up entry to a chronic case
+ * @route   POST /api/chronicCases/:id/followup
+ * @access  Private
+ */
+const addFollowUp = async (req, res) => {
+  try {
+    const { date, symptomChanges, interference, prescription } = req.body;
+    const updatedCase = await ChronicCase.findByIdAndUpdate(
+      req.params.id,
+      {
+        $push: {
+          followUps: { date: date || new Date(), symptomChanges, interference, prescription },
+        },
+      },
+      { new: true }
+    );
+    if (!updatedCase) {
+      return res.status(404).json({ success: false, error: "Chronic case not found" });
+    }
+    res.json({ success: true, data: updatedCase });
+  } catch (error) {
+    console.error("Error adding follow-up:", error);
+    res.status(500).json({ success: false, error: "Failed to add follow-up" });
+  }
+};
+
+/**
  * @desc    Delete a chronic case
  * @route   DELETE /api/chronicCases/:id
  * @access  Private
@@ -121,4 +148,5 @@ module.exports = {
   getPatientChronicCases,
   updateChronicCase,
   deleteChronicCase,
+  addFollowUp,
 };

@@ -1,13 +1,14 @@
 "use client";
 
 import { useForm, useFieldArray } from "react-hook-form";
+import { useState } from "react";
 import { StepProps } from "../ChronicCaseWizard";
 import { ChronicCase } from "@/types/chronicCase";
 import { createChronicCase, updateChronicCase } from "@/services/chronicCaseService";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Pill, ShieldAlert, Save, Plus, Trash2 } from "lucide-react";
+import { Pill, ShieldAlert, Save, Plus, Trash2, Activity, Archive } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +20,7 @@ import { treatmentSchema, TreatmentFormData } from "@/lib/validations/chronicCas
 export default function StepTreatment({ caseData, nextStep, prevStep }: StepProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [submitStatus, setSubmitStatus] = useState<"Draft" | "Active" | "Completed">("Active");
 
   const { register, handleSubmit, control, formState: { isSubmitting, errors } } = useForm<TreatmentFormData>({
     resolver: zodResolver(treatmentSchema),
@@ -62,7 +64,7 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
   });
 
   const onSubmit = (data: TreatmentFormData) => {
-    const finalizedCase = { ...caseData, ...data, status: "Completed" as const };
+    const finalizedCase = { ...caseData, ...data, status: submitStatus as ChronicCase["status"] };
     saveMutation.mutate(finalizedCase);
   };
 
@@ -77,9 +79,46 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
         subtitle="Management strategy and initial prescription details"
         onBack={prevStep}
         isLastStep
-        isSubmitting={isSubmitting}
+        isSubmitting={isSubmitting || saveMutation.isPending}
         nextLabel={caseData._id ? "Update Case" : "Complete Case"}
         nextIcon={<Save className="w-4 h-4" />}
+        customActions={
+          <div className="flex flex-wrap gap-3">
+            <Button
+              type="submit"
+              onClick={() => setSubmitStatus("Draft")}
+              variant="outline"
+              size="sm"
+              isLoading={saveMutation.isPending && submitStatus === "Draft"}
+              leftIcon={<Archive className="w-4 h-4" />}
+              className="rounded-xl"
+            >
+              Save Draft
+            </Button>
+            <Button
+              type="submit"
+              onClick={() => setSubmitStatus("Active")}
+              variant="secondary"
+              size="sm"
+              isLoading={saveMutation.isPending && submitStatus === "Active"}
+              leftIcon={<Activity className="w-4 h-4" />}
+              className="rounded-xl"
+            >
+              Activate Case
+            </Button>
+            <Button
+              type="submit"
+              onClick={() => setSubmitStatus("Completed")}
+              variant="primary"
+              size="sm"
+              isLoading={saveMutation.isPending && submitStatus === "Completed"}
+              leftIcon={<Save className="w-4 h-4" />}
+              className="rounded-xl"
+            >
+              {caseData._id ? "Update & Complete" : "Complete Case"}
+            </Button>
+          </div>
+        }
       >
         <div className="space-y-12">
           {/* Plan of Treatment */}

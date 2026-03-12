@@ -137,16 +137,26 @@ export default function AppointmentsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 w-full md:w-auto shrink-0">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto shrink-0">
                       {apt.status === 'Scheduled' && !isStaff ? (
-                        <Button
-                          onClick={() => router.push(`/consultation/acute?patientId=${apt.patientId?._id}&appointmentId=${apt._id}`)}
-                          variant="primary"
-                          className="h-14 px-8 rounded-2xl group/btn bg-brand-primary shadow-lg shadow-brand-primary/20"
-                          rightIcon={<ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />}
-                        >
-                          Complete Consultation
-                        </Button>
+                        <>
+                          <Button
+                            onClick={() => router.push(`/consultation/acute?patientId=${apt.patientId?._id}&appointmentId=${apt._id}`)}
+                            variant="primary"
+                            className="h-12 px-6 rounded-2xl group/btn bg-brand-primary shadow-lg shadow-brand-primary/20 w-full sm:w-auto"
+                            rightIcon={<ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />}
+                          >
+                            Acute
+                          </Button>
+                          <Button
+                            onClick={() => router.push(`/consultation/chronic?patientId=${apt.patientId?._id}`)}
+                            variant="outline"
+                            className="h-12 px-6 rounded-2xl group/btn w-full sm:w-auto"
+                            rightIcon={<ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />}
+                          >
+                            Chronic Case
+                          </Button>
+                        </>
                       ) : (
                         <Button
                           onClick={() => router.push(`/patients/${apt.patientId?._id}`)}

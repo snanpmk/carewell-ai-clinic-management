@@ -2,15 +2,17 @@
 
 import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, User as UserIcon, Fingerprint, History, Pill, Calendar, CalendarPlus } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Heart, User as UserIcon, Fingerprint, History, Pill, Calendar, CalendarPlus, ClipboardList, Edit3, PlusCircle, CheckCircle2, Activity, FileArchive, Clock } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 import { getPatient } from "@/services/patientService";
 import { getConsultationsByPatient, summarizeHistory } from "@/services/consultationService";
-import { getPatientChronicCases } from "@/services/chronicCaseService";
+import { getPatientChronicCases, addFollowUp, FollowUpEntry } from "@/services/chronicCaseService";
 import { ChronicCase } from "@/types/chronicCase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUIStore } from "@/store/useUIStore";
 import { clsx } from "clsx";
+import { toast } from "sonner";
 
 import { PatientProfileHeader } from "@/components/patients/profile/PatientProfileHeader";
 import { PatientProfileInfoCard } from "@/components/patients/profile/PatientProfileInfoCard";
@@ -27,7 +29,8 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const aiEnabled = user?.clinic?.aiEnabled ?? true;
   const { privacyMode } = useUIStore();
   
-  const [activeTab, setActiveTab] = useState<"timeline" | "management">("timeline");
+  const [activeTab, setActiveTab] = useState<"timeline" | "management" | "chronicCases">("timeline");
+  const [followUpModalCaseId, setFollowUpModalCaseId] = useState<string | null>(null);
 
   const { data: patientRes, isLoading: patientLoading } = useQuery({
     queryKey: ["patient", patientId],
@@ -43,6 +46,8 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
     queryKey: ["chronicCases", patientId],
     queryFn: () => getPatientChronicCases(patientId),
   });
+
+  const chronicCases: ChronicCase[] = chronicRes || [];
 
   const visits = useMemo(() => {
     const acute = consultRes?.data || [];
@@ -69,6 +74,39 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const patient = patientRes?.data;
   const aiSummary = summaryRes?.data;
   const isStaff = user?.role === "staff";
+
+  const queryClient = useQueryClient();
+
+  // Follow-up form
+  const followUpForm = useForm<FollowUpEntry>({
+    defaultValues: { symptomChanges: "", interference: "", prescription: "", date: "" }
+  });
+  const followUpMutation = useMutation({
+    mutationFn: (data: FollowUpEntry) => addFollowUp(followUpModalCaseId!, data),
+    onSuccess: () => {
+      toast.success("Follow-up entry saved!");
+      queryClient.invalidateQueries({ queryKey: ["chronicCases", patientId] });
+      setFollowUpModalCaseId(null);
+      followUpForm.reset();
+    },
+    onError: () => toast.error("Failed to save follow-up."),
+  });
+
+  // Status badge helper
+  const statusBadge = (status: ChronicCase["status"]) => {
+    const map = {
+      Draft: { label: "Draft", icon: <FileArchive className="w-3 h-3" />, cls: "bg-slate-100 text-slate-500" },
+      Active: { label: "Active", icon: <Activity className="w-3 h-3" />, cls: "bg-emerald-50 text-emerald-600" },
+      Completed: { label: "Completed", icon: <CheckCircle2 className="w-3 h-3" />, cls: "bg-blue-50 text-blue-600" },
+      Closed: { label: "Closed", icon: <Clock className="w-3 h-3" />, cls: "bg-red-50 text-red-400" },
+    };
+    const s = map[status] ?? map["Draft"];
+    return (
+      <span className={clsx("inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full", s.cls)}>
+        {s.icon}{s.label}
+      </span>
+    );
+  };
 
   const bmi = useMemo(() => {
     const vitals = latestChronicCase?.physicalExamination?.vitals;
@@ -296,13 +334,106 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                     >
                       <Pill className="w-3.5 h-3.5" /> Management Flow
                     </button>
+                    <button
+                      onClick={() => setActiveTab("chronicCases")}
+                      className={clsx(
+                        "px-8 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 flex items-center gap-2",
+                        activeTab === "chronicCases" 
+                          ? "bg-white text-slate-900 shadow-xl border border-slate-100" 
+                          : "text-slate-400 hover:text-slate-600"
+                      )}
+                    >
+                      <ClipboardList className="w-3.5 h-3.5" /> Chronic Cases
+                      {chronicCases.length > 0 && (
+                        <span className="bg-brand-primary text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                          {chronicCases.length}
+                        </span>
+                      )}
+                    </button>
                   </div>
 
                   <div className="animate-in fade-in zoom-in-95 duration-500">
                     {activeTab === "timeline" ? (
                       <PatientProfileTimeline visits={unifiedVisits} />
-                    ) : (
+                    ) : activeTab === "management" ? (
                       <PatientManagementHistory visits={unifiedVisits} />
+                    ) : (
+                      /* Chronic Cases Tab */
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Chronic Case Records</h3>
+                          <button
+                            onClick={() => router.push(`/consultation/chronic?patientId=${patientId}`)}
+                            className="inline-flex items-center gap-1.5 text-[10px] font-bold text-brand-primary hover:text-brand-primary/80 uppercase tracking-wider transition-colors"
+                          >
+                            <PlusCircle className="w-3.5 h-3.5" /> New Case
+                          </button>
+                        </div>
+
+                        {chronicCases.length === 0 ? (
+                          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
+                            <ClipboardList className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                            <p className="text-sm font-medium text-slate-400">No chronic case records yet.</p>
+                            <button
+                              onClick={() => router.push(`/consultation/chronic?patientId=${patientId}`)}
+                              className="mt-4 text-xs text-brand-primary font-semibold hover:underline"
+                            >
+                              Start First Chronic Case →
+                            </button>
+                          </div>
+                        ) : (
+                          chronicCases.map((c) => (
+                            <div key={c._id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-3 mb-2">
+                                    {statusBadge(c.status)}
+                                    <span className="text-[10px] text-slate-400 font-medium">
+                                      {new Date(c.createdAt!).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                                    </span>
+                                  </div>
+                                  <p className="text-base font-semibold text-slate-900 truncate">
+                                    {c.summaryDiagnosis?.diseaseDiagnosis || c.analysisAndDiagnosis?.finalDiagnosis?.disease || "Diagnosis not recorded"}
+                                  </p>
+                                  {c.header?.opNumber && (
+                                    <p className="text-xs text-slate-400 mt-1">OP: {c.header.opNumber}</p>
+                                  )}
+                                  {c.followUps && c.followUps.length > 0 && (
+                                    <p className="text-xs text-slate-400 mt-1">{c.followUps.length} follow-up{c.followUps.length > 1 ? "s" : ""} recorded</p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <button
+                                    onClick={() => setFollowUpModalCaseId(c._id!)}
+                                    className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl transition-all"
+                                  >
+                                    <PlusCircle className="w-3 h-3" /> Follow-Up
+                                  </button>
+                                  <button
+                                    onClick={() => router.push(`/consultation/chronic?patientId=${patientId}&caseId=${c._id}`)}
+                                    className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary hover:text-brand-primary/80 bg-brand-primary/5 hover:bg-brand-primary/10 px-3 py-1.5 rounded-xl transition-all"
+                                  >
+                                    <Edit3 className="w-3 h-3" /> Edit
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Follow-Ups inline */}
+                              {c.followUps && c.followUps.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 gap-2">
+                                  {c.followUps.slice(-3).map((fu, i) => (
+                                    <div key={i} className="text-xs text-slate-500 flex items-start gap-3">
+                                      <span className="text-slate-300 font-mono shrink-0">{fu.date ? new Date(fu.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "—"}</span>
+                                      <span className="flex-1">{fu.symptomChanges}</span>
+                                      {fu.prescription && <span className="text-brand-primary font-semibold shrink-0">{fu.prescription}</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
                     )}
                   </div>
                 </>
@@ -310,6 +441,70 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </>
+      )}
+
+      {/* Follow-Up Modal */}
+      {followUpModalCaseId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4 animate-in zoom-in-95 duration-300">
+            <h2 className="text-xl font-semibold text-slate-900 mb-1">Add Follow-Up</h2>
+            <p className="text-xs text-slate-400 font-medium mb-6">Record a progress visit for this chronic case.</p>
+            <form
+              onSubmit={followUpForm.handleSubmit((data) => followUpMutation.mutate(data))}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Date</label>
+                <input
+                  type="date"
+                  {...followUpForm.register("date")}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Symptom Changes <span className="text-red-400">*</span></label>
+                <textarea
+                  {...followUpForm.register("symptomChanges", { required: true })}
+                  rows={3}
+                  placeholder="Describe changes since last visit…"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand-primary resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">Interference</label>
+                <input
+                  {...followUpForm.register("interference")}
+                  placeholder="Any intercurrent illness, drug changes…"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5">New Prescription</label>
+                <input
+                  {...followUpForm.register("prescription")}
+                  placeholder="e.g. Sulphur 200c / continue"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand-primary"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setFollowUpModalCaseId(null); followUpForm.reset(); }}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={followUpMutation.isPending}
+                  className="flex-1 py-2.5 rounded-xl bg-brand-primary text-white text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+                >
+                  {followUpMutation.isPending ? "Saving…" : "Save Follow-Up"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

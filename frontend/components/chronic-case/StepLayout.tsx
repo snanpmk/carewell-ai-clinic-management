@@ -18,6 +18,7 @@ interface StepLayoutProps {
   isFirstStep?: boolean;
   isLastStep?: boolean;
   headerActions?: ReactNode;
+  customActions?: ReactNode;
   error?: string;
 }
 
@@ -35,6 +36,7 @@ export default function StepLayout({
   isFirstStep = false,
   isLastStep = false,
   headerActions,
+  customActions,
   error,
 }: StepLayoutProps) {
   return (
@@ -72,18 +74,22 @@ export default function StepLayout({
             {backLabel}
           </Button>
         )}
-        <Button
-          type={onNext ? "button" : "submit"}
-          onClick={onNext}
-          variant="primary"
-          size="md"
-          rightIcon={!isSubmitting && !isLastStep ? nextIcon : undefined}
-          leftIcon={isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLastStep ? nextIcon : undefined)}
-          isLoading={isSubmitting}
-          className={isLastStep ? "shadow-2xl shadow-brand-primary/20 min-w-[160px]" : "min-w-[160px]"}
-        >
-          {nextLabel}
-        </Button>
+        {customActions ? (
+          customActions
+        ) : (
+          <Button
+            type={onNext ? "button" : "submit"}
+            onClick={onNext}
+            variant="primary"
+            size="md"
+            rightIcon={!isSubmitting && !isLastStep ? nextIcon : undefined}
+            leftIcon={isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLastStep ? nextIcon : undefined)}
+            isLoading={isSubmitting}
+            className={isLastStep ? "shadow-2xl shadow-brand-primary/20 min-w-[160px]" : "min-w-[160px]"}
+          >
+            {nextLabel}
+          </Button>
+        )}
       </div>
     </div>
   );

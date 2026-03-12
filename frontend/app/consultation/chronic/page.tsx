@@ -7,14 +7,16 @@ import { useSearchParams } from "next/navigation";
 function ChronicCasePageContent() {
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
+  const caseId = searchParams.get("caseId");
 
   return (
     <div className="flex-1 w-full p-4 md:p-6 pb-24 md:pb-8 flex flex-col h-full overflow-hidden">
       <div className="w-full flex-1 flex flex-col min-h-0 relative">
-       
-
         <div className="flex-1 overflow-y-auto no-scrollbar">
-          <ChronicCaseWizard patientId={patientId || undefined} />
+          <ChronicCaseWizard
+            patientId={patientId || undefined}
+            caseId={caseId || undefined}
+          />
         </div>
       </div>
     </div>
@@ -28,3 +30,4 @@ export default function ChronicCasePage() {
     </Suspense>
   );
 }
+

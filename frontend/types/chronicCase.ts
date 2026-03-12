@@ -1,7 +1,7 @@
 export interface ChronicCase {
   _id?: string;
   patient: string;
-  status: "Draft" | "Completed";
+  status: "Draft" | "Active" | "Completed" | "Closed";
   createdAt?: string;
   updatedAt?: string;
 
