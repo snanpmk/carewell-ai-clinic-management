@@ -137,7 +137,7 @@ export default function AppointmentsPage() {
 
   const allConsultations: ConsultationRecord[] = response?.data || [];
 
-  const filteredConsultations = allConsultations.filter((apt: ConsultationRecord) => {
+  const filteredConsultations: ConsultationRecord[] = allConsultations.filter((apt: ConsultationRecord) => {
     const query = searchQuery.toLowerCase();
     const matchesSearch = 
       (apt.patientId?.name || "").toLowerCase().includes(query) ||

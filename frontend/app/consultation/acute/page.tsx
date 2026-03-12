@@ -165,9 +165,12 @@ function ConsultationForm() {
 
   const aiNotes = generateMutation.data?.success ? generateMutation.data.data : null;
 
+  interface SavePayload extends FormData {
+    id?: string;
+  }
+
   const saveMutation = useMutation({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutationFn: (payload: any) => {
+    mutationFn: (payload: SavePayload) => {
       if (payload.id) {
         const { id, ...data } = payload;
         return updateConsultation(id, { ...data, status: "Completed" });

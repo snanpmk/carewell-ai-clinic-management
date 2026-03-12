@@ -68,8 +68,7 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
             }}
             className="p-0 m-0 w-full"
             components={{
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              DayButton: (props: any) => {
+              DayButton: (props) => {
                 const { day, modifiers, ...buttonProps } = props;
                 const dateKey = format(day.date, "yyyy-MM-dd");
                 const count = appointmentCounts[dateKey] || 0;

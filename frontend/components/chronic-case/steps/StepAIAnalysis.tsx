@@ -90,8 +90,7 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
       setValue("homeopathicDiagnosis.differentialConsiderations", result.differentialConsiderations || "");
       setValue("homeopathicDiagnosis.repertorization", result.repertorization || []);
       // Store prescriptionInsight in the homeopathicDiagnosis node
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setValue("homeopathicDiagnosis.prescriptionInsight" as any, result.prescriptionInsight || "");
+      setValue("homeopathicDiagnosis.prescriptionInsight", result.prescriptionInsight || "");
 
       updateCaseData({
         homeopathicDiagnosis: {
@@ -100,8 +99,7 @@ export default function StepAIAnalysis({ caseData, updateCaseData, nextStep, pre
           miasmaticExpression: result.miasmaticExpression,
           differentialConsiderations: result.differentialConsiderations,
           repertorization: result.repertorization,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          prescriptionInsight: result.prescriptionInsight as any,
+          prescriptionInsight: result.prescriptionInsight,
         }
       });
       toast.success("AI synthesis complete — review and refine before proceeding.");
