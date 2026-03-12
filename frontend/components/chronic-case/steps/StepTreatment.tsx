@@ -35,9 +35,11 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
                 medicine: m.medicine || "",
                 potency: m.potency || "",
                 form: m.form || "Pills",
-                dose: m.dose || ""
+                dose: m.dose || "",
+                quantity: m.quantity || "",
+                indication: m.indication || "",
               }))
-            : [{ medicine: "", potency: "", form: "Pills", dose: "" }],
+            : [{ medicine: "", potency: "", form: "Pills", dose: "", quantity: "", indication: "" }],
         },
       }
     }
@@ -154,7 +156,7 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
               </div>
               <Button
                 type="button"
-                onClick={() => append({ medicine: "", potency: "", form: "Pills", dose: "" })}
+                onClick={() => append({ medicine: "", potency: "", form: "Pills", dose: "", quantity: "", indication: "" })}
                 variant="primary"
                 size="sm"
                 className="h-9 rounded-2xl"
@@ -174,56 +176,86 @@ export default function StepTreatment({ caseData, nextStep, prevStep }: StepProp
             <div className="space-y-4">
               {fields.map((field, index) => (
                 <div key={field.id} className="relative group animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-inner">
-                    <div className="md:col-span-4">
-                      <Input 
-                        label={`Medicine ${index + 1}`} 
-                        {...register(`management.firstPrescription.medicines.${index}.medicine` as const)} 
-                        placeholder="Remedy Name"
-                        error={(errors.management?.firstPrescription?.medicines as Array<{ medicine?: { message?: string } }>)?.[index]?.medicine?.message}
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Input 
-                        label="Potency" 
-                        {...register(`management.firstPrescription.medicines.${index}.potency` as const)} 
-                        placeholder="e.g. 200c"
-                        error={(errors.management?.firstPrescription?.medicines as Array<{ potency?: { message?: string } }>)?.[index]?.potency?.message}
-                      />
-                    </div>
-                    <div className="md:col-span-3">
-                      <Select 
-                        label="Form" 
-                        options={[
-                          { label: "Pills / Globules", value: "Pills" },
-                          { label: "Liquid / Droplets", value: "Liquid" },
-                          { label: "Powder / Trituration", value: "Powder" },
-                          { label: "Tablets", value: "Tablets" },
-                          { label: "Mother Tincture", value: "Q" },
-                          { label: "External / Ointment", value: "External" }
-                        ]}
-                        {...register(`management.firstPrescription.medicines.${index}.form` as const)} 
-                        error={(errors.management?.firstPrescription?.medicines as Array<{ form?: { message?: string } }>)?.[index]?.form?.message}
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Input 
-                        label="Dosage" 
-                        {...register(`management.firstPrescription.medicines.${index}.dose` as const)} 
-                        placeholder="e.g. 4 pills TDS"
-                        error={(errors.management?.firstPrescription?.medicines as Array<{ dose?: { message?: string } }>)?.[index]?.dose?.message}
-                      />
-                    </div>
-                    <div className="md:col-span-1 flex items-end justify-center pb-2">
+                  {/* Card */}
+                  <div className="bg-slate-50 rounded-2xl border border-slate-100 shadow-inner overflow-hidden">
+                    {/* Header row: index + remove */}
+                    <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-white">
+                      <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">Rx {index + 1}</span>
                       {fields.length > 1 && (
                         <button
                           type="button"
                           onClick={() => remove(index)}
-                          className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+                          className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       )}
+                    </div>
+
+                    <div className="p-5 space-y-4">
+                      {/* Row 1: Medicine · Potency · Form */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div className="md:col-span-5">
+                          <Input 
+                            label="Medicine / Remedy" 
+                            {...register(`management.firstPrescription.medicines.${index}.medicine` as const)} 
+                            placeholder="e.g. Sulphur, Nux Vomica"
+                            error={(errors.management?.firstPrescription?.medicines as Array<{ medicine?: { message?: string } }>)?.[index]?.medicine?.message}
+                          />
+                        </div>
+                        <div className="md:col-span-3">
+                          <Input 
+                            label="Potency" 
+                            {...register(`management.firstPrescription.medicines.${index}.potency` as const)} 
+                            placeholder="e.g. 200c, 1M, Q"
+                            error={(errors.management?.firstPrescription?.medicines as Array<{ potency?: { message?: string } }>)?.[index]?.potency?.message}
+                          />
+                        </div>
+                        <div className="md:col-span-4">
+                          <Select 
+                            label="Physician Form" 
+                            options={[
+                              { label: "Pills / Globules", value: "Pills" },
+                              { label: "Liquid / Droplets", value: "Liquid" },
+                              { label: "Powder / Trituration", value: "Powder" },
+                              { label: "Tablets", value: "Tablets" },
+                              { label: "Mother Tincture (Q)", value: "Q" },
+                              { label: "External / Ointment", value: "External" },
+                              { label: "Injection", value: "Injection" },
+                            ]}
+                            {...register(`management.firstPrescription.medicines.${index}.form` as const)} 
+                            error={(errors.management?.firstPrescription?.medicines as Array<{ form?: { message?: string } }>)?.[index]?.form?.message}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Row 2: Dose schedule · Quantity */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Input 
+                            label="Dose / Schedule" 
+                            {...register(`management.firstPrescription.medicines.${index}.dose` as const)} 
+                            placeholder="e.g. 4 pills OD, 10 drops TDS"
+                            error={(errors.management?.firstPrescription?.medicines as Array<{ dose?: { message?: string } }>)?.[index]?.dose?.message}
+                          />
+                        </div>
+                        <div>
+                          <Input 
+                            label="Quantity / Supply" 
+                            {...register(`management.firstPrescription.medicines.${index}.quantity` as const)}
+                            placeholder="e.g. 1 dram, 10 ml, 2 weeks supply"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Row 3: Indication */}
+                      <div>
+                        <Input
+                          label="Indication (Why)"
+                          {...register(`management.firstPrescription.medicines.${index}.indication` as const)}
+                          placeholder="Clinical reason — e.g. for chronic skin eruptions with burning, worse at night"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

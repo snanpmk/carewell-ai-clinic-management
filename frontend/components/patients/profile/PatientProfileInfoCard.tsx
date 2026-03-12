@@ -1,73 +1,148 @@
 "use client";
 
-import { User, Phone, MapPin } from "lucide-react";
+import { Phone, MapPin, User, Stethoscope, FilePlus } from "lucide-react";
 import { useUIStore } from "@/store/useUIStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 
 interface PatientContent {
+  _id: string;
   name: string;
   age: number;
   gender: string;
   phone: string;
   address?: string;
+  existingConditions?: string;
 }
 
 interface PatientProfileInfoCardProps {
   patient: PatientContent;
+  patientId: string;
+  visitsCount: number;
+  chronicCount: number;
+  bp?: string;
 }
 
-export function PatientProfileInfoCard({ patient }: PatientProfileInfoCardProps) {
+function getInitials(name: string) {
+  return name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+}
+
+export function PatientProfileInfoCard({
+  patient,
+  patientId,
+  visitsCount,
+  chronicCount,
+  bp,
+}: PatientProfileInfoCardProps) {
   const { privacyMode } = useUIStore();
   const { user } = useAuthStore();
   const isStaff = user?.role === "staff";
+  const router = useRouter();
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl shadow-slate-200/50 text-center relative overflow-hidden group transition-all duration-300">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-brand-primary/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
-      
-      <div className="relative w-28 h-28 mx-auto mb-6 group-hover:scale-105 transition-transform duration-500">
-        <div className="absolute -inset-1.5 bg-linear-to-tr from-brand-primary to-brand-accent rounded-2xl opacity-25 blur-sm group-hover:opacity-40 transition-opacity" />
-        <div className="relative w-28 h-28 bg-linear-to-br from-brand-primary to-brand-accent rounded-2xl flex items-center justify-center border-4 border-white shadow-2xl shadow-brand-primary/20 rotate-3 group-hover:rotate-0 transition-all duration-500">
-          <span className="text-4xl font-semibold text-white italic drop-shadow-sm">{patient.name.charAt(0).toUpperCase()}</span>
-        </div>
-      </div>
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/40 overflow-hidden">
+      {/* Top gradient bar */}
+      <div className="h-1.5 w-full bg-linear-to-r from-brand-primary via-brand-accent to-brand-primary/40" />
 
-      <h2 className={clsx(
-        "text-2xl font-semibold text-slate-900 tracking-tight transition-all uppercase",
-        privacyMode && "blur-md select-none"
-      )}>{patient.name}</h2>
-      
-      <div className="mt-8 space-y-5 text-left border-t border-slate-100 pt-8">
-        <div className="flex items-center gap-4 text-sm group/item">
-          <div className="p-3 bg-brand-primary/5 rounded-2xl text-brand-primary group-hover/item:bg-brand-primary/10 transition-colors">
-            <User className="w-5 h-5" />
+      <div className="p-6">
+        {/* Avatar + Name row */}
+        <div className="flex items-center gap-5 mb-6">
+          <div className="relative shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-brand-primary to-brand-accent flex items-center justify-center shadow-lg shadow-brand-primary/20">
+              <span className="text-2xl font-bold text-white">{getInitials(patient.name)}</span>
+            </div>
+            <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-sm" />
           </div>
-          <div>
-            <p className="eyebrow leading-none mb-1.5 uppercase tracking-widest text-[10px] text-slate-400">Demographics</p>
-            <p className="font-semibold text-slate-800 tracking-tight text-base uppercase">{patient.age} YRS / {patient.gender}</p>
+          <div className="flex-1 min-w-0">
+            <h2
+              className={clsx(
+                "text-xl font-bold text-slate-900 tracking-tight truncate",
+                privacyMode && "blur-md select-none"
+              )}
+            >
+              {patient.name}
+            </h2>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                {patient.age}Y
+              </span>
+              <span className="w-1 h-1 rounded-full bg-slate-300" />
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                {patient.gender}
+              </span>
+              {patient.existingConditions && (
+                <>
+                  <span className="w-1 h-1 rounded-full bg-slate-300" />
+                  <span className="text-[10px] font-bold text-brand-primary uppercase tracking-wide truncate max-w-[140px]">
+                    {patient.existingConditions}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
         </div>
-        
-        <div className="flex items-center gap-4 text-sm group/item">
-          <div className="p-3 bg-slate-100 rounded-2xl text-slate-500 group-hover/item:bg-slate-200 transition-colors">
-            <Phone className="w-5 h-5" />
+
+        {/* Stats pills */}
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
+            <p className="text-lg font-bold text-slate-900">{visitsCount}</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Visits</p>
           </div>
-          <div>
-            <p className="eyebrow leading-none mb-1.5 uppercase tracking-widest text-[10px] text-slate-400">Contact</p>
-            <p className={clsx("font-semibold text-slate-800 tracking-tight text-base transition-all uppercase", privacyMode && "blur-sm select-none")}>{patient.phone}</p>
+          <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
+            <p className="text-lg font-bold text-slate-900">{chronicCount}</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Chronic</p>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
+            <p className="text-lg font-bold text-slate-900">{bp || "—"}</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">BP</p>
           </div>
         </div>
-        
-        {patient.address && !isStaff && (
-          <div className="flex items-center gap-4 text-sm group/item">
-            <div className="p-3 bg-slate-100 rounded-2xl text-slate-500 group-hover/item:bg-slate-200 transition-colors">
-              <MapPin className="w-5 h-5" />
+
+        {/* Contact details */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-brand-primary/5 flex items-center justify-center shrink-0">
+              <User className="w-3.5 h-3.5 text-brand-primary" />
             </div>
-            <div>
-              <p className="eyebrow leading-none mb-1.5 uppercase tracking-widest text-[10px] text-slate-400">Residence</p>
-              <p className={clsx("font-semibold text-slate-800 tracking-tight text-sm text-balance leading-tight transition-all uppercase", privacyMode && "blur-sm select-none")}>{patient.address}</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Contact</p>
+              <p className={clsx("text-sm font-semibold text-slate-800 truncate", privacyMode && "blur-sm select-none")}>
+                {patient.phone}
+              </p>
             </div>
+          </div>
+
+          {patient.address && !isStaff && (
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                <MapPin className="w-3.5 h-3.5 text-slate-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Residence</p>
+                <p className={clsx("text-sm font-semibold text-slate-700 leading-tight truncate", privacyMode && "blur-sm select-none")}>
+                  {patient.address}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action buttons */}
+        {!isStaff && (
+          <div className="flex gap-2 mt-6 pt-5 border-t border-slate-100">
+            <button
+              onClick={() => router.push(`/consultation/acute?patientId=${patientId}`)}
+              className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl border border-slate-200 text-[11px] font-bold text-slate-600 hover:border-brand-primary/30 hover:text-brand-primary hover:bg-brand-primary/5 transition-all"
+            >
+              <FilePlus className="w-3.5 h-3.5" /> Acute
+            </button>
+            <button
+              onClick={() => router.push(`/consultation/chronic?patientId=${patientId}`)}
+              className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl bg-brand-primary text-white text-[11px] font-bold hover:opacity-90 transition-all shadow-md shadow-brand-primary/20"
+            >
+              <Stethoscope className="w-3.5 h-3.5" /> Chronic Case
+            </button>
           </div>
         )}
       </div>

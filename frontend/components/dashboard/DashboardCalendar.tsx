@@ -28,7 +28,7 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
 
   const selectedDayConsultations = useMemo(() => {
     if (!selected) return [];
-    return consultations.filter((apt) => 
+    return consultations.filter((apt) =>
       isSameDay(new Date(apt.consultationDate), selected)
     );
   }, [selected, consultations]);
@@ -47,13 +47,24 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
           </div>
         </div>
 
-        <div className="flex justify-center w-full custom-day-picker">
+        <div className="w-full custom-day-picker">
           <DayPicker
             mode="single"
             selected={selected}
             onSelect={setSelected}
             modifiers={{
               hasAppointments: (date) => !!appointmentCounts[format(date, "yyyy-MM-dd")]
+            }}
+            classNames={{
+              root: "w-full",
+              months: "w-full",
+              month: "w-full",
+              month_grid: "w-full border-separate border-spacing-y-1",
+              weekdays: "w-full grid grid-cols-7",
+              week: "w-full grid grid-cols-7 text-primary",
+              day: "p-0.5 flex",
+              button_next: 'm-4',
+              button_previous: 'm-4'
             }}
             className="p-0 m-0 w-full"
             components={{
@@ -62,7 +73,7 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
                 const { day, modifiers, className, ...buttonProps } = props;
                 const dateKey = format(day.date, "yyyy-MM-dd");
                 const count = appointmentCounts[dateKey] || 0;
-                
+
                 return (
                   <button {...buttonProps} className={clsx(
                     "relative flex items-center justify-center w-full aspect-square max-w-12 mx-auto cursor-pointer rounded-[14px] transition-all duration-200 group border-0 text-[15px] p-0 m-0",
@@ -92,18 +103,18 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
         <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
           <div>
             <div className="flex items-center gap-2 mb-1">
-               <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
-               <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-                 {selected ? format(selected, "EEEE") : "Agenda"}
-               </h3>
+              <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
+              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                {selected ? format(selected, "EEEE") : "Agenda"}
+              </h3>
             </div>
             <h2 className="text-xl font-light text-slate-900 tracking-tight">
               {selected ? format(selected, "MMMM do, yyyy") : "Select a date"}
             </h2>
           </div>
           <div className="flex flex-col items-end">
-             <span className="text-2xl font-light text-brand-primary leading-none">{selectedDayConsultations.length}</span>
-             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Interactions</span>
+            <span className="text-2xl font-light text-brand-primary leading-none">{selectedDayConsultations.length}</span>
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Interactions</span>
           </div>
         </div>
 
@@ -118,8 +129,8 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
           ) : (
             <div className="divide-y divide-slate-50">
               {selectedDayConsultations.map((apt, index) => (
-                <div 
-                  key={apt._id} 
+                <div
+                  key={apt._id}
                   className="p-6 hover:bg-slate-50/50 transition-all flex items-center justify-between group animate-in fade-in slide-in-from-bottom-2"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -133,14 +144,14 @@ export function DashboardCalendar({ consultations }: DashboardCalendarProps) {
                         {apt.patientId?.name || "Anonymous Patient"}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                         <span className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-bold rounded uppercase tracking-wider border border-slate-200/50">OP #{apt.opNumber || "N/A"}</span>
-                         <span className="text-[11px] font-medium text-slate-400 line-clamp-1 italic">
-                           &quot;{apt.symptoms}&quot;
-                         </span>
+                        <span className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-bold rounded uppercase tracking-wider border border-slate-200/50">OP #{apt.opNumber || "N/A"}</span>
+                        <span className="text-[11px] font-medium text-slate-400 line-clamp-1 italic">
+                          &quot;{apt.symptoms}&quot;
+                        </span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3">
                     <div className={clsx(
                       "px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border shadow-xs",

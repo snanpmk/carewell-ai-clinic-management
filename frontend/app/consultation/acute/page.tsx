@@ -39,6 +39,8 @@ const formSchema = z.object({
     potency: z.string().min(1, "Potency is required"),
     form: z.string().min(1, "Form is required"),
     dosage: z.string().min(1, "Dosage is required"),
+    quantity: z.string().optional(),
+    indication: z.string().optional(),
   })).min(1, "At least one prescription is required"),
   additionalNotes: z.string().optional(),
   advice: z.string().optional(),
@@ -431,7 +433,7 @@ function ConsultationForm() {
                           type="button" 
                           variant="outline" 
                           size="sm"
-                          onClick={() => append({ medicine: "", potency: "", form: "Pills", dosage: "" })}
+                          onClick={() => append({ medicine: "", potency: "", form: "Pills", dosage: "", quantity: "", indication: "" })}
                           className="h-8 rounded-full text-[10px] px-4"
                         >
                           Add Medicine
@@ -440,56 +442,44 @@ function ConsultationForm() {
 
                       <div className="space-y-4">
                         {fields.map((field, index) => (
-                          <div key={field.id} className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-4 rounded-xl border border-slate-100 shadow-sm relative group animate-in fade-in slide-in-from-top-2">
-                            <div className="md:col-span-4">
-                              <Input 
-                                label="Medicine" 
-                                {...register(`prescriptions.${index}.medicine`)} 
-                                placeholder="e.g. Arsenicum Alb"
-                                error={errors.prescriptions?.[index]?.medicine?.message}
-                              />
-                            </div>
-                            <div className="md:col-span-2">
-                              <Input 
-                                label="Potency" 
-                                {...register(`prescriptions.${index}.potency`)} 
-                                placeholder="200c"
-                                error={errors.prescriptions?.[index]?.potency?.message}
-                              />
-                            </div>
-                            <div className="md:col-span-3">
-                              <Select 
-                                label="Form" 
-                                options={[
-                                  { label: "Pills / Globules", value: "Pills" },
-                                  { label: "Liquid / Droplets", value: "Liquid" },
-                                  { label: "Powder / Trituration", value: "Powder" },
-                                  { label: "Tablets", value: "Tablets" },
-                                  { label: "Mother Tincture", value: "Q" },
-                                  { label: "External / Ointment", value: "External" }
-                                ]}
-                                {...register(`prescriptions.${index}.form`)} 
-                                error={errors.prescriptions?.[index]?.form?.message}
-                              />
-                            </div>
-                            <div className="md:col-span-2">
-                              <Input 
-                                label="Dosage" 
-                                {...register(`prescriptions.${index}.dosage`)} 
-                                placeholder="4 pills TDS"
-                                error={errors.prescriptions?.[index]?.dosage?.message}
-                              />
-                            </div>
-                            <div className="md:col-span-1 flex items-end justify-center pb-2">
+                          <div key={field.id} className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
+                            {/* Rx header */}
+                            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-50 bg-slate-50/50">
+                              <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">Rx {index + 1}</span>
                               {fields.length > 1 && (
-                                <button 
-                                  type="button" 
-                                  onClick={() => remove(index)}
-                                  className="p-2 text-slate-300 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all"
-                                >
-                                  <Trash2 className="w-4 h-4" />
+                                <button type="button" onClick={() => remove(index)} className="p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               )}
+                            </div>
+                            <div className="p-4 space-y-3">
+                              {/* Row 1: Medicine · Potency · Form */}
+                              <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                                <div className="md:col-span-5">
+                                  <Input label="Medicine / Remedy" {...register(`prescriptions.${index}.medicine`)} placeholder="e.g. Arsenicum Alb" error={errors.prescriptions?.[index]?.medicine?.message} />
+                                </div>
+                                <div className="md:col-span-3">
+                                  <Input label="Potency" {...register(`prescriptions.${index}.potency`)} placeholder="200c" error={errors.prescriptions?.[index]?.potency?.message} />
+                                </div>
+                                <div className="md:col-span-4">
+                                  <Select label="Physician Form" options={[
+                                    { label: "Pills / Globules", value: "Pills" },
+                                    { label: "Liquid / Droplets", value: "Liquid" },
+                                    { label: "Powder / Trituration", value: "Powder" },
+                                    { label: "Tablets", value: "Tablets" },
+                                    { label: "Mother Tincture (Q)", value: "Q" },
+                                    { label: "External / Ointment", value: "External" },
+                                    { label: "Injection", value: "Injection" },
+                                  ]} {...register(`prescriptions.${index}.form`)} error={errors.prescriptions?.[index]?.form?.message} />
+                                </div>
+                              </div>
+                              {/* Row 2: Dosage · Quantity */}
+                              <div className="grid grid-cols-2 gap-3">
+                                <Input label="Dose / Schedule" {...register(`prescriptions.${index}.dosage`)} placeholder="4 pills OD" error={errors.prescriptions?.[index]?.dosage?.message} />
+                                <Input label="Quantity / Supply" {...register(`prescriptions.${index}.quantity`)} placeholder="1 dram, 10 ml…" />
+                              </div>
+                              {/* Row 3: Indication */}
+                              <Input label="Indication (Why)" {...register(`prescriptions.${index}.indication`)} placeholder="Clinical reason for this medicine" />
                             </div>
                           </div>
                         ))}
@@ -543,7 +533,7 @@ function ConsultationForm() {
                         type="button" 
                         variant="outline" 
                         size="sm"
-                        onClick={() => append({ medicine: "", potency: "", form: "Pills", dosage: "" })}
+                        onClick={() => append({ medicine: "", potency: "", form: "Pills", dosage: "", quantity: "", indication: "" })}
                         className="h-8 rounded-full text-[10px] px-4"
                         leftIcon={<Plus className="w-3.5 h-3.5" />}
                       >
@@ -603,6 +593,20 @@ function ConsultationForm() {
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             )}
+                          </div>
+                          <div className="md:col-span-6">
+                            <Input 
+                              label="Quantity / Supply" 
+                              {...register(`prescriptions.${index}.quantity`)} 
+                              placeholder="1 dram, 10 ml…"
+                            />
+                          </div>
+                          <div className="md:col-span-6">
+                            <Input 
+                              label="Indication (Why)" 
+                              {...register(`prescriptions.${index}.indication`)} 
+                              placeholder="Clinical reason for this medicine"
+                            />
                           </div>
                         </div>
                       ))}

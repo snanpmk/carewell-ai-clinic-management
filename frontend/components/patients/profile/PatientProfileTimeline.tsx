@@ -1,10 +1,11 @@
 "use client";
 
-import { Activity, Clock, FileText, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { Activity, Clock, FileText, Sparkles, ChevronDown, ChevronUp, Pill } from "lucide-react";
 import { ChronicCase } from "@/types/chronicCase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useState } from "react";
 import { ChronicCaseDetails } from "./ChronicCaseDetails";
+import { clsx } from "clsx";
 
 export interface UnifiedVisitItem {
   _id: string;
@@ -29,229 +30,190 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
   const [expandedCases, setExpandedCases] = useState<Record<string, boolean>>({});
 
   const toggleCase = (id: string) => {
-    setExpandedCases(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpandedCases((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  return (
-    <>
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-4 tracking-tight uppercase italic">
-          <div className="p-3 bg-brand-primary/10 rounded-2xl border border-brand-primary/20 shadow-inner">
-            <Clock className="w-6 h-6 text-brand-primary" />
-          </div>
-          Clinical Timeline
-        </h2>
+  if (visits.length === 0) {
+    return (
+      <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-16 text-center">
+        <FileText className="w-8 h-8 text-slate-200 mx-auto mb-3" />
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">No visits yet</p>
       </div>
+    );
+  }
 
-      <div className="space-y-8">
-        {visits.length === 0 ? (
-          <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-24 text-center shadow-sm">
-            <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <FileText className="w-10 h-10 text-slate-200" />
-            </div>
-            <p className="eyebrow uppercase tracking-widest text-[10px] text-slate-400 font-bold">Empty Medical Record</p>
-            <p className="text-slate-400 text-sm mt-3 font-medium">No past visits found for this patient.</p>
-          </div>
-        ) : (
-          visits.map((visit: UnifiedVisitItem, idx: number) => {
-            
-            // --- Chronic Case Rendering ---
-            if (visit.isChronic && visit.chronicData) {
-              const c = visit.chronicData;
-              const isExpanded = !!expandedCases[visit._id];
-              const totality = c.analysisAndDiagnosis?.evaluation?.totalityOfSymptoms || "No totality extracted.";
-              const remedies = c.analysisAndDiagnosis?.finalDiagnosis?.homeopathicDiagnosis || "No prescription finalized.";
+  return (
+    <div className="space-y-3">
+      {visits.map((visit: UnifiedVisitItem, idx: number) => {
+        // --- Chronic Case ---
+        if (visit.isChronic && visit.chronicData) {
+          const c = visit.chronicData;
+          const isExpanded = !!expandedCases[visit._id];
+          const totality = c.analysisAndDiagnosis?.evaluation?.totalityOfSymptoms;
+          const remedy = c.analysisAndDiagnosis?.finalDiagnosis?.homeopathicDiagnosis;
+          const diagnosis = c.summaryDiagnosis?.diseaseDiagnosis || c.analysisAndDiagnosis?.finalDiagnosis?.disease;
 
-              return (
-                <div key={visit._id} className="bg-slate-950 border border-slate-900 rounded-2xl p-10 shadow-2xl relative overflow-hidden group transition-all duration-500">
-                  <div className="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-brand-primary to-brand-accent opacity-100" />
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-brand-primary/10 transition-all duration-700" />
-                  
-                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 pb-8 border-b border-white/5">
-                    <div className="flex items-center gap-5">
-                      <div className="w-14 h-14 bg-linear-to-br from-brand-primary to-brand-accent rounded-2xl flex items-center justify-center text-white shadow-xl shadow-brand-primary/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                        <Sparkles className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-white tracking-tight uppercase italic">Chronic Evaluation</h3>
-                        <p className="eyebrow !text-brand-accent mt-1.5 opacity-100 uppercase tracking-widest text-[10px]">
-                           {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 relative z-10">
-                      <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-[0.2em] bg-white/10 text-brand-accent border border-white/10 shadow-inner">
-                          Gov Spec v1.0
-                      </span>
-                      <button 
-                        onClick={() => toggleCase(visit._id)}
-                        className="p-3 bg-brand-primary/10 text-brand-primary rounded-2xl hover:bg-brand-primary hover:text-white transition-all shadow-lg border border-brand-primary/20"
-                      >
-                        {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </button>
-                    </div>
+          return (
+            <div
+              key={visit._id}
+              className="group bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 transition-all duration-300"
+            >
+              {/* Collapsed header */}
+              <div
+                className="flex items-center gap-4 p-5 cursor-pointer"
+                onClick={() => toggleCase(visit._id)}
+              >
+                {/* Icon */}
+                <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-primary to-brand-accent flex items-center justify-center shrink-0 shadow-lg shadow-brand-primary/20">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[9px] font-bold text-brand-accent uppercase tracking-widest">Chronic Evaluation</span>
+                    <span className="w-1 h-1 rounded-full bg-white/20" />
+                    <span className="text-[9px] text-slate-500 font-medium">
+                      {visit.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
                   </div>
-                  
-                  {isExpanded ? (
-                    <ChronicCaseDetails data={c} />
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                      <div className="space-y-8">
-                        {aiEnabled && (
-                          <>
-                            <div>
-                              <div className="eyebrow mb-4 flex items-center gap-2 !text-slate-300 uppercase tracking-widest text-[10px] font-bold">
-                                  <Activity className="w-4 h-4 text-brand-primary" /> Totality of Symptoms
-                              </div>
-                              <div className="p-6 bg-white/5 rounded-2xl border border-white/5 shadow-inner backdrop-blur-md">
-                                <p className="text-sm md:text-base font-medium text-slate-200 leading-relaxed italic line-clamp-4">&quot;{totality}&quot;</p>
-                              </div>
-                            </div>
-                          </>
-                        )}
-                        
-                        {!aiEnabled && (
-                          <div className="p-10 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-center h-full">
-                             <FileText className="w-10 h-10 text-white/5 mb-4" />
-                             <p className="eyebrow !text-white/20 uppercase tracking-widest text-[10px] font-bold">Clinical data archive</p>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-8">
-                        <div className="bg-linear-to-br from-white/5 to-transparent rounded-2xl p-8 border border-white/10 relative shadow-2xl h-full flex flex-col justify-center">
-                           <div className="absolute top-6 right-6 text-white/5">
-                             <FileText className="w-12 h-12" />
-                           </div>
-                           <p className="eyebrow !text-brand-accent mb-6 uppercase tracking-widest text-[10px] font-bold">Management Plan</p>
-                           <p className="text-2xl font-semibold text-white leading-tight mb-4 tracking-tight line-clamp-2 uppercase italic">
-                             {remedies}
-                           </p>
-                           <button 
-                             onClick={() => toggleCase(visit._id)}
-                             className="text-[10px] font-semibold uppercase tracking-widest text-brand-primary hover:text-brand-accent transition-colors mt-4 flex items-center gap-2"
-                           >
-                             View Full Case Analysis <ChevronDown className="w-3 h-3" />
-                           </button>
-                        </div>
-                      </div>
-                    </div>
+                  <p className="text-sm font-semibold text-white truncate">
+                    {diagnosis || "Chronic Case Record"}
+                  </p>
+                </div>
+
+                {/* Collapse toggle */}
+                <div className="flex items-center gap-2 shrink-0">
+                  {remedy && !isExpanded && (
+                    <span className="hidden sm:inline text-[9px] font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-2 py-1 rounded-lg uppercase tracking-wide truncate max-w-[120px]">
+                      {remedy}
+                    </span>
                   )}
-                </div>
-              );
-            }
-
-            // --- Acute Case Rendering ---
-            let aiNotes: Record<string, unknown> | null = null;
-            let adviceText = "";
-
-            try { 
-                if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes);
-                else if (typeof visit.aiGeneratedNotes === "object") aiNotes = visit.aiGeneratedNotes as Record<string, unknown>;
-            } catch { }
-
-            try { 
-              if (typeof visit.doctorEditedNotes === 'string') {
-                if (visit.doctorEditedNotes.startsWith('{')) {
-                  const parsed = JSON.parse(visit.doctorEditedNotes);
-                  adviceText = parsed.advice || "";
-                } else {
-                  adviceText = visit.doctorEditedNotes;
-                }
-              } else if (typeof visit.doctorEditedNotes === 'object' && visit.doctorEditedNotes !== null) {
-                adviceText = (visit.doctorEditedNotes as Record<string, unknown>).advice as string || "";
-              }
-            } catch { }
-
-            if (!adviceText) {
-                adviceText = (aiNotes?.advice as string) || "No advice recorded.";
-            }
-
-            return (
-              <div key={visit._id} className="bg-white border border-slate-200 rounded-2xl p-10 shadow-xl shadow-slate-200/40 group relative overflow-hidden transition-all duration-500 hover:shadow-2xl">
-                <div className="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-brand-primary/20 to-brand-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 pb-8 border-b border-slate-100">
-                  <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 bg-slate-50 border border-slate-200 shadow-inner rounded-2xl flex items-center justify-center text-slate-400 font-semibold text-xl group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
-                      {visits.length - idx}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-slate-900 tracking-tight uppercase italic">Acute Consultation</h3>
-                      <p className="eyebrow mt-1.5 uppercase tracking-widest text-[10px] text-slate-400 font-bold">
-                         {visit.date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-[0.2em] bg-slate-100 text-slate-500 border border-slate-200 shadow-inner group-hover:bg-brand-primary/10 group-hover:text-brand-primary group-hover:border-brand-primary/20 transition-all duration-500">
-                      {visit.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="space-y-8">
-                    <div>
-                      <div className="eyebrow mb-4 flex items-center gap-2 uppercase tracking-widest text-[10px] text-slate-400 font-bold">
-                         <Activity className="w-4 h-4 text-brand-primary" /> Presenting Symptoms
-                      </div>
-                      <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
-                        <p className="text-sm md:text-base font-medium text-slate-700 leading-relaxed italic">&quot;{visit.symptoms}&quot;</p>
-                        {visit.diagnosis && (
-                          <div className="mt-6 pt-5 border-t border-slate-200/60 flex items-center gap-3">
-                            <span className="px-3 py-1.5 bg-brand-primary/5 text-brand-primary text-[10px] uppercase tracking-[0.2em] font-semibold rounded-lg border border-brand-primary/10">
-                              Assessment: <span className="text-slate-900 ml-1">{visit.diagnosis}</span>
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {aiEnabled && aiNotes && !!aiNotes["assessment"] && (
-                       <div>
-                          <div className="eyebrow mb-4 flex items-center gap-2 uppercase tracking-widest text-[10px] text-slate-400 font-bold">
-                             <Sparkles className="w-4 h-4 text-brand-accent" /> Clinical Reasoning
-                          </div>
-                          <div className="p-6 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 shadow-inner">
-                            <p className="text-sm font-medium text-slate-600 leading-relaxed italic border-l-4 border-brand-primary/20 pl-4">
-                              {aiNotes["assessment"] as string}
-                            </p>
-                          </div>
-                       </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-8">
-                    <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl p-8 border border-slate-800 relative shadow-2xl h-full flex flex-col justify-center">
-                       <div className="absolute top-6 right-6 text-white/5">
-                         <FileText className="w-12 h-12" />
-                       </div>
-                      <p className="eyebrow !text-brand-accent mb-6 uppercase tracking-widest text-[10px] font-bold">Prescription</p>
-                      <p className="text-2xl font-semibold text-white leading-tight mb-4 tracking-tight line-clamp-3 uppercase italic">
-                        {visit.prescription || "No prescription recorded."}
-                      </p>
-
-                      <div className="mt-6 pt-6 border-t border-white/5">
-                         <p className="eyebrow !text-slate-400 mb-3 uppercase tracking-widest text-[10px] font-bold">Advice & Follow-up</p>
-                         <p className="text-sm text-slate-200 font-medium leading-relaxed italic">
-                           {adviceText}
-                         </p>
-                      </div>
-
-                      {visit.additionalNotes && (
-                        <div className="mt-6 pt-6 border-t border-white/5">
-                          <p className="text-xs text-slate-300 font-medium italic">
-                            <span className="eyebrow !text-slate-400 not-italic mr-2 uppercase tracking-widest text-[10px] font-bold">Note:</span> {visit.additionalNotes}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <button className="w-7 h-7 rounded-lg bg-white/5 hover:bg-brand-primary/20 text-slate-400 hover:text-brand-primary flex items-center justify-center transition-all">
+                    {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
                 </div>
               </div>
-            );
-          })
-        )}
-      </div>
-    </>
+
+              {/* Expanded content */}
+              {isExpanded && (
+                <div className="border-t border-white/5">
+                  {totality && (
+                    <div className="px-5 py-4 border-b border-white/5">
+                      <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                        <Activity className="w-3 h-3 text-brand-primary" /> Totality of Symptoms
+                      </p>
+                      <p className="text-sm text-slate-300 italic leading-relaxed line-clamp-4">&quot;{totality}&quot;</p>
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <ChronicCaseDetails data={c} />
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // --- Acute Case ---
+        let aiNotes: Record<string, unknown> | null = null;
+        let adviceText = "";
+
+        try {
+          if (typeof visit.aiGeneratedNotes === "string") aiNotes = JSON.parse(visit.aiGeneratedNotes);
+          else if (typeof visit.aiGeneratedNotes === "object") aiNotes = visit.aiGeneratedNotes as Record<string, unknown>;
+        } catch {}
+
+        try {
+          if (typeof visit.doctorEditedNotes === "string") {
+            if (visit.doctorEditedNotes.startsWith("{")) {
+              const parsed = JSON.parse(visit.doctorEditedNotes);
+              adviceText = parsed.advice || "";
+            } else {
+              adviceText = visit.doctorEditedNotes;
+            }
+          } else if (typeof visit.doctorEditedNotes === "object" && visit.doctorEditedNotes !== null) {
+            adviceText = (visit.doctorEditedNotes as Record<string, unknown>).advice as string || "";
+          }
+        } catch {}
+
+        if (!adviceText) adviceText = (aiNotes?.advice as string) || "";
+
+        return (
+          <div
+            key={visit._id}
+            className={clsx(
+              "group bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200",
+              "animate-in fade-in slide-in-from-bottom-1"
+            )}
+            style={{ animationDelay: `${idx * 30}ms` }}
+          >
+            {/* Header row */}
+            <div className="flex items-center gap-4 px-5 py-4 border-b border-slate-50">
+              {/* Visit number */}
+              <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:text-brand-primary group-hover:border-brand-primary/20 group-hover:bg-brand-primary/5 transition-all shrink-0">
+                {String(visits.length - idx).padStart(2, "0")}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Acute Consultation</span>
+                </div>
+                <p className="text-xs font-medium text-slate-500">
+                  {visit.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  {" · "}
+                  {visit.date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+
+              {visit.diagnosis && (
+                <span className="hidden sm:inline text-[9px] font-bold text-brand-primary bg-brand-primary/5 border border-brand-primary/10 px-2 py-1 rounded-lg uppercase tracking-wide shrink-0">
+                  {visit.diagnosis}
+                </span>
+              )}
+            </div>
+
+            {/* Body */}
+            <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Symptoms */}
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                  <Activity className="w-3 h-3 text-brand-primary" /> Symptoms
+                </p>
+                <p className="text-sm text-slate-600 italic leading-relaxed line-clamp-3">
+                  &quot;{visit.symptoms || "Not recorded"}&quot;
+                </p>
+                {aiEnabled && aiNotes && !!aiNotes["assessment"] && (
+                  <div className="mt-3 pt-3 border-t border-slate-50">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-brand-accent" /> AI Reasoning
+                    </p>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 border-l-2 border-brand-accent/20 pl-2">
+                      {aiNotes["assessment"] as string}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Prescription */}
+              <div className="bg-slate-900 rounded-xl p-4">
+                <p className="text-[9px] font-bold text-brand-accent uppercase tracking-widest mb-2 flex items-center gap-1">
+                  <Pill className="w-3 h-3" /> Prescription
+                </p>
+                <p className="text-sm font-semibold text-white leading-snug line-clamp-2 uppercase">
+                  {visit.prescription || "Not recorded"}
+                </p>
+                {adviceText && (
+                  <div className="mt-3 pt-3 border-t border-white/5">
+                    <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Advice</p>
+                    <p className="text-xs text-slate-300 leading-relaxed line-clamp-2 italic">{adviceText}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }

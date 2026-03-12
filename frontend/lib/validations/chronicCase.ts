@@ -94,6 +94,8 @@ export const treatmentSchema = z.object({
         potency: z.string().min(1, "Potency is required"),
         form: z.string().min(1, "Form is required"),
         dose: z.string().min(1, "Dose is required"),
+        quantity: z.string().optional(),
+        indication: z.string().optional(),
       })).min(1, "At least one medicine is required"),
     }),
   }),

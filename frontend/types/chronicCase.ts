@@ -368,6 +368,8 @@ export interface ChronicCase {
         potency?: string;
         form?: string;
         dose?: string;
+        quantity?: string;
+        indication?: string;
       }>;
     };
   };
@@ -385,6 +387,7 @@ export interface ChronicCase {
     totalityOfSymptoms?: string;
     miasmaticExpression?: string;
     differentialConsiderations?: string;
+    prescriptionInsight?: string;
     repertorization?: Array<{
       symptom?: string;
       rubric?: string;

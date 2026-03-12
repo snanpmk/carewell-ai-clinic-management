@@ -2,7 +2,7 @@
 
 import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, User as UserIcon, Fingerprint, History, Pill, Calendar, CalendarPlus, ClipboardList, Edit3, PlusCircle, CheckCircle2, Activity, FileArchive, Clock } from "lucide-react";
+import { History, Pill, Calendar, CalendarPlus, ClipboardList, Edit3, PlusCircle, CheckCircle2, Activity, FileArchive, Clock } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { getPatient } from "@/services/patientService";
@@ -155,65 +155,16 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
         </div>
       ) : (
         <>
-          {/* Quick Stats Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/40 flex items-center gap-5">
-              <div className="p-3 bg-brand-primary/10 rounded-2xl text-brand-primary">
-                <UserIcon className="w-6 h-6" />
-              </div>
-              <div className="min-w-0">
-                <p className="eyebrow !text-slate-400 uppercase tracking-[0.2em] text-[10px]">Profile</p>
-                <p className="text-lg font-semibold text-slate-900 tracking-tight uppercase truncate">
-                  {patient.age}Y • {patient.gender}
-                </p>
-              </div>
-            </div>
-
-            {!isStaff && (
-              <>
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/40 flex items-center gap-5">
-                  <div className="p-3 bg-brand-accent/10 rounded-2xl text-brand-accent">
-                    <Fingerprint className="w-6 h-6" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="eyebrow !text-slate-400 uppercase tracking-[0.2em] text-[10px]">Clinical ID</p>
-                    <p className={clsx("text-lg font-semibold text-slate-900 tracking-tight uppercase truncate", privacyMode && "blur-sm")}>
-                      {patient._id.substring(0, 12)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/40 flex items-center gap-5">
-                  <div className="p-3 bg-red-50 rounded-2xl text-red-500">
-                    <Heart className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="eyebrow !text-slate-400 uppercase tracking-[0.2em] text-[10px]">Vitals Status</p>
-                    <p className="text-lg font-semibold text-slate-900 tracking-tight uppercase">
-                      {latestChronicCase?.physicalExamination?.vitals?.bp || 'No BP'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/40 flex items-center gap-5">
-                  <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-500">
-                    <History className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="eyebrow !text-slate-400 uppercase tracking-[0.2em] text-[10px]">Engagement</p>
-                    <p className="text-lg font-semibold text-slate-900 tracking-tight uppercase">
-                      {visits.length} VISITS
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
             {/* Left Column - Info & Clinical Overview */}
             <div className="xl:col-span-4 space-y-8">
-              <PatientProfileInfoCard patient={patient} />
+              <PatientProfileInfoCard
+                patient={patient}
+                patientId={patientId}
+                visitsCount={visits.length}
+                chronicCount={chronicCases.length}
+                bp={latestChronicCase?.physicalExamination?.vitals?.bp}
+              />
               
               {!isStaff && (
                 <>

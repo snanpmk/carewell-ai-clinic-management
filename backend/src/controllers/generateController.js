@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const AICache = require("../models/AICache");
-const { generateConsultationNotes, summarizePatientHistory, analyzeChronicCase } = require("../services/aiService");
+const { generateConsultationNotes, summarizePatientHistory, analyzeChronicCase, extractClinicalContext } = require("../services/aiService");
 
 /**
  * Helper to generate a stable hash for any object
@@ -136,7 +136,9 @@ const analyzeChronicCaseController = async (req, res) => {
       });
     }
 
-    const inputHash = generateHash(caseData);
+    // Hash only the clinical fields — prevents cache misses on unrelated changes (address, unit, etc.)
+    const clinicalContext = extractClinicalContext(caseData);
+    const inputHash = generateHash(clinicalContext);
 
     // Check Cache
     const cachedResponse = await AICache.findOne({ inputHash, useCase: "analyzeChronicCase" });
@@ -150,7 +152,7 @@ const analyzeChronicCaseController = async (req, res) => {
     // Save to Cache
     await AICache.create({
       inputHash,
-      inputData: { ...caseData },
+      inputData: clinicalContext,
       outputData: analysis,
       useCase: "analyzeChronicCase"
     }).catch(err => console.error("Cache save error:", err.message));
@@ -160,7 +162,9 @@ const analyzeChronicCaseController = async (req, res) => {
     console.error("analyzeChronicCase error:", error.message);
     return res.status(500).json({
       success: false,
-      error: "AI service failed to analyze chronic case.",
+      error: error.message?.includes("quota")
+        ? "AI speed limit reached. Please wait a moment and try again."
+        : "AI service failed to analyze chronic case.",
     });
   }
 };
