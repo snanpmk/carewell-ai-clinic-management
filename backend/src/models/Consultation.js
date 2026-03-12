@@ -7,6 +7,16 @@ const consultationSchema = new mongoose.Schema(
       ref: "Patient",
       required: [true, "Patient ID is required"],
     },
+    doctorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Doctor ID is required"],
+    },
+    clinic: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Clinic",
+      required: true,
+    },
     symptoms: {
       type: String,
       required: [true, "Symptoms are required"],

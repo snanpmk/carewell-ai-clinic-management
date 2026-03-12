@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Clock, FileText, Sparkles, ChevronDown, ChevronUp, Pill } from "lucide-react";
+import { Activity, Clock, FileText, Sparkles, ChevronDown, ChevronUp, Pill, Stethoscope, Hash, Info } from "lucide-react";
 import { ChronicCase } from "@/types/chronicCase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useState } from "react";
@@ -18,6 +18,16 @@ export interface UnifiedVisitItem {
   aiGeneratedNotes?: string | Record<string, unknown>;
   additionalNotes?: string;
   chronicData?: ChronicCase;
+  doctorId?: {
+    _id: string;
+    name: string;
+    profileImage?: string;
+  };
+  doctor?: {
+    _id: string;
+    name: string;
+    profileImage?: string;
+  };
 }
 
 interface PatientProfileTimelineProps {
@@ -76,6 +86,12 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                     <span className="text-[9px] text-slate-500 font-medium">
                       {visit.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                     </span>
+                    {visit.doctor && (
+                      <>
+                        <span className="w-1 h-1 rounded-full bg-white/20" />
+                        <span className="text-[9px] font-bold text-brand-primary uppercase tracking-widest">Dr. {visit.doctor.name}</span>
+                      </>
+                    )}
                   </div>
                   <p className="text-sm font-semibold text-white truncate">
                     {diagnosis || "Chronic Case Record"}
@@ -158,6 +174,12 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Acute Consultation</span>
+                  {(visit.doctorId || visit.doctor) && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-slate-200" />
+                      <span className="text-[9px] font-bold text-brand-primary uppercase tracking-widest">Dr. {visit.doctorId?.name || visit.doctor?.name}</span>
+                    </>
+                  )}
                 </div>
                 <p className="text-xs font-medium text-slate-500">
                   {visit.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
@@ -200,9 +222,51 @@ export function PatientProfileTimeline({ visits }: PatientProfileTimelineProps) 
                 <p className="text-[9px] font-bold text-brand-accent uppercase tracking-widest mb-2 flex items-center gap-1">
                   <Pill className="w-3 h-3" /> Prescription
                 </p>
-                <p className="text-sm font-semibold text-white leading-snug line-clamp-2 uppercase">
-                  {visit.prescription || "Not recorded"}
-                </p>
+                <div className="space-y-2">
+                  {(() => {
+                    const p = visit.prescription;
+                    if (!p) return <p className="text-sm font-semibold text-white uppercase italic opacity-50">Not recorded</p>;
+
+                    try {
+                      // Try to parse if it's a JSON array string
+                      const rxArr = typeof p === "string" && p.startsWith("[") ? JSON.parse(p) : (Array.isArray(p) ? p : null);
+
+                      if (Array.isArray(rxArr)) {
+                        return rxArr.map((m: any, i: number) => (
+                          <div key={i} className="bg-white/5 rounded-lg p-2.5 border border-white/5 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-black text-white uppercase italic">{m.medicine} {m.potency}</p>
+                              {m.quantity && <span className="text-[9px] font-bold text-brand-accent uppercase bg-brand-accent/10 px-1.5 py-0.5 rounded">{m.quantity}</span>}
+                            </div>
+                            <div className="flex items-center gap-3">
+                               <p className="text-[10px] font-bold text-brand-primary uppercase tracking-widest leading-none flex items-center gap-1">
+                                 <Clock className="w-2.5 h-2.5" /> {m.dosage || m.dose}
+                               </p>
+                               {m.form && (
+                                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none flex items-center gap-1">
+                                   <Activity className="w-2.5 h-2.5" /> {m.form}
+                                 </p>
+                               )}
+                            </div>
+                            {m.indication && (
+                              <p className="text-[10px] text-slate-400 italic leading-snug pt-1 border-t border-white/5 mt-1 flex items-start gap-1">
+                                <Info className="w-2.5 h-2.5 mt-0.5 shrink-0" /> {m.indication}
+                              </p>
+                            )}
+                          </div>
+                        ));
+                      }
+                    } catch (e) {
+                      // fallback to string display if parsing fails
+                    }
+
+                    return (
+                      <p className="text-sm font-semibold text-white leading-snug line-clamp-2 uppercase italic">
+                        {visit.prescription}
+                      </p>
+                    );
+                  })()}
+                </div>
                 {adviceText && (
                   <div className="mt-3 pt-3 border-t border-white/5">
                     <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Advice</p>

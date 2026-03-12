@@ -9,6 +9,7 @@ import StepLayout from "../StepLayout";
 import { useQuery } from "@tanstack/react-query";
 import { Patient, getAllPatients } from "@/services/patientService";
 import { getPatientChronicCases } from "@/services/chronicCaseService";
+import { getNextOPNumber } from "@/services/consultationService";
 import { useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -120,19 +121,26 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
 
         const patientRecord = memoPatients.find((p: Patient) => p._id === selectedPatientId);
         if (patientRecord) {
-          reset({
-            patient: selectedPatientId,
-            header: { opNumber: "", unit: "", caseTakenBy: "" },
-            demographics: {
-              name: patientRecord.name || "",
-              age: patientRecord.age || 0,
-              sex: patientRecord.sex || patientRecord.gender || "",
-              religion: "",
-              caste: "",
-              occupation: "",
-              phone: patientRecord.phone || "",
-            },
-            summaryDiagnosis: { diseaseDiagnosis: "", homeopathicDiagnosis: "", result: "" }
+          // Prefill OP Number for new chronic cases
+          getNextOPNumber().then(res => {
+            reset({
+              patient: selectedPatientId,
+              header: { 
+                opNumber: res.success ? res.data.opNumber : "", 
+                unit: "", 
+                caseTakenBy: "" 
+              },
+              demographics: {
+                name: patientRecord.name || "",
+                age: patientRecord.age || 0,
+                sex: patientRecord.sex || patientRecord.gender || "",
+                religion: "",
+                caste: "",
+                occupation: "",
+                phone: patientRecord.phone || "",
+              },
+              summaryDiagnosis: { diseaseDiagnosis: "", homeopathicDiagnosis: "", result: "" }
+            });
           });
         }
       }

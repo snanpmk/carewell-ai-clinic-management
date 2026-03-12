@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Search, Filter, Loader2, FileText, ChevronRight } from "lucide-react";
+import { Calendar, Search, Filter, Loader2, FileText, ChevronRight, Stethoscope } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 export default function AppointmentsPage() {
   const router = useRouter();
   const [filter, setFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuthStore();
   const isStaff = user?.role === "staff";
 
@@ -32,17 +33,57 @@ export default function AppointmentsPage() {
       _id: string;
       name: string;
     };
+    doctorId?: {
+      _id: string;
+      name: string;
+    };
   }
 
-  const consultations = response?.data || [];
+  const allConsultations = response?.data || [];
+
+  const filteredConsultations = allConsultations.filter((apt: ConsultationRecord) => {
+    // 1. Search Logic (Flexible & Case-Insensitive)
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = 
+      (apt.patientId?.name || "").toLowerCase().includes(query) ||
+      (apt.symptoms || "").toLowerCase().includes(query) ||
+      (apt.opNumber || "").toLowerCase().includes(query) ||
+      (apt._id || "").toLowerCase().includes(query);
+
+    if (!matchesSearch) return false;
+
+    // 2. Filter Logic (Date-based)
+    if (filter === "All") return true;
+
+    const aptDate = new Date(apt.consultationDate);
+    const now = new Date();
+    
+    if (filter === "Today") {
+      return aptDate.toDateString() === now.toDateString();
+    }
+
+    if (filter === "Week") {
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      return aptDate >= weekAgo && aptDate <= now;
+    }
+
+    return true;
+  });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 fill-mode-both px-4 md:px-0 pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Medical Records</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium tracking-tight">Chronological archive of all clinical consultations.</p>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-[1px] w-8 bg-brand-primary/40" />
+            <span className="eyebrow text-brand-primary/70">Clinical Archive</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-light text-slate-900 tracking-tight">
+            Medical <span className="font-semibold text-brand-primary">Records</span>
+          </h1>
+          <p className="text-sm text-slate-500 max-w-md leading-relaxed mt-1">Chronological archive of all clinical consultations.</p>
         </div>
         <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
           {["All", "Today", "Week"].map((f) => (
@@ -50,8 +91,8 @@ export default function AppointmentsPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-6 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 ${
-                filter === f 
-                  ? "bg-white text-slate-900 shadow-xl border border-slate-100" 
+                filter === f
+                  ? "bg-white text-slate-900 shadow-xl border border-slate-100"
                   : "text-slate-400 hover:text-slate-600"
               }`}
             >
@@ -60,7 +101,6 @@ export default function AppointmentsPage() {
           ))}
         </div>
       </div>
-
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-24 text-slate-400">
           <Loader2 className="w-8 h-8 text-brand-primary animate-spin mb-4" />
@@ -75,10 +115,12 @@ export default function AppointmentsPage() {
                 placeholder="Search by patient, symptom or ID..." 
                 leftIcon={<Search className="w-4 h-4" />}
                 className="h-12"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2">
-               <p className="eyebrow !text-brand-primary mr-2 uppercase tracking-[0.2em] text-[10px] font-bold">{consultations.length} RECORDS FOUND</p>
+               <p className="eyebrow !text-brand-primary mr-2 uppercase tracking-[0.2em] text-[10px] font-bold">{filteredConsultations.length} RECORDS FOUND</p>
                <Button variant="outline" className="h-12 w-12 p-0 flex items-center justify-center rounded-2xl">
                  <Filter className="w-4 h-4" />
                </Button>
@@ -86,13 +128,13 @@ export default function AppointmentsPage() {
           </div>
 
           <div className="divide-y divide-slate-50">
-            {consultations.length === 0 ? (
+            {filteredConsultations.length === 0 ? (
               <div className="py-32 text-center">
                 <FileText className="w-16 h-16 text-slate-100 mx-auto mb-6" />
                 <p className="eyebrow text-slate-300 tracking-widest uppercase text-[10px] font-bold">No clinical history found.</p>
               </div>
             ) : (
-              consultations.map((apt: ConsultationRecord) => {
+              filteredConsultations.map((apt: ConsultationRecord) => {
                 const dateObj = new Date(apt.consultationDate);
                 const dayStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -132,6 +174,15 @@ export default function AppointmentsPage() {
                             {dayStr}, {dateObj.getFullYear()}
                           </span>
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                          {apt.doctorId && (
+                            <>
+                              <span className="flex items-center gap-2 eyebrow !text-brand-primary uppercase tracking-widest text-[10px] font-bold">
+                                <Stethoscope className="w-3.5 h-3.5" />
+                                Dr. {apt.doctorId.name}
+                              </span>
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                            </>
+                          )}
                           <span className="font-bold text-slate-500 italic truncate max-w-sm group-hover:text-slate-700 transition-colors">&quot;{apt.symptoms}&quot;</span>
                         </div>
                       </div>

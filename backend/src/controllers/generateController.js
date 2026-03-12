@@ -169,4 +169,33 @@ const analyzeChronicCaseController = async (req, res) => {
   }
 };
 
-module.exports = { generateNotes, summarizeHistory, analyzeChronicCaseController };
+const Consultation = require("../models/Consultation");
+const ChronicCase = require("../models/ChronicCase");
+
+/**
+ * GET /api/ai/next-op-number
+ * Generates a unique, incremental OP number for the clinic.
+ */
+const getNextOPNumber = async (req, res) => {
+  try {
+    const clinicId = req.clinicId;
+    const currentYear = new Date().getFullYear();
+
+    // Count both acute consultations and chronic cases for this clinic
+    const consultationCount = await Consultation.countDocuments({ clinic: clinicId });
+    const chronicCount = await ChronicCase.countDocuments({ clinic: clinicId });
+
+    const totalCount = consultationCount + chronicCount + 1;
+    
+    // Format: OP-2024-001 (Zero-padded to 3 digits)
+    const paddedCount = String(totalCount).padStart(3, "0");
+    const opNumber = `OP-${currentYear}-${paddedCount}`;
+
+    return res.status(200).json({ success: true, data: { opNumber } });
+  } catch (error) {
+    console.error("getNextOPNumber error:", error.message);
+    return res.status(500).json({ success: false, error: "Failed to generate OP number." });
+  }
+};
+
+module.exports = { generateNotes, summarizeHistory, analyzeChronicCaseController, getNextOPNumber };

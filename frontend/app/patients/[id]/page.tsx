@@ -125,6 +125,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
         isChronic: true,
         date: new Date(v.createdAt as string),
         chronicData: v as unknown as ChronicCase,
+        doctor: v.doctor as UnifiedVisitItem["doctor"],
       };
     }
     return {
@@ -137,6 +138,7 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
       doctorEditedNotes: v.doctorEditedNotes as Record<string, unknown>,
       aiGeneratedNotes: v.aiGeneratedNotes as Record<string, unknown>,
       additionalNotes: v.additionalNotes as string,
+      doctorId: v.doctorId as UnifiedVisitItem["doctorId"],
     };
   });
 

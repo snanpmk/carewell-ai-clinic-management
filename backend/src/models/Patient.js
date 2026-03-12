@@ -21,7 +21,6 @@ const patientSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: [true, "Phone number is required"],
-      unique: true,
       trim: true,
     },
     email: {
@@ -40,8 +39,16 @@ const patientSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    clinic: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Clinic",
+      required: true,
+    },
   },
   { timestamps: true }
 );
+
+// Compound index for phone uniqueness within a clinic
+patientSchema.index({ phone: 1, clinic: 1 }, { unique: true });
 
 module.exports = mongoose.model("Patient", patientSchema);

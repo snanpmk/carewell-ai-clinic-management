@@ -207,16 +207,44 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
 
           <div className="pt-6 border-t border-white/5">
             <p className={labelClass}>Prescriptions Given</p>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {data.management?.firstPrescription?.medicines?.map((m, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-brand-primary/10 rounded-2xl border border-brand-primary/20">
-                  <div className="flex items-center gap-4">
-                    <Pill className="w-5 h-5 text-brand-primary" />
-                    <div>
-                      <p className="text-base font-black text-white uppercase italic">{m.medicine}</p>
-                      <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest mt-0.5">{m.potency} • {m.dose}</p>
+                <div key={i} className="p-5 bg-brand-primary/10 rounded-[1.5rem] border border-brand-primary/20 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Pill className="w-6 h-6 text-brand-primary" />
+                      <div>
+                        <p className="text-lg font-black text-white uppercase italic leading-none">{m.medicine}</p>
+                        <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest mt-1">{m.potency}</p>
+                      </div>
                     </div>
+                    {m.quantity && (
+                      <div className="text-right">
+                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Quantity</p>
+                        <p className="text-xs font-bold text-brand-accent uppercase">{m.quantity}</p>
+                      </div>
+                    )}
                   </div>
+
+                  <div className="flex items-center gap-6 pt-3 border-t border-white/5">
+                    <div>
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Dose / Schedule</p>
+                      <p className="text-xs font-bold text-slate-200">{m.dose}</p>
+                    </div>
+                    {m.form && (
+                      <div>
+                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Form</p>
+                        <p className="text-xs font-bold text-slate-200">{m.form}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {m.indication && (
+                    <div className="pt-3 border-t border-white/5 bg-white/[0.02] -mx-5 px-5 -mb-5 pb-5 rounded-b-[1.5rem]">
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Indication (Why)</p>
+                      <p className="text-xs text-slate-300 italic leading-relaxed">&quot;{m.indication}&quot;</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -10,14 +10,16 @@ const createChronicCase = async (req, res) => {
   try {
     const { patient } = req.body;
 
-    // Verify patient exists
-    const existingPatient = await Patient.findById(patient);
+    // Verify patient exists and belongs to clinic
+    const existingPatient = await Patient.findOne({ _id: patient, clinic: req.clinicId });
     if (!existingPatient) {
-      return res.status(404).json({ success: false, error: "Patient not found" });
+      return res.status(404).json({ success: false, error: "Patient not found in your clinic" });
     }
 
     const newCase = new ChronicCase({
       ...req.body,
+      doctor: req.user._id,
+      clinic: req.clinicId,
     });
 
     const savedCase = await newCase.save();
@@ -47,9 +49,11 @@ const createChronicCase = async (req, res) => {
  */
 const getChronicCase = async (req, res) => {
   try {
-    const chronicCase = await ChronicCase.findById(req.params.id).populate("patient", "name age gender contact");
+    const chronicCase = await ChronicCase.findOne({ _id: req.params.id, clinic: req.clinicId })
+      .populate("patient", "name age gender contact")
+      .populate("doctor", "name profileImage licenseNumber");
     if (!chronicCase) {
-      return res.status(404).json({ success: false, error: "Chronic case not found" });
+      return res.status(404).json({ success: false, error: "Chronic case not found in your clinic" });
     }
     res.json({ success: true, data: chronicCase });
   } catch (error) {
@@ -65,7 +69,9 @@ const getChronicCase = async (req, res) => {
  */
 const getPatientChronicCases = async (req, res) => {
   try {
-    const cases = await ChronicCase.find({ patient: req.params.patientId }).sort({ createdAt: -1 });
+    const cases = await ChronicCase.find({ patient: req.params.patientId, clinic: req.clinicId })
+      .populate("doctor", "name profileImage")
+      .sort({ createdAt: -1 });
     res.json({ success: true, data: cases });
   } catch (error) {
     console.error("Error fetching chronic cases for patient:", error);
@@ -80,14 +86,14 @@ const getPatientChronicCases = async (req, res) => {
  */
 const updateChronicCase = async (req, res) => {
   try {
-    const updatedCase = await ChronicCase.findByIdAndUpdate(
-      req.params.id,
+    const updatedCase = await ChronicCase.findOneAndUpdate(
+      { _id: req.params.id, clinic: req.clinicId },
       { $set: req.body },
       { new: true, runValidators: true }
     );
 
     if (!updatedCase) {
-      return res.status(404).json({ success: false, error: "Chronic case not found" });
+      return res.status(404).json({ success: false, error: "Chronic case not found in your clinic" });
     }
 
     res.json({ success: true, data: updatedCase });
@@ -105,8 +111,8 @@ const updateChronicCase = async (req, res) => {
 const addFollowUp = async (req, res) => {
   try {
     const { date, symptomChanges, interference, prescription } = req.body;
-    const updatedCase = await ChronicCase.findByIdAndUpdate(
-      req.params.id,
+    const updatedCase = await ChronicCase.findOneAndUpdate(
+      { _id: req.params.id, clinic: req.clinicId },
       {
         $push: {
           followUps: { date: date || new Date(), symptomChanges, interference, prescription },
@@ -115,7 +121,7 @@ const addFollowUp = async (req, res) => {
       { new: true }
     );
     if (!updatedCase) {
-      return res.status(404).json({ success: false, error: "Chronic case not found" });
+      return res.status(404).json({ success: false, error: "Chronic case not found in your clinic" });
     }
     res.json({ success: true, data: updatedCase });
   } catch (error) {
@@ -131,9 +137,9 @@ const addFollowUp = async (req, res) => {
  */
 const deleteChronicCase = async (req, res) => {
   try {
-    const deletedCase = await ChronicCase.findByIdAndDelete(req.params.id);
+    const deletedCase = await ChronicCase.findOneAndDelete({ _id: req.params.id, clinic: req.clinicId });
     if (!deletedCase) {
-      return res.status(404).json({ success: false, error: "Chronic case not found" });
+      return res.status(404).json({ success: false, error: "Chronic case not found in your clinic" });
     }
     res.json({ success: true, message: "Chronic case deleted" });
   } catch (error) {

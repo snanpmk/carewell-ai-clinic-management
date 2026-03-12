@@ -23,6 +23,8 @@ const saveConsultation = async (req, res) => {
 
     const consultation = await Consultation.create({
       patientId,
+      doctorId: req.user._id,
+      clinic: req.clinicId,
       symptoms,
       modalities,
       generals,
@@ -54,7 +56,9 @@ const getConsultationsByPatient = async (req, res) => {
   try {
     const consultations = await Consultation.find({
       patientId: req.params.patientId,
+      clinic: req.clinicId,
     })
+      .populate("doctorId", "name profileImage")
       .sort({ consultationDate: -1 })
       .select("-__v");
 
@@ -71,8 +75,9 @@ const getConsultationsByPatient = async (req, res) => {
  */
 const getAllConsultations = async (req, res) => {
   try {
-    const consultations = await Consultation.find()
+    const consultations = await Consultation.find({ clinic: req.clinicId })
       .populate("patientId", "name age phone")
+      .populate("doctorId", "name profileImage")
       .sort({ consultationDate: -1 })
       .select("-__v");
 
@@ -99,7 +104,11 @@ const updateConsultation = async (req, res) => {
       updateData.doctorEditedNotes = JSON.stringify(updateData.doctorEditedNotes);
     }
 
-    const consultation = await Consultation.findByIdAndUpdate(id, updateData, { new: true });
+    const consultation = await Consultation.findOneAndUpdate(
+      { _id: id, clinic: req.clinicId },
+      updateData,
+      { new: true }
+    );
 
     if (!consultation) {
       return res.status(404).json({ success: false, error: "Consultation not found." });
@@ -118,8 +127,9 @@ const updateConsultation = async (req, res) => {
  */
 const getConsultationById = async (req, res) => {
   try {
-    const consultation = await Consultation.findById(req.params.id)
+    const consultation = await Consultation.findOne({ _id: req.params.id, clinic: req.clinicId })
       .populate("patientId", "name age phone gender")
+      .populate("doctorId", "name profileImage licenseNumber")
       .select("-__v");
 
     if (!consultation) {

@@ -2,12 +2,12 @@
 
 import { toast } from "sonner";
 import { Suspense, useEffect } from "react";
-import { Sparkles, Save, User, FileText, Loader2, Activity, Pill, Trash2, Plus } from "lucide-react";
+import { Sparkles, Save, User, FileText, Loader2, Activity, Pill, Trash2, Plus, Printer } from "lucide-react";
 import { useForm, useWatch, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useSearchParams, useRouter } from "next/navigation";
-import { generateNotes, saveConsultation, updateConsultation } from "@/services/consultationService";
+import { generateNotes, saveConsultation, updateConsultation, getNextOPNumber } from "@/services/consultationService";
 import apiClient from "@/services/apiClient";
 import { getPatient, getAllPatients } from "@/services/patientService";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { ConsultationNotes } from "@/services/consultationService";
+import { generatePrescriptionPDF } from "@/lib/pdfGenerator";
 
 const aiGenerationSchema = z.object({
   patientId: z.string().min(1, "Please select a patient"),
@@ -133,8 +134,15 @@ function ConsultationForm() {
       setValue("diagnosis", apt.diagnosis || "");
       // advice is handled within doctorEditedNotes usually, but if advice field exists
       setValue("advice", apt.advice || "");
+    } else if (!urlAppointmentId) {
+      // Auto-prefill next OP Number for new consultations
+      getNextOPNumber().then(res => {
+        if (res.success) {
+          setValue("opNumber", res.data.opNumber);
+        }
+      });
     }
-  }, [appointmentRes, setValue]);
+  }, [appointmentRes, setValue, urlAppointmentId]);
 
   const allPatients = allPatientsRes?.data || [];
   const patient = patientRes?.data;
@@ -213,6 +221,42 @@ function ConsultationForm() {
     onGenerate(values);
   };
 
+  const handlePrint = () => {
+    const values = getValues();
+    if (!patient) {
+      toast.error("Please select a patient first.");
+      return;
+    }
+
+    if (!values.prescriptions || values.prescriptions.length === 0 || !values.prescriptions[0].medicine) {
+      toast.error("Please add at least one prescription before printing.");
+      return;
+    }
+
+    generatePrescriptionPDF({
+      clinicName: user?.clinic?.name || "Carewell Clinic",
+      clinicAddress: user?.clinic?.address,
+      doctorName: user?.name || "Doctor",
+      doctorLicense: user?.licenseNumber,
+      patientName: patient.name,
+      patientAge: patient.age,
+      patientGender: patient.gender,
+      date: new Date().toLocaleDateString('en-IN'),
+      opNumber: values.opNumber,
+      diagnosis: values.diagnosis,
+      symptoms: values.symptoms,
+      prescriptions: values.prescriptions.map(p => ({
+        medicine: p.medicine,
+        potency: p.potency,
+        form: p.form,
+        dosage: p.dosage,
+        quantity: p.quantity,
+        indication: p.indication
+      })),
+      advice: values.advice
+    });
+  };
+
   const handleSave = () => {
     const values = getValues();
 
@@ -271,7 +315,7 @@ function ConsultationForm() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <div className="h-px w-8 bg-brand-primary/40" />
+            <div className="h-[1px] w-8 bg-brand-primary/40" />
             <span className="eyebrow text-brand-primary/70">Clinical Session</span>
           </div>
           <h1 className="text-3xl font-light text-slate-900 tracking-tight">
@@ -292,15 +336,25 @@ function ConsultationForm() {
             )}
           </div>
         </div>
-        <Button
-          onClick={handleSave}
-          disabled={saveMutation.isPending || (aiEnabled && !aiNotes)}
-          variant="primary"
-          className="h-11 rounded-xl px-8 shadow-md"
-          leftIcon={saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        >
-          Save Clinical Record
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handlePrint}
+            variant="outline"
+            className="h-11 rounded-xl px-6 border-slate-200 text-slate-600 hover:bg-slate-50"
+            leftIcon={<Printer className="w-4 h-4" />}
+          >
+            Print Prescription
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={saveMutation.isPending || (aiEnabled && !aiNotes)}
+            variant="primary"
+            className="h-11 rounded-xl px-8 shadow-md"
+            leftIcon={saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          >
+            Save Clinical Record
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">

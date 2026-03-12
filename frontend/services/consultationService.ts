@@ -81,3 +81,11 @@ export const summarizeHistory = async (consultations: unknown[]) => {
   const response = await apiClient.post("/api/ai/summarize-history", { consultations });
   return response.data;
 };
+
+/**
+ * Fetch the next available OP number for the clinic.
+ */
+export const getNextOPNumber = async (): Promise<{ success: boolean; data: { opNumber: string } }> => {
+  const response = await apiClient.get("/api/ai/next-op-number");
+  return response.data;
+};

@@ -119,7 +119,7 @@ export default function ChronicCaseWizard({
     <div className="flex flex-col mx-auto w-full space-y-6 animate-in fade-in duration-500 pb-8">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-3 mb-2">
-          <div className="h-px w-8 bg-brand-primary/40" />
+          <div className="h-[1px] w-8 bg-brand-primary/40" />
           <span className="eyebrow text-brand-primary/70">Clinical Intelligence</span>
         </div>
         <h1 className="text-3xl font-light text-slate-900 tracking-tight">

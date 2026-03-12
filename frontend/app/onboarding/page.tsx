@@ -73,9 +73,15 @@ export default function OnboardingPage() {
   return (
     <div className="w-full space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both pb-12 px-4 md:px-0">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4">
-        <div className="flex-1">
-          <h1>Patient Onboarding</h1>
-          <p className="text-sm text-slate-500 font-medium tracking-tight ml-1">Register new patients into the CareWell Homeopathic registry.</p>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-[1px] w-8 bg-brand-primary/40" />
+            <span className="eyebrow text-brand-primary/70">Patient Registry</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-light text-slate-900 tracking-tight">
+            Patient <span className="font-semibold text-brand-primary">Onboarding</span>
+          </h1>
+          <p className="text-sm text-slate-500 max-w-md leading-relaxed mt-1">Register new patients into the CareWell Homeopathic registry.</p>
         </div>
       </div>
 

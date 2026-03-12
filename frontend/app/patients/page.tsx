@@ -24,6 +24,7 @@ export default function PatientsPage() {
     return (
       (patient?.name || "").toLowerCase().includes(query) ||
       (patient?.phone || "").includes(query) ||
+      (patient?.email || "").toLowerCase().includes(query) ||
       (patient?._id || "").toLowerCase().includes(query)
     );
   });

@@ -37,13 +37,16 @@ export default function AIToolsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both max-w-5xl mx-auto">
-      <div className="flex items-center gap-3 border-b border-slate-200 pb-6 mb-8">
-        <div className="p-3 bg-indigo-50 rounded-xl">
-          <Sparkles className="w-8 h-8 text-indigo-600" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">AI Tools Center</h1>
-          <p className="text-sm text-slate-500 mt-1">Enhance your clinical workflow with artificial intelligence.</p>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4 mb-8">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-[1px] w-8 bg-brand-primary/40" />
+            <span className="eyebrow text-brand-primary/70">Intelligence</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-light text-slate-900 tracking-tight">
+            AI Tools <span className="font-semibold text-brand-primary">Center</span>
+          </h1>
+          <p className="text-sm text-slate-500 max-w-md leading-relaxed mt-1">Enhance your clinical workflow with artificial intelligence.</p>
         </div>
       </div>
 

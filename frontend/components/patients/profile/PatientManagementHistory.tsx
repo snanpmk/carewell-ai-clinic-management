@@ -66,6 +66,12 @@ export function PatientManagementHistory({ visits }: PatientManagementHistoryPro
                         )}>
                           {isChronic ? "Chronic" : "Acute"}
                         </span>
+                        {(visit.doctorId || visit.doctor) && (
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary flex items-center gap-1.5">
+                            <span className="w-1 h-1 rounded-full bg-slate-200" />
+                            Dr. {visit.doctorId?.name || visit.doctor?.name}
+                          </span>
+                        )}
                       </div>
                       <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase italic truncate">{medicine}</h3>
                       <p className="text-sm font-bold text-slate-500 mt-1 truncate">{details}</p>

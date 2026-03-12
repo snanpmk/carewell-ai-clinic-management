@@ -105,11 +105,15 @@ export default function SettingsPage() {
   return (
     <div className="w-full space-y-12 animate-in fade-in duration-700 pb-12 px-4 md:px-0">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-4">
-        <div>
-          <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Settings & Team</h1>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-[1px] w-8 bg-brand-primary/40" />
+            <span className="eyebrow text-brand-primary/70">Configuration</span>
           </div>
-          <p className="text-sm text-slate-500 font-medium tracking-tight ml-1">Manage your clinic preferences and staff access.</p>
+          <h1 className="text-3xl md:text-4xl font-light text-slate-900 tracking-tight">
+            Settings & <span className="font-semibold text-brand-primary">Team</span>
+          </h1>
+          <p className="text-sm text-slate-500 max-w-md leading-relaxed mt-1">Manage your clinic preferences and staff access.</p>
         </div>
       </div>
 

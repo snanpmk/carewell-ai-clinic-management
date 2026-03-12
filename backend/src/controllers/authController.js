@@ -21,12 +21,21 @@ const generateToken = (id) => {
   });
 };
 
-// @desc    Register a new clinic and primary doctor using Google
+// @desc    Register a new clinic and primary doctor using Google (Strictly one-time setup)
 // @route   POST /api/auth/register
 // @access  Public
 const registerClinic = async (req, res) => {
   try {
     const { clinicName, clinicAddress, doctorPhone, doctorLicense, credential, profileImage } = req.body;
+
+    // --- Strict Single-Tenant Check ---
+    const existingClinicCount = await Clinic.countDocuments();
+    if (existingClinicCount > 0) {
+      return res.status(403).json({ 
+        success: false, 
+        error: "Registration is restricted. A clinic is already registered on this instance." 
+      });
+    }
 
     if (!credential) {
       return res.status(400).json({ success: false, error: "No Google credential provided." });
