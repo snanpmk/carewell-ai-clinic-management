@@ -27,6 +27,11 @@ export default function StepInitialPresentation({ caseData, updateCaseData, next
       <StepLayout
         title="Opening Narrative"
         subtitle="Capturing the patient's own words and initial clinical impressions"
+        patientContext={caseData.demographics?.name ? {
+          name: caseData.demographics.name,
+          age: caseData.demographics.age || 0,
+          gender: caseData.demographics.sex || ""
+        } : undefined}
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >

@@ -79,7 +79,7 @@ export function DynamicTable<T extends FieldValues>({
                         {...register(`${name}.${index}.${col.accessor}` as Path<T>)}
                         placeholder={col.placeholder}
                         type={col.type || "text"}
-                        className="w-full bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 placeholder:text-slate-300 placeholder:font-normal"
+                        className="w-full bg-transparent border-none focus:ring-0 outline-0 text-sm font-bold text-slate-700 placeholder:text-slate-300 placeholder:font-normal"
                       />
                     </td>
                   ))}

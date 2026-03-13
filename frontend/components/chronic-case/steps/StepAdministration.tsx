@@ -10,25 +10,27 @@ import { useQuery } from "@tanstack/react-query";
 import { Patient, getAllPatients } from "@/services/patientService";
 import { getPatientChronicCases } from "@/services/chronicCaseService";
 import { getNextOPNumber } from "@/services/consultationService";
-import { getClinicMembers, ClinicMember } from "@/services/authService";
-import { useMemo, useEffect } from "react";
+import { getClinicMembers } from "@/services/authService";
+import { useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function StepAdministration({ caseData, updateCaseData, nextStep }: StepProps) {
   const { user } = useAuthStore();
-  const { data: allPatientsRes } = useQuery<{ success: boolean; data: Patient[] }>({
+  const hasInitialized = useRef(false);
+
+  const { data: allPatientsRes, isLoading: isLoadingPatients } = useQuery<{ success: boolean; data: Patient[] }>({
     queryKey: ["patients"],
     queryFn: getAllPatients,
   });
 
-  const { data: membersRes } = useQuery<{ success: boolean; data: ClinicMember[] }>({
+  const { data: membersRes } = useQuery<{ success: boolean; data: any[] }>({
     queryKey: ["clinicMembers"],
     queryFn: getClinicMembers,
   });
 
-  const { register, handleSubmit, reset, control, formState: { isSubmitting } } = useForm<ChronicCase>({
+  const { register, handleSubmit, reset, control, setValue, formState: { isSubmitting } } = useForm<ChronicCase>({
     defaultValues: {
       patient: caseData.patient || "",
       header: {
@@ -58,7 +60,6 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
     name: "patient",
   });
 
-  // Fetch existing chronic cases - enabled whenever a patient is selected
   const { data: existingCases, isFetching: isLoadingExisting } = useQuery({
     queryKey: ["chronicCases", selectedPatientId],
     queryFn: () => getPatientChronicCases(selectedPatientId as string),
@@ -68,95 +69,65 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
   const memoPatients = useMemo(() => allPatientsRes?.data || [], [allPatientsRes?.data]);
 
   useEffect(() => {
-    if (!selectedPatientId) return;
+    if (!selectedPatientId || isLoadingPatients) return;
 
-    // 1. Logic for existing chronic case found
+    // 1. Logic for EXISTING chronic case found
     if (existingCases && existingCases.length > 0) {
       const latestCase = existingCases[0];
       
-      // Prevent infinite loop: Only reset if the case _id is actually different
       if (latestCase._id !== caseData._id) {
         updateCaseData(latestCase);
         
         reset({
+          ...latestCase, // Use full object spread for robustness
           patient: selectedPatientId,
           header: {
-            opNumber: latestCase.header?.opNumber || "",
-            unit: latestCase.header?.unit || "",
+            ...latestCase.header,
             caseTakenBy: latestCase.header?.caseTakenBy || user?.name || "",
-          },
-          demographics: {
-            name: latestCase.demographics?.name || "",
-            age: latestCase.demographics?.age || 0,
-            sex: latestCase.demographics?.sex || "",
-            religion: latestCase.demographics?.religion || "",
-            caste: latestCase.demographics?.caste || "",
-            occupation: latestCase.demographics?.occupation || "",
-            phone: latestCase.demographics?.phone || "",
-          },
-          summaryDiagnosis: {
-            diseaseDiagnosis: latestCase.summaryDiagnosis?.diseaseDiagnosis || "",
-            homeopathicDiagnosis: latestCase.summaryDiagnosis?.homeopathicDiagnosis || "",
-            result: latestCase.summaryDiagnosis?.result || "",
           }
         });
         
-        toast.success("Active clinical record detected. Loading most recent analysis.");
+        toast.success("Existing clinical record loaded.");
       }
     } 
-    // 2. Logic for NO existing chronic case (New Case)
+    // 2. Logic for NEW chronic case population
     else if (existingCases && existingCases.length === 0) {
-      // Only clear if we were previously looking at a different patient
-      if (selectedPatientId !== caseData.patient) {
-        updateCaseData({
-          patient: selectedPatientId,
-          status: "Draft",
-          header: {},
-          demographics: {},
-          initialPresentation: {},
-          presentingComplaints: [],
-          historyOfPresentIllness: {},
-          previousIllnessHistory: [],
-          familyHistory: [],
-          personalHistory: {},
-          lifeSpaceInvestigation: {},
-          physicalFeatures: {},
-          physicalExamination: {},
-          femaleHistory: {},
-          analysisAndDiagnosis: {},
-          management: {},
-        });
+      const patientRecord = memoPatients.find((p: Patient) => p._id === selectedPatientId);
+      
+      // Important: Only reset if the demographic name is currently different/empty 
+      // OR if we just switched patients
+      if (patientRecord && (caseData.patient !== selectedPatientId || !hasInitialized.current)) {
+        hasInitialized.current = true;
+        
+        getNextOPNumber().then(res => {
+          const newCaseDefaults = {
+            patient: selectedPatientId,
+            status: "Draft" as const,
+            header: { 
+              opNumber: res.success ? res.data.opNumber : "", 
+              unit: "", 
+              caseTakenBy: user?.name || "" 
+            },
+            demographics: {
+              name: patientRecord.name || "",
+              age: patientRecord.age || 0,
+              sex: patientRecord.gender || patientRecord.sex || "",
+              religion: "",
+              caste: "",
+              occupation: "",
+              phone: patientRecord.phone || "",
+            },
+            summaryDiagnosis: { diseaseDiagnosis: "", homeopathicDiagnosis: "", result: "" }
+          };
 
-        const patientRecord = memoPatients.find((p: Patient) => p._id === selectedPatientId);
-        if (patientRecord) {
-          // Prefill OP Number for new chronic cases
-          getNextOPNumber().then(res => {
-            reset({
-              patient: selectedPatientId,
-              header: { 
-                opNumber: res.success ? res.data.opNumber : "", 
-                unit: "", 
-                caseTakenBy: user?.name || "" 
-              },
-              demographics: {
-                name: patientRecord.name || "",
-                age: patientRecord.age || 0,
-                sex: patientRecord.sex || patientRecord.gender || "",
-                religion: "",
-                caste: "",
-                occupation: "",
-                phone: patientRecord.phone || "",
-              },
-              summaryDiagnosis: { diseaseDiagnosis: "", homeopathicDiagnosis: "", result: "" }
-            });
-          });
-        }
+          updateCaseData(newCaseDefaults);
+          reset(newCaseDefaults);
+        });
       }
     }
-  }, [selectedPatientId, existingCases, memoPatients, reset, updateCaseData, caseData._id, caseData.patient, user?.name]);
+  }, [selectedPatientId, existingCases, memoPatients, isLoadingPatients, reset, updateCaseData, caseData._id, caseData.patient, user?.name]);
 
   const onSubmit = (data: ChronicCase) => {
-    // Merge current form data into global state before proceeding
     updateCaseData(data);
     nextStep();
   };
@@ -168,7 +139,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
     })), [memoPatients]);
 
   const doctorOptions = useMemo(() => 
-    (membersRes?.data || []).map((m: ClinicMember) => ({
+    (membersRes?.data || []).map((m: any) => ({
       value: m.name,
       label: m.name,
     })), [membersRes?.data]);
@@ -178,6 +149,11 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
       <StepLayout
         title="Administrative Overview"
         subtitle="Patient registry and clinical metadata"
+        patientContext={caseData.demographics?.name ? {
+          name: caseData.demographics.name,
+          age: caseData.demographics.age || 0,
+          gender: caseData.demographics.sex || ""
+        } : undefined}
         isFirstStep
         isSubmitting={isSubmitting}
       >
@@ -185,7 +161,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-200/80 space-y-6">
             <div className="flex items-center justify-between">
               <div className="eyebrow flex items-center gap-2">Patient Registry Lookup</div>
-              {isLoadingExisting && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
+              {(isLoadingExisting || isLoadingPatients) && <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />}
             </div>
             <div className="max-w-md">
               <Select label="Registered Patient" options={patientOptions} {...register("patient")} required />

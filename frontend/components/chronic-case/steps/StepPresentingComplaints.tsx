@@ -12,9 +12,15 @@ import StepLayout from "../StepLayout";
 import { extractLSMA } from "@/services/chronicCaseService";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+
+const SENSATION_TAGS = ["Throbbing", "Stitching", "Burning", "Cramping", "Heavy", "Dull", "Sharp", "Numb"];
 
 export default function StepPresentingComplaints({ caseData, updateCaseData, nextStep, prevStep }: StepProps) {
-  const { register, handleSubmit, control, setValue, formState: { isSubmitting } } = useForm<Partial<ChronicCase>>({
+  const { user } = useAuthStore();
+  const aiEnabled = user?.clinic?.aiEnabled ?? true;
+
+  const { register, handleSubmit, control, setValue, watch, formState: { isSubmitting } } = useForm<Partial<ChronicCase>>({
     defaultValues: {
       presentingComplaints: caseData.presentingComplaints || [
         { complaintType: "Chief", location: {}, modalities: {} }
@@ -49,7 +55,6 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
       const result = await extractLSMA(narration);
       
       if (result.symptoms && result.symptoms.length > 0) {
-        // Map AI results to the form structure
         const mappedSymptoms = result.symptoms.map(sym => ({
           complaintType: sym.complaintType || "Chief",
           location: {
@@ -69,17 +74,22 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
           accompaniments: sym.accompaniments || "",
         }));
 
-        // Replace the current list with the AI extracted ones
         replace(mappedSymptoms);
-        toast.success(`Magic Sync complete: ${mappedSymptoms.length} symptoms extracted.`);
+        toast.success(`AI Sync complete: ${mappedSymptoms.length} symptoms extracted.`);
       } else {
         toast.info("AI couldn't find distinct symptoms in the narration.");
       }
     } catch (err) {
-      toast.error("AI Magic Sync failed. Please try again or fill manually.");
+      toast.error("AI Sync failed. Please try again or fill manually.");
     } finally {
       setIsExtracting(false);
     }
+  };
+
+  const addSensationTag = (index: number, tag: string) => {
+    const current = watch(`presentingComplaints.${index}.sensation`) || "";
+    const newValue = current ? `${current}, ${tag}` : tag;
+    setValue(`presentingComplaints.${index}.sensation`, newValue);
   };
 
   const onSubmit = (data: Partial<ChronicCase>) => {
@@ -92,6 +102,11 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
       <StepLayout
         title="Presenting Complaints"
         subtitle="Mapping the complete symptom totality and clinical history"
+        patientContext={caseData.demographics?.name ? {
+          name: caseData.demographics.name,
+          age: caseData.demographics.age || 0,
+          gender: caseData.demographics.sex || ""
+        } : undefined}
         onBack={prevStep}
         isSubmitting={isSubmitting}
       >
@@ -99,21 +114,23 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
           {/* Section 3: Presenting Complaints */}
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-4">
-              <div className="eyebrow flex items-center gap-3">
-                <Activity className="w-4 h-4" /> Granular Symptom Analysis
+              <div className="eyebrow flex items-center gap-3 text-slate-900">
+                <Activity className="w-4 h-4 text-brand-primary" /> Granular Symptom Analysis
               </div>
               <div className="flex items-center gap-3">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="primary"
-                  onClick={handleMagicSync}
-                  disabled={isExtracting}
-                  className="bg-brand-primary shadow-lg shadow-brand-primary/20"
-                  leftIcon={isExtracting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
-                >
-                  {isExtracting ? "Syncing..." : "Magic AI Sync"}
-                </Button>
+                {aiEnabled && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="primary"
+                    onClick={handleMagicSync}
+                    disabled={isExtracting}
+                    className="bg-brand-primary shadow-lg shadow-brand-primary/20"
+                    leftIcon={isExtracting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  >
+                    {isExtracting ? "Syncing..." : "AI Totality Sync"}
+                  </Button>
+                )}
                 <Button 
                   type="button" 
                   size="sm" 
@@ -126,40 +143,40 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
               </div>
             </div>
 
-            {/* AI Insight Notification */}
             {!fields.length && !isExtracting && (
-              <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center">
-                <Sparkles className="w-8 h-8 text-slate-300 mx-auto mb-4" />
-                <h4 className="text-sm font-bold text-slate-900 mb-1">No Symptoms Recorded</h4>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto mb-6 leading-relaxed">
-                  Start by adding a card manually or use the Magic AI Sync to extract symptoms from the narration.
+              <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-16 text-center">
+                <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                <h4 className="text-sm font-bold text-slate-900 mb-1 uppercase tracking-widest">No Symptoms Recorded</h4>
+                <p className="text-xs text-slate-400 max-w-xs mx-auto mb-8 leading-relaxed italic">
+                  &quot;The physician must record all symptoms in the very expressions used by the patient.&quot;
                 </p>
-                <Button variant="outline" size="sm" onClick={() => append({ complaintType: "Chief", location: {}, modalities: {} })}>
-                  Add First Symptom
+                <Button variant="primary" size="md" onClick={() => append({ complaintType: "Chief", location: {}, modalities: {} })}>
+                  Initialize First Card
                 </Button>
               </div>
             )}
 
             <div className="space-y-10">
               {fields.map((field, index) => (
-                <div key={field.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200/60 shadow-xs relative group animate-in zoom-in-95 duration-500">
+                <div key={field.id} className="bg-white p-8 rounded-[3rem] border border-slate-200/60 shadow-xs relative group animate-in zoom-in-95 duration-500">
                   <button 
                     type="button" 
                     onClick={() => remove(index)}
-                    className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+                    className="absolute top-6 right-6 z-20 p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all cursor-pointer shadow-sm bg-white border border-slate-100"
+                    title="Remove Symptom"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Type & Location */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    {/* Column 1: Registry & Location */}
                     <div className="lg:col-span-4 space-y-6">
                       <Select 
-                        label="Type" 
+                        label="Complaint Priority" 
                         options={[{label: 'Chief Complaint', value:'Chief'}, {label: 'Associated Complaint', value:'Associated'}]} 
                         {...register(`presentingComplaints.${index}.complaintType`)} 
                       />
-                      <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+                      <div className="p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 space-y-4">
                         <div className="eyebrow !text-[9px] flex items-center gap-2 text-brand-primary">
                           <MapPin className="w-3 h-3" /> Anatomical Location
                         </div>
@@ -174,35 +191,60 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
                       </div>
                     </div>
 
-                    {/* Sensation & Modalities */}
-                    <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Column 2: Sensation & Modalities */}
+                    <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10">
                       <div className="space-y-6">
-                        <Textarea 
-                          label="Sensation" 
-                          {...register(`presentingComplaints.${index}.sensation`)} 
-                          placeholder="Burning, throbbing, stitching..."
-                          rows={4}
-                        />
-                        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+                        <div>
+                          <Textarea 
+                            label="Sensation" 
+                            {...register(`presentingComplaints.${index}.sensation`)} 
+                            placeholder="Burning, throbbing, stitching..."
+                            rows={4}
+                          />
+                          <div className="flex flex-wrap gap-1.5 mt-3 px-1">
+                            {SENSATION_TAGS.map(tag => (
+                              <button
+                                key={tag}
+                                type="button"
+                                onClick={() => addSensationTag(index, tag)}
+                                className="px-2 py-0.5 bg-slate-100 hover:bg-brand-primary/10 hover:text-brand-primary text-[9px] font-bold text-slate-500 rounded-lg transition-colors border border-slate-200"
+                              >
+                                + {tag}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100 space-y-4">
                           <div className="eyebrow !text-[9px] flex items-center gap-2 text-brand-primary">
                             <Zap className="w-3 h-3" /> Modalities
                           </div>
-                          <Input label="Aggravation (<)" {...register(`presentingComplaints.${index}.modalities.aggravation`)} />
-                          <Input label="Amelioration (>)" {...register(`presentingComplaints.${index}.modalities.amelioration`)} />
+                          <Input 
+                            label="Aggravation (<)" 
+                            {...register(`presentingComplaints.${index}.modalities.aggravation`)} 
+                            className="bg-red-50/30 border-red-100 focus:border-red-300"
+                          />
+                          <Input 
+                            label="Amelioration (>)" 
+                            {...register(`presentingComplaints.${index}.modalities.amelioration`)} 
+                            className="bg-emerald-50/30 border-emerald-100 focus:border-emerald-300"
+                          />
                           <Input label="Equivalent (=)" {...register(`presentingComplaints.${index}.modalities.equivalent`)} />
                         </div>
                       </div>
                       
-                      <div className="space-y-6">
+                      <div className="space-y-6 h-full flex flex-col">
                         <Textarea 
                           label="Accompaniments" 
                           {...register(`presentingComplaints.${index}.accompaniments`)} 
                           placeholder="Concomitant symptoms (e.g. sweating with pain)..."
-                          rows={4}
-                          className="h-full"
+                          className="flex-1 min-h-[160px]"
                         />
-                        <div className="p-5 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 text-center italic text-[10px] text-slate-400">
-                          LSMA Mapping — Part of Homeopathic Totality
+                        <div className="p-6 bg-brand-primary/5 rounded-[2rem] border border-brand-primary/10 text-center flex flex-col items-center justify-center">
+                          <Activity className="w-4 h-4 text-brand-primary mb-2 opacity-50" />
+                          <p className="italic text-[10px] text-slate-400 font-medium leading-relaxed">
+                            LSMA Mapping creates a complete clinical totality for accurate prescription.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -215,7 +257,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
           {/* Section 4: HPI */}
           <div className="pt-10 border-t border-slate-100 space-y-8">
             <div className="eyebrow flex items-center gap-3">
-              <Layers className="w-4 h-4" /> History of Present Illness (HPI)
+              <Layers className="w-4 h-4 text-brand-primary" /> History of Present Illness (HPI)
             </div>
             <Textarea 
               label="Chronological Development" 
