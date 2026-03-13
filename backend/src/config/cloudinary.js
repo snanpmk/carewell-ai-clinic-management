@@ -14,21 +14,25 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
-    // Get folder type from query param or body, default to 'misc'
-    const type = req.query.type || req.body.type || "misc";
+  params: (req, file) => {
+    // Strictly use query parameters as they are available before the body is parsed
+    const type = req.query.type || "misc";
     
-    // Define allowed folders to prevent arbitrary folder creation
     const allowedFolders = ["users", "patients", "clinical", "misc"];
     const folderName = allowedFolders.includes(type) ? `carewell/${type}` : "carewell/misc";
 
-    return {
+    // Build the configuration object
+    const config = {
       folder: folderName,
       allowed_formats: ["jpg", "jpeg", "png", "webp"],
-      transformation: type === "users" || type === "patients" 
-        ? [{ width: 500, height: 500, crop: "fill" }] // Auto-crop profile pictures
-        : [], // Keep clinical images original
     };
+
+    // Apply transformation only for profile-type images
+    if (type === "users" || type === "patients") {
+      config.transformation = [{ width: 500, height: 500, crop: "fill", gravity: "face" }];
+    }
+
+    return config;
   },
 });
 
