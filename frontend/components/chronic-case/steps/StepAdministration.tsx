@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Patient, getAllPatients } from "@/services/patientService";
 import { getPatientChronicCases } from "@/services/chronicCaseService";
 import { getNextOPNumber } from "@/services/consultationService";
-import { getClinicMembers } from "@/services/authService";
+import { getClinicMembers, ClinicMember } from "@/services/authService";
 import { useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -25,12 +25,12 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
     queryFn: getAllPatients,
   });
 
-  const { data: membersRes } = useQuery<{ success: boolean; data: any[] }>({
+  const { data: membersRes } = useQuery<{ success: boolean; data: ClinicMember[] }>({
     queryKey: ["clinicMembers"],
     queryFn: getClinicMembers,
   });
 
-  const { register, handleSubmit, reset, control, setValue, formState: { isSubmitting } } = useForm<ChronicCase>({
+  const { register, handleSubmit, reset, control, formState: { isSubmitting } } = useForm<ChronicCase>({
     defaultValues: {
       patient: caseData.patient || "",
       header: {
@@ -111,13 +111,17 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
             demographics: {
               name: patientRecord.name || "",
               age: patientRecord.age || 0,
-              sex: patientRecord.gender || patientRecord.sex || "",
+              sex: (patientRecord.gender || patientRecord.sex || "") as "Male" | "Female" | "Other",
               religion: "",
               caste: "",
               occupation: "",
               phone: patientRecord.phone || "",
             },
-            summaryDiagnosis: { diseaseDiagnosis: "", homeopathicDiagnosis: "", result: "" }
+            summaryDiagnosis: { 
+              diseaseDiagnosis: "", 
+              homeopathicDiagnosis: "", 
+              result: "" as "" | "Cured" | "Relieved" | "Referred" | "Otherwise" | "Expired"
+            }
           };
 
           updateCaseData(newCaseDefaults);
@@ -139,7 +143,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
     })), [memoPatients]);
 
   const doctorOptions = useMemo(() => 
-    (membersRes?.data || []).map((m: any) => ({
+    (membersRes?.data || []).map((m: ClinicMember) => ({
       value: m.name,
       label: m.name,
     })), [membersRes?.data]);

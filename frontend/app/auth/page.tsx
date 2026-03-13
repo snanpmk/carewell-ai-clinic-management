@@ -66,6 +66,7 @@ function AuthContent() {
 
   const {
     register,
+    trigger,
     getValues,
     reset,
     clearErrors,
@@ -140,6 +141,19 @@ function AuthContent() {
     const credential = credentialResponse.credential;
     if (!credential) return;
     
+    // If it's a direct login, we don't need to validate form fields
+    if (isLogin) {
+      loginMutation.mutate(credential);
+      return;
+    }
+
+    // Trigger validation for registration or invite
+    const isValid = await trigger();
+    if (!isValid) {
+      toast.error("Please fill in all required fields correctly.");
+      return;
+    }
+
     const values = getValues();
 
     if (isInvite) {
@@ -153,9 +167,13 @@ function AuthContent() {
         doctorPhone: values.doctorPhone,
         doctorLicense: values.doctorLicense || "STAFF",
       });
-    } else if (isLogin) {
-      loginMutation.mutate(credential);
     } else {
+      // Registration - always requires license as it's the primary doctor
+      if (!values.doctorLicense) {
+        toast.error("Medical license number is required for clinic registration.");
+        return;
+      }
+
       // Registration
       let uploadedImageUrl = null;
       if (profileImage) {

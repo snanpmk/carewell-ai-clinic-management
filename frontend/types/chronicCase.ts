@@ -379,7 +379,15 @@ export interface ChronicCase {
     date?: string;
     symptomChanges?: string;
     interference?: string;
-    prescription?: string;
+    prescription?: Array<{
+      medicine?: string;
+      potency?: string;
+      form?: string;
+      dose?: string;
+      quantity?: string;
+      indication?: string;
+    }>;
+    basisOfPrescription?: string;
   }>;
 
   // AI ANALYSIS (DRAFTING)

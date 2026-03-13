@@ -33,7 +33,15 @@ export interface FollowUpEntry {
   date?: string;
   symptomChanges: string;
   interference?: string;
-  prescription?: string;
+  prescription?: Array<{
+    medicine?: string;
+    potency?: string;
+    form?: string;
+    dose?: string;
+    quantity?: string;
+    indication?: string;
+  }>;
+  basisOfPrescription?: string;
 }
 
 export const addFollowUp = async (id: string, entry: FollowUpEntry): Promise<ChronicCase> => {

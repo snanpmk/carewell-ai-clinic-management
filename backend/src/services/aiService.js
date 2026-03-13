@@ -147,11 +147,28 @@ const summarizePatientHistory = async (consultations) => {
   const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
   });
-  const formattedVisits = consultations.map((v, i) => `Visit ${i + 1}: ${v.symptoms}`).join("\n");
-  const prompt = `Summarize clinical trajectory (2-3 sentences):\n${formattedVisits}`;
+
+  const formattedVisits = consultations.map((v, i) => {
+    if (v.isChronic) {
+      return `[Chronic Case ${v.date}] Diagnosis: ${v.diagnosis || 'Pending'}. Complaints: ${v.symptoms || 'N/A'}`;
+    }
+    return `[Acute Visit ${v.date}] Symptoms: ${v.symptoms}. Diagnosis: ${v.diagnosis || 'N/A'}`;
+  }).join("\n");
+
+  const prompt = `You are a clinical analyst. Summarize this patient's medical history into a professional 'Clinical Trajectory'.
+Focus on:
+1. Recurring symptom patterns and depth of the case.
+2. Progression or resolution of complaints over time.
+3. Dominant clinical themes.
+
+History:
+${formattedVisits}
+
+Write a dense, 2-3 sentence professional summary. Avoid conversational language.`;
+
   return withRetry(async () => {
     const result = await model.generateContent(prompt);
-    return result.response.text().trim();
+    return result.response.text().trim().replace(/^```[a-z]*\n?/, "").replace(/\n?```$/, "").trim();
   });
 };
 

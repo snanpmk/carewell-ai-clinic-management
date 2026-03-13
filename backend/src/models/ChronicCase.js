@@ -425,7 +425,17 @@ const ChronicCaseSchema = new mongoose.Schema(
         date: { type: Date, default: Date.now },
         symptomChanges: String,
         interference: String,
-        prescription: String,
+        prescription: [
+          {
+            medicine: String,
+            potency: String,
+            form: String,
+            dose: String,
+            quantity: String,
+            indication: String,
+          }
+        ],
+        basisOfPrescription: String,
       },
     ],
   },

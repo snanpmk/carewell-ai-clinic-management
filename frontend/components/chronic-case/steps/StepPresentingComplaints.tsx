@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { Plus, Trash2, MapPin, Activity, Zap, Layers, Sparkles, Loader2, Wand2 } from "lucide-react";
+import { Plus, Trash2, MapPin, Activity, Zap, Layers, Sparkles, Loader2 } from "lucide-react";
 import StepLayout from "../StepLayout";
 import { extractLSMA } from "@/services/chronicCaseService";
 import { toast } from "sonner";
@@ -79,7 +79,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
       } else {
         toast.info("AI couldn't find distinct symptoms in the narration.");
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error("AI Sync failed. Please try again or fill manually.");
     } finally {
       setIsExtracting(false);

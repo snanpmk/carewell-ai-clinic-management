@@ -3,14 +3,16 @@
 import { ChronicCase } from "@/types/chronicCase";
 import { 
   Activity, ClipboardList, Brain, 
-  Thermometer, ShieldCheck, Pill, Microscope, 
-  Baby, Stethoscope,
-  ShieldAlert,
+  Thermometer, Microscope, 
+  Stethoscope,
   User,
   Zap,
   Layers,
   HeartPulse,
-  Navigation
+  Navigation,
+  FileDigit,
+  TestTube,
+  Pill
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -18,7 +20,7 @@ interface ChronicCaseDetailsProps {
   data: ChronicCase;
 }
 
-function Section({ icon: Icon, title, children, className }: { icon: any, title: string, children: React.ReactNode, className?: string }) {
+function Section({ icon: Icon, title, children, className }: { icon: React.ElementType, title: string, children: React.ReactNode, className?: string }) {
   return (
     <div className={clsx("bg-white rounded-[2rem] border border-slate-200 p-8 shadow-xs space-y-6 relative overflow-hidden group transition-all hover:border-brand-primary/20", className)}>
       <div className="flex items-center justify-between">
@@ -89,7 +91,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
               <div>
                 <p className="text-[10px] font-bold text-brand-primary uppercase mb-1">Location & Sensation</p>
                 <p className="text-sm font-bold text-slate-800">
-                  <span className="text-slate-400">[{comp.location?.system}]</span> {comp.sensation}
+                  <span className="text-slate-400">[{comp.location?.system || 'System'}]</span> {comp.sensation}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
@@ -105,7 +107,7 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
               {comp.accompaniments && (
                 <div className="pt-2 border-t border-slate-100">
                   <p className="text-[9px] font-bold text-slate-400 uppercase mb-1 text-center">Accompaniments</p>
-                  <p className="text-[11px] text-slate-500 italic text-center leading-relaxed px-4">{comp.accompaniments}</p>
+                  <p className="text-xs text-slate-500 italic text-center leading-relaxed px-4">{comp.accompaniments}</p>
                 </div>
               )}
             </div>
@@ -201,65 +203,85 @@ export function ChronicCaseDetails({ data }: ChronicCaseDetailsProps) {
         </div>
       </Section>
 
-      {/* 7. Clinical Synthesis (CONCISE VERSION) */}
-      <div className="bg-slate-900 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-brand-primary/10 blur-[80px] pointer-events-none" />
-        
-        <div className="flex items-center justify-between border-b border-white/10 pb-5 mb-8">
-          <div className="eyebrow flex items-center gap-3 text-white">
-            <Microscope className="w-4 h-4 text-brand-primary" /> Conclusion Summary
-          </div>
-          <div className="px-3 py-1 rounded-full bg-brand-primary/20 border border-brand-primary/30 text-brand-primary text-[9px] font-black uppercase">Final Eval</div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          {/* Totality Paragraph */}
-          <div className="md:col-span-7 space-y-6">
-            <div>
-              <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Clinical Totality</p>
-              <p className="text-sm font-medium text-slate-300 leading-relaxed italic">&quot;{data.analysisAndDiagnosis?.evaluation?.totalityOfSymptoms}&quot;</p>
+      {/* 7. Clinical Synthesis (Simplified UI) */}
+      <Section icon={Microscope} title="Clinical Synthesis">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Left Column: Totality & Disease Mapping */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase text-slate-400">Clinical Totality</p>
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-sm font-medium text-slate-700 leading-relaxed italic">
+                  &quot;{data.analysisAndDiagnosis?.evaluation?.totalityOfSymptoms || "Totality not yet established."}&quot;
+                </p>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-4">
-              <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-                <p className="text-[8px] font-black uppercase text-slate-500 mb-1">Miasmatic Background</p>
-                <div className="flex gap-1.5">
-                  {data.analysisAndDiagnosis?.evaluation?.miasmaticExpression?.map(m => (
-                    <span key={m} className="text-[10px] font-black text-brand-primary uppercase">{m}</span>
-                  ))}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Dominant Miasm</p>
+                <div className="flex flex-wrap gap-2">
+                  {data.analysisAndDiagnosis?.evaluation?.miasmaticExpression?.length ? (
+                    data.analysisAndDiagnosis.evaluation.miasmaticExpression.map(m => (
+                      <span key={m} className="px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-black uppercase">
+                        {m}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-slate-500 italic">Not determined</span>
+                  )}
                 </div>
               </div>
-              <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-                <p className="text-[8px] font-black uppercase text-slate-500 mb-1">Disease Mapping</p>
-                <p className="text-[10px] font-black text-slate-300 uppercase">{data.analysisAndDiagnosis?.finalDiagnosis?.disease || 'Functional'}</p>
+
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Disease Mapping</p>
+                <p className="text-sm font-bold text-slate-800 capitalize">
+                  {data.analysisAndDiagnosis?.finalDiagnosis?.disease || 'Functional / Not Specified'}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Remedy & RX */}
-          <div className="md:col-span-5 space-y-6">
-            <div className="p-6 bg-brand-primary/10 rounded-[1.5rem] border border-brand-primary/20">
-              <p className="text-[9px] font-black uppercase text-brand-primary/70 mb-2 tracking-widest">Simillimum Suggestion</p>
-              <p className="text-2xl font-black text-brand-primary uppercase italic leading-none">
+          {/* Right Column: Remedy & Prescription */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="p-6 bg-brand-primary/5 rounded-2xl border border-brand-primary/20">
+              <p className="text-[10px] font-black uppercase text-brand-primary/70 mb-2">Simillimum Suggestion</p>
+              <p className="text-2xl font-black text-brand-primary uppercase italic leading-tight">
                 {data.analysisAndDiagnosis?.finalDiagnosis?.homeopathicDiagnosis || "Pending"}
               </p>
             </div>
             
-            {data.management?.firstPrescription?.medicines?.length ? (
-              <div className="space-y-2">
-                {data.management.firstPrescription.medicines.slice(0, 2).map((m, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs py-2 border-b border-white/5 last:border-0">
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-3 h-3 text-brand-primary" />
-                      <span className="font-bold text-slate-200">{m.medicine} {m.potency}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-500 font-bold uppercase">{m.dose}</span>
-                  </div>
-                ))}
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Pill className="w-4 h-4 text-emerald-500" />
+                <p className="text-[10px] font-black uppercase text-slate-500">First Prescription</p>
               </div>
-            ) : null}
+              
+              {data.management?.firstPrescription?.medicines?.length ? (
+                <div className="space-y-3">
+                  {data.management.firstPrescription.medicines.map((m, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200">
+                      <div>
+                        <p className="text-sm font-bold text-slate-800 uppercase">{m.medicine} <span className="text-emerald-600 ml-1">{m.potency}</span></p>
+                        {(m.dose || m.quantity) && (
+                          <p className="text-[10px] text-slate-500 mt-1 uppercase font-semibold">
+                            {m.dose} {m.quantity && `• Qty: ${m.quantity}`}
+                          </p>
+                        )}
+                      </div>
+                      <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                        <span className="text-[10px] font-black">{idx + 1}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 italic">No prescription recorded yet.</p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </Section>
     </div>
   );
 }

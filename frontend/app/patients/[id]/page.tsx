@@ -6,10 +6,10 @@ import {
   History, Pill, Edit3, 
   Activity, Clock, 
   Loader2, Stethoscope, Heart, Scale, Sparkles,
-  Phone, MapPin
+  Phone, MapPin, Plus, Trash2, Zap
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { getPatient } from "@/services/patientService";
 import { getConsultationsByPatient, summarizeHistory } from "@/services/consultationService";
 import { getPatientChronicCases, addFollowUp, FollowUpEntry } from "@/services/chronicCaseService";
@@ -66,7 +66,12 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
 
   const { data: summaryRes, isLoading: summaryLoading } = useQuery({
     queryKey: ["patient-summary", patientId],
-    queryFn: () => summarizeHistory(visits),
+    queryFn: () => summarizeHistory(visits.map(v => ({
+      isChronic: !!v.demographics,
+      date: v.consultationDate || v.createdAt,
+      symptoms: v.symptoms || (v as any).presentingComplaints?.[0]?.sensation || "General checkup",
+      diagnosis: v.diagnosis || (v as any).summaryDiagnosis?.diseaseDiagnosis || "Pending"
+    }))),
     enabled: visits.length > 0 && aiEnabled,
   });
 
@@ -78,7 +83,18 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
   const queryClient = useQueryClient();
 
   const followUpForm = useForm<FollowUpEntry>({
-    defaultValues: { symptomChanges: "", interference: "", prescription: "", date: "" }
+    defaultValues: { 
+      symptomChanges: "", 
+      interference: "", 
+      basisOfPrescription: "",
+      prescription: [{ medicine: "", potency: "", dose: "4-4-4", quantity: "15 Days" }],
+      date: new Date().toISOString().split('T')[0] 
+    }
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: followUpForm.control,
+    name: "prescription"
   });
 
   const followUpMutation = useMutation({
@@ -319,6 +335,32 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                 bp={latestChronicCase?.physicalExamination?.vitals?.bp}
               />
 
+              {/* AI INTELLIGENCE SUMMARY */}
+              {aiEnabled && !isStaff && (
+                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                  <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-brand-primary" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Clinical Trajectory</span>
+                    </div>
+                    <div className="px-2 py-0.5 rounded-md bg-brand-primary/10 text-brand-primary text-[8px] font-black uppercase">AI Powered</div>
+                  </div>
+                  <div className="p-8">
+                    {summaryLoading ? (
+                      <div className="space-y-3">
+                        <div className="h-2 w-full bg-slate-100 animate-pulse rounded-full" />
+                        <div className="h-2 w-4/5 bg-slate-100 animate-pulse rounded-full" />
+                        <div className="h-2 w-2/3 bg-slate-100 animate-pulse rounded-full" />
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-600 leading-relaxed italic font-medium">
+                        {aiSummary ? `"${aiSummary}"` : "Insufficient historical data for a comprehensive clinical synthesis."}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* BIOMETRICS PANEL */}
               {!isStaff && (
                 <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
@@ -341,26 +383,6 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {/* AI INTELLIGENCE SUMMARY */}
-              {aiEnabled && !isStaff && (
-                <div className="bg-brand-primary/5 border border-brand-primary/10 rounded-2xl p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Sparkles className="w-4 h-4 text-brand-primary" />
-                    <span className="eyebrow !text-brand-primary">AI History Summary</span>
-                  </div>
-                  {summaryLoading ? (
-                    <div className="space-y-3">
-                      <div className="h-3 w-full bg-brand-primary/5 animate-pulse rounded-full" />
-                      <div className="h-3 w-4/5 bg-brand-primary/5 animate-pulse rounded-full" />
-                    </div>
-                  ) : (
-                    <p className="text-sm text-slate-600 leading-relaxed italic">
-                      {aiSummary || "Insufficient data for clinical synthesis."}
-                    </p>
-                  )}
                 </div>
               )}
 
@@ -398,29 +420,95 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
       {/* FOLLOW-UP MODAL */}
       {followUpModalCaseId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg animate-in zoom-in-95 duration-300">
-            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-              <Activity className="w-5 h-5 text-emerald-500" /> Log Progress Visit
-            </h2>
-            <form onSubmit={followUpForm.handleSubmit((data) => followUpMutation.mutate(data))} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300 no-scrollbar">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
+                <Activity className="w-6 h-6 text-brand-primary" /> Log Progress Visit
+              </h2>
+              <div className="px-3 py-1 bg-slate-50 rounded-full border border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                Chronic Follow-up
+              </div>
+            </div>
+
+            <form onSubmit={followUpForm.handleSubmit((data) => followUpMutation.mutate(data))} className="space-y-8">
+              {/* Basic Meta */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="eyebrow block mb-2">Visit Date</label>
-                  <input type="date" {...followUpForm.register("date")} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-primary" />
+                  <label className="eyebrow block mb-2 px-1">Visit Date</label>
+                  <input type="date" {...followUpForm.register("date")} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/5 transition-all" />
                 </div>
                 <div>
-                  <label className="eyebrow block mb-2">Prescription</label>
-                  <input {...followUpForm.register("prescription")} placeholder="Remedy & Potency" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-primary" />
+                  <label className="eyebrow block mb-2 px-1">Interference / Factors</label>
+                  <input {...followUpForm.register("interference")} placeholder="Diet, Stress, Intercurrent remedies..." className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/5 transition-all" />
                 </div>
               </div>
+
+              {/* Symptom Changes */}
               <div>
-                <label className="eyebrow block mb-2">Symptom Changes</label>
-                <textarea {...followUpForm.register("symptomChanges", { required: true })} rows={4} placeholder="Observations since last visit..." className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-primary resize-none" />
+                <label className="eyebrow block mb-2 px-1">Symptom Evolution (Changes)</label>
+                <textarea 
+                  {...followUpForm.register("symptomChanges", { required: true })} 
+                  rows={4} 
+                  placeholder="Record patient's report on how symptoms have changed since last visit..." 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-[1.5rem] px-5 py-4 text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/5 transition-all resize-none" 
+                />
               </div>
-              <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setFollowUpModalCaseId(null)} className="flex-1 py-3.5 rounded-xl border border-slate-200 text-xs font-bold uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">Cancel</button>
-                <button type="submit" disabled={followUpMutation.isPending} className="flex-1 py-3.5 rounded-xl bg-slate-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-brand-primary transition-all shadow-xl">
-                  {followUpMutation.isPending ? "Syncing..." : "Record Visit"}
+
+              {/* Multi-Prescription Area */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-1">
+                  <label className="eyebrow flex items-center gap-2">
+                    <Zap className="w-3.5 h-3.5 text-brand-primary" /> Prescription Protocol
+                  </label>
+                  <button 
+                    type="button" 
+                    onClick={() => append({ medicine: "", potency: "", dose: "4-4-4", quantity: "15 Days" })}
+                    className="text-[10px] font-black text-brand-primary uppercase tracking-widest hover:underline flex items-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" /> Add Medicine
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {fields.map((item, index) => (
+                    <div key={item.id} className="p-5 bg-slate-50/50 rounded-2xl border border-slate-200 relative group animate-in slide-in-from-top-2 duration-300">
+                      <button 
+                        type="button" 
+                        onClick={() => remove(index)}
+                        className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div className="md:col-span-5">
+                          <input {...followUpForm.register(`prescription.${index}.medicine` as const)} placeholder="Medicine Name" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none border-dashed" />
+                        </div>
+                        <div className="md:col-span-3">
+                          <input {...followUpForm.register(`prescription.${index}.potency` as const)} placeholder="Potency" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none border-dashed" />
+                        </div>
+                        <div className="md:col-span-4">
+                          <input {...followUpForm.register(`prescription.${index}.dose` as const)} placeholder="Dose (e.g. 4-4-4)" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none border-dashed" />
+                        </div>
+                        <div className="md:col-span-12">
+                          <input {...followUpForm.register(`prescription.${index}.indication` as const)} placeholder="Indication / Why this medicine?" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-[10px] font-medium focus:outline-none border-dashed italic" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Basis of RX */}
+              <div>
+                <label className="eyebrow block mb-2 px-1">Basis of Prescription (Reasoning)</label>
+                <input {...followUpForm.register("basisOfPrescription")} placeholder="Why is this protocol selected? (e.g. Second Prescription logic)" className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm font-medium focus:outline-none focus:border-brand-primary transition-all" />
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-4 pt-6">
+                <button type="button" onClick={() => setFollowUpModalCaseId(null)} className="flex-1 py-4 rounded-2xl border border-slate-200 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">Discard</button>
+                <button type="submit" disabled={followUpMutation.isPending} className="flex-1 py-4 rounded-2xl bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest hover:bg-brand-primary transition-all shadow-2xl shadow-slate-200">
+                  {followUpMutation.isPending ? "Syncing..." : "Finalize Visit"}
                 </button>
               </div>
             </form>
