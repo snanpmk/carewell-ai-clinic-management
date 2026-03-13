@@ -158,6 +158,8 @@ const loginDoctor = async (req, res) => {
           profileImage: doctor.profileImage,
           role: doctor.role,
           clinic: doctor.clinic,
+          phone: doctor.phone,
+          licenseNumber: doctor.licenseNumber,
           token: generateToken(doctor._id),
         },
       });
@@ -449,6 +451,93 @@ const removeMember = async (req, res) => {
   }
 };
 
+// @desc    Check if system is initialized (at least one clinic registered)
+// @route   GET /api/auth/status
+// @access  Public
+const getSystemStatus = async (req, res) => {
+  try {
+    const clinicCount = await Clinic.countDocuments();
+    res.status(200).json({
+      success: true,
+      initialized: clinicCount > 0,
+    });
+  } catch (error) {
+    console.error("System Status Error:", error);
+    res.status(500).json({ success: false, error: "Server Error" });
+  }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateUser = async (req, res) => {
+  try {
+    const { name, phone, licenseNumber, profileImage } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (licenseNumber) user.licenseNumber = licenseNumber;
+    if (profileImage) user.profileImage = profileImage;
+
+    const updatedUser = await user.save();
+    const populatedUser = await User.findById(updatedUser._id).populate("clinic");
+
+    res.status(200).json({
+      success: true,
+      data: {
+        _id: populatedUser._id,
+        name: populatedUser.name,
+        email: populatedUser.email,
+        profileImage: populatedUser.profileImage,
+        phone: populatedUser.phone,
+        licenseNumber: populatedUser.licenseNumber,
+        role: populatedUser.role,
+        clinic: populatedUser.clinic,
+      },
+    });
+  } catch (error) {
+    console.error("Update User Error:", error);
+    res.status(500).json({ success: false, error: "Server Error during profile update" });
+  }
+};
+
+// @desc    Update clinic details
+// @route   PUT /api/auth/clinic
+// @access  Private (Primary Doctor only)
+const updateClinicDetails = async (req, res) => {
+  try {
+    const { name, address } = req.body;
+
+    if (req.user.role !== "primary") {
+      return res.status(403).json({ success: false, error: "Only primary doctors can update clinic details." });
+    }
+
+    const clinic = await Clinic.findById(req.user.clinic);
+
+    if (!clinic) {
+      return res.status(404).json({ success: false, error: "Clinic not found" });
+    }
+
+    if (name) clinic.name = name;
+    if (address) clinic.address = address;
+
+    const updatedClinic = await clinic.save();
+
+    res.status(200).json({
+      success: true,
+      data: updatedClinic,
+    });
+  } catch (error) {
+    console.error("Update Clinic Error:", error);
+    res.status(500).json({ success: false, error: "Server Error during clinic update" });
+  }
+};
+
 module.exports = {
   registerClinic,
   loginDoctor,
@@ -458,4 +547,7 @@ module.exports = {
   getClinicMembers,
   toggleAI,
   removeMember,
+  getSystemStatus,
+  updateUser,
+  updateClinicDetails,
 };

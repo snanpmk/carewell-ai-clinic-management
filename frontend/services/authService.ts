@@ -46,8 +46,31 @@ export const acceptInviteWithGoogle = async (payload: {
   return data;
 };
 
+export const getSystemStatus = async (): Promise<{ success: boolean; initialized: boolean }> => {
+  const { data } = await apiClient.get("/api/auth/status");
+  return data;
+};
+
 export const getMe = async () => {
   const { data } = await apiClient.get("/api/auth/me");
+  return data;
+};
+
+export const updateProfile = async (payload: {
+  name?: string;
+  phone?: string;
+  licenseNumber?: string;
+  profileImage?: string | null;
+}) => {
+  const { data } = await apiClient.put("/api/auth/profile", payload);
+  return data;
+};
+
+export const updateClinicDetails = async (payload: {
+  name?: string;
+  address?: string;
+}) => {
+  const { data } = await apiClient.put("/api/auth/clinic", payload);
   return data;
 };
 

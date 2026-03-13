@@ -1,12 +1,12 @@
 "use client";
 
 import { Input } from "@/components/ui/Input";
-import { acceptInviteWithGoogle, loginWithGoogle, registerWithGoogle } from "@/services/authService";
+import { acceptInviteWithGoogle, getSystemStatus, loginWithGoogle, registerWithGoogle } from "@/services/authService";
 import { uploadImage } from "@/services/patientService";
 import { useAuthStore } from "@/store/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,6 +32,13 @@ function AuthContent() {
   const inviteToken = searchParams.get("inviteToken");
   const isInvite = !!inviteToken;
 
+  const { data: statusData, isLoading: isLoadingStatus } = useQuery({
+    queryKey: ["systemStatus"],
+    queryFn: getSystemStatus,
+  });
+
+  const isInitialized = statusData?.initialized || false;
+
   const invitedRole = useMemo(() => {
     if (!inviteToken) return null;
     try {
@@ -44,7 +51,16 @@ function AuthContent() {
 
   const isStaffInvite = invitedRole === "staff";
 
-  const [isLogin, setIsLogin] = useState(!isInvite);
+  const [userSelectedMode, setUserSelectedMode] = useState<boolean | null>(null);
+
+  const isLogin = useMemo(() => {
+    if (userSelectedMode !== null) return userSelectedMode;
+    if (isLoadingStatus) return true;
+    if (isInvite) return false;
+    if (!isInitialized) return false;
+    return true;
+  }, [userSelectedMode, isLoadingStatus, isInvite, isInitialized]);
+
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -144,7 +160,7 @@ function AuthContent() {
       let uploadedImageUrl = null;
       if (profileImage) {
         try {
-          uploadedImageUrl = await uploadMutation.mutateAsync(profileImage);
+          uploadedImageUrl = await uploadImage(profileImage, "users");
         } catch {
           console.error("Image upload failed, continuing without image");
         }
@@ -165,7 +181,15 @@ function AuthContent() {
     toast.error("Google Sign-In failed. Please try again.");
   };
 
-  const isLoading = loginMutation.isPending || registerMutation.isPending || acceptInviteMutation.isPending || uploadMutation.isPending;
+  const isLoading = loginMutation.isPending || registerMutation.isPending || acceptInviteMutation.isPending || uploadMutation.isPending || isLoadingStatus;
+
+  if (isLoadingStatus) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-10 h-10 animate-spin text-brand-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full min-h-screen bg-white font-sans text-slate-900">
@@ -349,7 +373,7 @@ function AuthContent() {
              )}
           </div>
 
-          {!isInvite && (
+          {!isInvite && !isInitialized && (
             <div className="text-center pt-8 border-t border-slate-200">
               <p className="text-sm font-medium text-slate-500">
                 {isLogin ? "New to Carewell AI? " : "Already have a clinic? "}
@@ -357,7 +381,7 @@ function AuthContent() {
                   onClick={() => {
                     clearErrors();
                     reset();
-                    setIsLogin(!isLogin);
+                    setUserSelectedMode(!isLogin);
                     setProfileImage(null);
                     setImagePreview(null);
                   }}

@@ -16,6 +16,7 @@ interface User {
   role?: string;
   clinic: Clinic;
   licenseNumber?: string;
+  phone?: string;
 }
 
 interface AuthState {
@@ -25,6 +26,7 @@ interface AuthState {
   login: (user: User, token: string) => void;
   logout: () => void;
   updateClinic: (clinic: Clinic) => void;
+  updateUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -37,6 +39,9 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ user: null, token: null, isAuthenticated: false }),
       updateClinic: (clinic) => set((state) => ({
         user: state.user ? { ...state.user, clinic } : null
+      })),
+      updateUser: (user) => set((state) => ({
+        user: state.user ? { ...state.user, ...user } : null
       })),
     }),
     {

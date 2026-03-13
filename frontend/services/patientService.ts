@@ -55,11 +55,13 @@ export const getAllPatients = async () => {
 
 /**
  * Upload an image to the backend (Cloudinary).
+ * type can be 'users', 'patients', or 'clinical'
  */
-export const uploadImage = async (file: File): Promise<string> => {
+export const uploadImage = async (file: File, type: string = "misc"): Promise<string> => {
   const formData = new FormData();
   formData.append("image", file);
-  const { data } = await apiClient.post("/api/upload", formData, {
+  // Send type as a query parameter so multer-storage-cloudinary can access it early
+  const { data } = await apiClient.post(`/api/upload?type=${type}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return data.url;

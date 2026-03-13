@@ -1,13 +1,15 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Card } from "@/components/ui/Card";
-import { Mail, ArrowRight, User as UserIcon, Loader2, CheckCircle2, Trash2, Users, Sparkles, Power } from "lucide-react";
+import { Mail, ArrowRight, User as UserIcon, Loader2, CheckCircle2, Trash2, Users, Sparkles, Power, Phone, Shield, Building, MapPin, UploadCloud, Save } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import apiClient from "@/services/apiClient";
+import { updateClinicDetails, updateProfile } from "@/services/authService";
+import { uploadImage } from "@/services/patientService";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -16,11 +18,118 @@ import { useForm } from "react-hook-form";
 import clsx from "clsx";
 
 export default function SettingsPage() {
-  const { user, updateClinic } = useAuthStore();
+  const { user, updateClinic, updateUser } = useAuthStore();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const isPrimary = user?.role === "primary";
   const aiEnabled = user?.clinic?.aiEnabled ?? true;
+
+  // Profile Form
+  const {
+    register: registerProfile,
+    handleSubmit: handleSubmitProfile,
+    reset: resetProfile,
+    formState: { errors: profileErrors },
+  } = useForm({
+    defaultValues: {
+      name: user?.name || "",
+      phone: user?.phone || "",
+      licenseNumber: user?.licenseNumber || "",
+    },
+  });
+
+  useEffect(() => {
+    console.log(user);
+    
+    if (user) {
+      resetProfile({
+        name: user.name || "",
+        phone: user.phone || "",
+        licenseNumber: user.licenseNumber || "",
+      });
+    }
+  }, [user, resetProfile]);
+
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const uploadMutation = useMutation({
+    mutationFn: uploadImage,
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: (res) => {
+      updateUser(res.data);
+      toast.success("Profile updated successfully.");
+      setProfileImage(null);
+    },
+    onError: () => {
+      toast.error("Failed to update profile.");
+    }
+  });
+
+  const onProfileSubmit = async (data: { name: string; phone: string; licenseNumber: string }) => {
+    let uploadedImageUrl = user?.profileImage;
+    if (profileImage) {
+      try {
+        uploadedImageUrl = await uploadImage(profileImage, "users");
+      } catch {
+        toast.error("Image upload failed.");
+        return;
+      }
+    }
+
+    updateProfileMutation.mutate({
+      ...data,
+      profileImage: uploadedImageUrl,
+    });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProfileImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Clinic Form
+  const {
+    register: registerClinicForm,
+    handleSubmit: handleSubmitClinic,
+    reset: resetClinicForm,
+    formState: { errors: clinicErrors },
+  } = useForm({
+    defaultValues: {
+      name: user?.clinic?.name || "",
+      address: user?.clinic?.address || "",
+    },
+  });
+
+  useEffect(() => {
+    if (user?.clinic) {
+      resetClinicForm({
+        name: user.clinic.name || "",
+        address: user.clinic.address || "",
+      });
+    }
+  }, [user?.clinic, resetClinicForm]);
+
+  const updateClinicDetailsMutation = useMutation({
+    mutationFn: updateClinicDetails,
+    onSuccess: (res) => {
+      updateClinic(res.data);
+      toast.success("Clinic details updated successfully.");
+    },
+    onError: () => {
+      toast.error("Failed to update clinic details.");
+    }
+  });
+
+  const onClinicSubmit = (data: { name: string; address: string }) => {
+    updateClinicDetailsMutation.mutate(data);
+  };
 
   const toggleAIMutation = useMutation({
     mutationFn: async (enabled: boolean) => {
@@ -74,10 +183,10 @@ export default function SettingsPage() {
   };
 
   const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
+    register: registerInvite,
+    handleSubmit: handleSubmitInvite,
+    reset: resetInvite,
+    formState: { errors: inviteErrors },
   } = useForm({
     defaultValues: { email: "", role: "doctor" as "doctor" | "staff" },
   });
@@ -89,7 +198,7 @@ export default function SettingsPage() {
     },
     onSuccess: () => {
       setMessage({ type: "success", text: "Invitation sent successfully!" });
-      reset();
+      resetInvite();
     },
     onError: (err: unknown) => {
       const errorMsg = (err as { response?: { data?: { error?: string } } }).response?.data?.error || (err as Error).message || "Failed to send invite.";
@@ -97,7 +206,7 @@ export default function SettingsPage() {
     }
   });
 
-  const onSubmit = (data: { email: string; role: "doctor" | "staff" }) => {
+  const onInviteSubmit = (data: { email: string; role: "doctor" | "staff" }) => {
     setMessage(null);
     inviteMutation.mutate(data);
   };
@@ -128,13 +237,19 @@ export default function SettingsPage() {
           <div className="flex items-center gap-8 mb-10">
             <div className="relative w-24 h-24 shrink-0">
               <div className="absolute -inset-1.5 bg-linear-to-tr from-brand-primary to-brand-accent rounded-full opacity-25 blur-sm" />
-              <div className="relative w-24 h-24 bg-white border-4 border-white shadow-2xl rounded-full overflow-hidden flex items-center justify-center">
-                {user?.profileImage ? (
-                  <Image src={user.profileImage} alt={user.name || "User"} width={96} height={96} className="w-full h-full object-cover" />
+              <label className="relative w-24 h-24 bg-white border-4 border-white shadow-2xl rounded-full overflow-hidden flex items-center justify-center cursor-pointer group/img">
+                <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                {imagePreview || user?.profileImage ? (
+                  <Image src={imagePreview || user?.profileImage || ""} alt={user?.name || "User"} width={96} height={96} className="w-full h-full object-cover transition-transform group-hover/img:scale-110" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300 font-semibold text-3xl">{user?.name?.charAt(0) || "U"}</div>
+                  <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300 font-semibold text-3xl group-hover/img:text-brand-primary transition-colors">
+                    <UserIcon className="w-8 h-8" />
+                  </div>
                 )}
-              </div>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                  <UploadCloud className="w-6 h-6 text-white" />
+                </div>
+              </label>
             </div>
             <div>
               <h2 className="text-2xl font-semibold text-slate-900 tracking-tight uppercase">{user?.name}</h2>
@@ -149,11 +264,77 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-slate-100">
-             <p className="eyebrow text-slate-400 mb-2 uppercase tracking-[0.2em] text-[10px] font-bold">Clinic Affiliation</p>
-             <p className="text-lg font-semibold text-slate-900 tracking-tight uppercase">{typeof user?.clinic === 'object' ? (user.clinic.name as React.ReactNode) : 'Carewell Clinic'}</p>
-          </div>
+          <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-6 pt-8 border-t border-slate-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input
+                label="Full Name"
+                {...registerProfile("name", { required: "Name is required" })}
+                error={profileErrors.name?.message}
+                leftIcon={<UserIcon className="w-4 h-4" />}
+              />
+              <Input
+                label="Contact Phone"
+                {...registerProfile("phone")}
+                leftIcon={<Phone className="w-4 h-4" />}
+              />
+              <Input
+                label="Medical License #"
+                {...registerProfile("licenseNumber")}
+                disabled={user?.role === 'staff'}
+                leftIcon={<Shield className="w-4 h-4" />}
+              />
+            </div>
+            <div className="flex justify-end pt-4">
+              <Button 
+                type="submit" 
+                variant="primary" 
+                size="sm" 
+                className="px-8 rounded-xl"
+                isLoading={updateProfileMutation.isPending || uploadMutation.isPending}
+                leftIcon={<Save className="w-4 h-4" />}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </form>
         </Card>
+
+        {/* Clinic Details Card - Only for Primary Doctors */}
+        {isPrimary && (
+          <Card className="p-10 border-slate-200 rounded-2xl shadow-2xl shadow-slate-200/40 bg-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-brand-accent/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+            
+            <div className="eyebrow text-brand-accent mb-10 flex items-center gap-4 uppercase tracking-[0.2em] text-[10px] font-bold">
+               <div className="w-10 h-px bg-brand-accent/30" /> Clinic Registry
+            </div>
+
+            <form onSubmit={handleSubmitClinic(onClinicSubmit)} className="space-y-6">
+              <Input
+                label="Clinic Name"
+                {...registerClinicForm("name", { required: "Clinic name is required" })}
+                error={clinicErrors.name?.message}
+                leftIcon={<Building className="w-4 h-4" />}
+              />
+              <Input
+                label="Clinic Address"
+                {...registerClinicForm("address")}
+                leftIcon={<MapPin className="w-4 h-4" />}
+              />
+              <div className="flex justify-end pt-4">
+                <Button 
+                  type="submit" 
+                  variant="primary" 
+                  size="sm" 
+                  className="px-8 rounded-xl bg-brand-accent hover:bg-brand-accent/90 border-brand-accent hover:border-brand-accent/90"
+                  isLoading={updateClinicDetailsMutation.isPending}
+                  leftIcon={<Save className="w-4 h-4" />}
+                >
+                  Update Registry
+                </Button>
+              </div>
+            </form>
+          </Card>
+        )}
 
         {/* AI Control Card - Only for Primary Doctors */}
         {isPrimary && (
@@ -219,15 +400,15 @@ export default function SettingsPage() {
               Empower your clinic by inviting associate doctors or reception staff to join your clinical workspace.
             </p>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmitInvite(onInviteSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   label="Member Email"
                   type="email"
-                  {...register("email")}
+                  {...registerInvite("email")}
                   placeholder="name@carewell.com"
                   leftIcon={<Mail className="w-5 h-5" />}
-                  error={errors.email?.message}
+                  error={inviteErrors.email?.message}
                 />
                 <Select
                   label="Role Selection"
@@ -235,7 +416,7 @@ export default function SettingsPage() {
                     { label: "Associate Doctor", value: "doctor" },
                     { label: "Reception / Staff", value: "staff" },
                   ]}
-                  {...register("role")}
+                  {...registerInvite("role")}
                 />
               </div>
 

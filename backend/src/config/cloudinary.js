@@ -14,9 +14,21 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "carewell_doctors",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  params: async (req, file) => {
+    // Get folder type from query param or body, default to 'misc'
+    const type = req.query.type || req.body.type || "misc";
+    
+    // Define allowed folders to prevent arbitrary folder creation
+    const allowedFolders = ["users", "patients", "clinical", "misc"];
+    const folderName = allowedFolders.includes(type) ? `carewell/${type}` : "carewell/misc";
+
+    return {
+      folder: folderName,
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      transformation: type === "users" || type === "patients" 
+        ? [{ width: 500, height: 500, crop: "fill" }] // Auto-crop profile pictures
+        : [], // Keep clinical images original
+    };
   },
 });
 
