@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { ConsultationNotes } from "@/services/consultationService";
+import { ConsultationNotes, SaveConsultationPayload } from "@/services/consultationService";
 import { generatePrescriptionPDF } from "@/lib/pdfGenerator";
 
 const aiGenerationSchema = z.object({
@@ -54,6 +54,7 @@ interface Patient {
   name: string;
   age: number;
   phone: string;
+  gender: "Male" | "Female" | "Other";
 }
 
 interface ApiError {
@@ -165,7 +166,7 @@ function ConsultationForm() {
 
   const aiNotes = generateMutation.data?.success ? generateMutation.data.data : null;
 
-  interface SavePayload extends FormData {
+  interface SavePayload extends SaveConsultationPayload {
     id?: string;
   }
 

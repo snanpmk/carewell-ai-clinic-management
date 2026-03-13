@@ -26,18 +26,6 @@ export default function AppointmentsPage() {
 
   interface ConsultationRecord {
     _id: string;
-    consultationDate: string;
-    severity?: string;
-    symptoms: string;
-    modalities?: string;
-    generals?: string;
-    mentals?: string;
-    diagnosis?: string;
-    prescription?: string;
-    status?: "Scheduled" | "In-Progress" | "Completed";
-    opNumber?: string;
-    aiGeneratedNotes?: string | Record<string, unknown>;
-    doctorEditedNotes?: string | Record<string, unknown>;
     patientId?: {
       _id: string;
       name: string;
@@ -49,7 +37,23 @@ export default function AppointmentsPage() {
       _id: string;
       name: string;
       licenseNumber?: string;
+      profileImage?: string;
     };
+    clinic:string,
+    symptoms: string;
+    severity?: string;
+    modalities?: string;
+    generals?: string;
+    mentals?: string;
+    diagnosis?: string;
+    opNumber?: string;
+    status?: "Scheduled" | "In-Progress" | "Completed";
+    prescription?: string;
+    consultationDate: string;
+    aiGeneratedNotes?: string | Record<string, unknown>;
+    doctorEditedNotes?: string | Record<string, unknown>;
+    createdAt: string;
+    updatedAt: string;
   }
 
   const handlePrint = (apt: ConsultationRecord) => {
@@ -232,7 +236,9 @@ export default function AppointmentsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredConsultations.map((apt: ConsultationRecord) => (
+                  filteredConsultations.map((apt: ConsultationRecord) => {
+                    console.log(apt)
+                    return (
                     <tr key={apt._id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
@@ -295,7 +301,8 @@ export default function AppointmentsPage() {
                         </div>
                       </td>
                     </tr>
-                  ))
+                  )
+                  })
                 )}
               </tbody>
             </table>
