@@ -161,6 +161,7 @@ const loginDoctor = async (req, res) => {
           clinic: doctor.clinic,
           phone: doctor.phone,
           licenseNumber: doctor.licenseNumber,
+          role: doctor.role,
           token: generateToken(doctor._id),
         },
       });
@@ -193,6 +194,8 @@ const getMe = async (req, res) => {
         profileImage: doctor.profileImage,
         role: doctor.role,
         clinic: doctor.clinic,
+        phone: doctor.phone,
+        licenseNumber: doctor.licenseNumber,
       },
     });
   } catch (error) {

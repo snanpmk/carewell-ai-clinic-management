@@ -275,12 +275,14 @@ export default function SettingsPage() {
                 {...registerProfile("phone")}
                 leftIcon={<Phone className="w-4 h-4" />}
               />
-              <Input
-                label="Medical License #"
-                {...registerProfile("licenseNumber")}
-                disabled={user?.role === 'staff'}
-                leftIcon={<Shield className="w-4 h-4" />}
+              {user?.role !== 'staff' && (
+                <Input
+                  label="Medical License #"
+                  {...registerProfile("licenseNumber")}
+                  disabled={user?.role === 'staff'}
+                  leftIcon={<Shield className="w-4 h-4" />}
               />
+              )}
             </div>
             <div className="flex justify-end pt-4">
               <Button 
