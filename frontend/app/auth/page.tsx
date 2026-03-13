@@ -147,8 +147,17 @@ function AuthContent() {
       return;
     }
 
-    // Trigger validation for registration or invite
-    const isValid = await trigger();
+    // Determine fields to validate based on mode
+    const fieldsToValidate: (keyof AuthFormValues)[] = ["doctorPhone"];
+    if (!isInvite) {
+      fieldsToValidate.push("clinicName");
+      fieldsToValidate.push("doctorLicense");
+    } else if (!isStaffInvite) {
+      fieldsToValidate.push("doctorLicense");
+    }
+
+    // Trigger validation for the relevant fields
+    const isValid = await trigger(fieldsToValidate);
     if (!isValid) {
       toast.error("Please fill in all required fields correctly.");
       return;

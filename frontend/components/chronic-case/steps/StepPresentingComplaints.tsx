@@ -79,7 +79,7 @@ export default function StepPresentingComplaints({ caseData, updateCaseData, nex
       } else {
         toast.info("AI couldn't find distinct symptoms in the narration.");
       }
-    } catch (_err) {
+    } catch {
       toast.error("AI Sync failed. Please try again or fill manually.");
     } finally {
       setIsExtracting(false);

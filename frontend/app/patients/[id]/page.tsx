@@ -69,8 +69,8 @@ export default function PatientProfilePage({ params }: { params: Promise<{ id: s
     queryFn: () => summarizeHistory(visits.map(v => ({
       isChronic: !!v.demographics,
       date: v.consultationDate || v.createdAt,
-      symptoms: v.symptoms || (v as any).presentingComplaints?.[0]?.sensation || "General checkup",
-      diagnosis: v.diagnosis || (v as any).summaryDiagnosis?.diseaseDiagnosis || "Pending"
+      symptoms: v.symptoms || (v as ChronicCase).presentingComplaints?.[0]?.sensation || "General checkup",
+      diagnosis: v.diagnosis || (v as ChronicCase).summaryDiagnosis?.diseaseDiagnosis || "Pending"
     }))),
     enabled: visits.length > 0 && aiEnabled,
   });

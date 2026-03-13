@@ -6,12 +6,9 @@ import {
   Thermometer, Microscope, 
   Stethoscope,
   User,
-  Zap,
   Layers,
   HeartPulse,
   Navigation,
-  FileDigit,
-  TestTube,
   Pill
 } from "lucide-react";
 import { clsx } from "clsx";

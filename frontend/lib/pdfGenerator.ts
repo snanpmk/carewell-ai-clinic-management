@@ -16,6 +16,12 @@ interface PrescriptionData {
   modalities?: string;
   generals?: string;
   mentals?: string;
+  
+  // Follow-up specific fields
+  symptomChanges?: string;
+  interference?: string;
+  basisOfPrescription?: string;
+
   prescriptions: Array<{
     medicine: string;
     potency: string;
@@ -88,38 +94,45 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
   doc.setFont('helvetica', 'normal');
   doc.text(data.date, 145, 52);
 
-  // 4. Clinical Context
+  // 4. Clinical Context & Follow-up Details
   let currentY = 80;
   
-  if (data.diagnosis || data.symptoms || data.modalities || data.generals || data.mentals) {
+  const clinicalDetails = [
+    { label: 'Diagnosis:', value: data.diagnosis },
+    { label: 'Chief Complaint:', value: data.symptoms },
+    { label: 'Symptom Changes:', value: data.symptomChanges },
+    { label: 'Interference:', value: data.interference },
+    { label: 'Prescription Basis:', value: data.basisOfPrescription },
+    { label: 'Modalities:', value: data.modalities },
+    { label: 'Physical Generals:', value: data.generals },
+    { label: 'Mental State:', value: data.mentals },
+  ].filter(item => !!item.value);
+
+  if (clinicalDetails.length > 0) {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 141, 150);
-    doc.text('CLINICAL DETAILS', 15, currentY);
+    doc.text('CLINICAL EVALUATION', 15, currentY);
     
     doc.setDrawColor(200, 200, 200);
     doc.line(15, currentY + 2, 60, currentY + 2);
     
-    currentY += 8;
+    currentY += 10;
     doc.setFontSize(9);
     doc.setTextColor(80, 80, 80);
 
-    const details = [
-      { label: 'Diagnosis:', value: data.diagnosis },
-      { label: 'Chief Complaint:', value: data.symptoms },
-      { label: 'Modalities:', value: data.modalities },
-      { label: 'Physical Generals:', value: data.generals },
-      { label: 'Mental State:', value: data.mentals },
-    ];
+    clinicalDetails.forEach(item => {
+      doc.setFont('helvetica', 'bold');
+      doc.text(item.label, 15, currentY);
+      doc.setFont('helvetica', 'normal');
+      const splitValue = doc.splitTextToSize(item.value || "", pageWidth - 55);
+      doc.text(splitValue, 50, currentY);
+      currentY += (splitValue.length * 5) + 3;
 
-    details.forEach(item => {
-      if (item.value) {
-        doc.setFont('helvetica', 'bold');
-        doc.text(item.label, 15, currentY);
-        doc.setFont('helvetica', 'normal');
-        const splitValue = doc.splitTextToSize(item.value, pageWidth - 50);
-        doc.text(splitValue, 45, currentY);
-        currentY += (splitValue.length * 5) + 2;
+      // Page break check
+      if (currentY > 260) {
+        doc.addPage();
+        currentY = 20;
       }
     });
     
@@ -127,6 +140,11 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
   }
 
   // 5. Prescription Table
+  if (currentY > 240) {
+    doc.addPage();
+    currentY = 20;
+  }
+
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(0, 48, 87); // Brand Secondary
@@ -137,7 +155,7 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
   const tableData = data.prescriptions.map((p, index) => [
     index + 1,
     `${p.medicine} ${p.potency}`,
-    p.form,
+    p.form || '-',
     p.dosage,
     p.quantity || '-',
     p.indication || '-'
@@ -154,7 +172,7 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
     columnStyles: {
       0: { cellWidth: 8 },
       1: { cellWidth: 45, fontStyle: 'bold' },
-      2: { cellWidth: 25 },
+      2: { cellWidth: 20 },
       3: { cellWidth: 35 },
       4: { cellWidth: 20 },
       5: { cellWidth: 'auto' },
@@ -189,19 +207,19 @@ export const generatePrescriptionPDF = (data: PrescriptionData) => {
   }
 
   // 7. Footer / Signature
-  const footerY = 270;
+  const footerY = 280;
   doc.setDrawColor(230, 230, 230);
-  doc.line(10, footerY - 5, pageWidth - 10, footerY - 5);
+  doc.line(10, footerY - 15, pageWidth - 10, footerY - 15);
   
-  doc.setFontSize(8);
+  doc.setFontSize(7);
   doc.setTextColor(150, 150, 150);
-  doc.text('This is an electronically generated prescription from Carewell AI.', 15, footerY);
+  doc.text('This is an electronically generated prescription from Carewell AI Homeopathy.', 15, footerY - 10);
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(60, 60, 60);
-  doc.text('Signature / Seal', pageWidth - 50, footerY - 10);
-  doc.line(pageWidth - 60, footerY - 15, pageWidth - 15, footerY - 15);
+  doc.text('Signature / Seal', pageWidth - 50, footerY - 20);
+  doc.line(pageWidth - 60, footerY - 25, pageWidth - 15, footerY - 25);
 
   // Save PDF
   const fileName = `Prescription_${data.patientName.replace(/\s+/g, '_')}_${data.date.replace(/\//g, '-')}.pdf`;

@@ -110,12 +110,18 @@ const updateChronicCase = async (req, res) => {
  */
 const addFollowUp = async (req, res) => {
   try {
-    const { date, symptomChanges, interference, prescription } = req.body;
+    const { date, symptomChanges, interference, prescription, basisOfPrescription } = req.body;
     const updatedCase = await ChronicCase.findOneAndUpdate(
       { _id: req.params.id, clinic: req.clinicId },
       {
         $push: {
-          followUps: { date: date || new Date(), symptomChanges, interference, prescription },
+          followUps: { 
+            date: date || new Date(), 
+            symptomChanges, 
+            interference, 
+            prescription,
+            basisOfPrescription 
+          },
         },
       },
       { new: true }
