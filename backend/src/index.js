@@ -23,9 +23,9 @@ app.use(helmet());
 
 // Dynamic CORS configuration
 const allowedOrigins = [
-  process.env.FRONTEND_URL?.replace(/\/$/, ""), // Remove trailing slash if present
+  process.env.FRONTEND_URL?.replace(/\/$/, ""),
   "http://localhost:3000",
-  "http://localhost:5173", // Vite default
+  "http://localhost:5173",
 ].filter(Boolean);
 
 app.use(
