@@ -112,7 +112,7 @@ function AuthContent() {
   });
 
   const uploadMutation = useMutation({
-    mutationFn: uploadImage,
+    mutationFn: ({ file, type }: { file: File; type: string }) => uploadImage(file, type),
   });
 
   // Global Error Handler for Mutations
@@ -160,9 +160,9 @@ function AuthContent() {
       let uploadedImageUrl = null;
       if (profileImage) {
         try {
-          uploadedImageUrl = await uploadImage(profileImage, "users");
+          uploadedImageUrl = await uploadMutation.mutateAsync({ file: profileImage, type: "users" });
         } catch {
-          console.error("Image upload failed, continuing without image");
+          return;
         }
       }
 

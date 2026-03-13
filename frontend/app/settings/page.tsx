@@ -39,8 +39,6 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
-    console.log(user);
-    
     if (user) {
       resetProfile({
         name: user.name || "",
@@ -54,7 +52,7 @@ export default function SettingsPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const uploadMutation = useMutation({
-    mutationFn: uploadImage,
+    mutationFn: ({ file, type }: { file: File; type: string }) => uploadImage(file, type),
   });
 
   const updateProfileMutation = useMutation({
@@ -63,6 +61,7 @@ export default function SettingsPage() {
       updateUser(res.data);
       toast.success("Profile updated successfully.");
       setProfileImage(null);
+      setImagePreview(null);
     },
     onError: () => {
       toast.error("Failed to update profile.");
@@ -73,9 +72,8 @@ export default function SettingsPage() {
     let uploadedImageUrl = user?.profileImage;
     if (profileImage) {
       try {
-        uploadedImageUrl = await uploadImage(profileImage, "users");
+        uploadedImageUrl = await uploadMutation.mutateAsync({ file: profileImage, type: "users" });
       } catch {
-        toast.error("Image upload failed.");
         return;
       }
     }
