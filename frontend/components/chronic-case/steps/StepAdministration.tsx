@@ -10,14 +10,22 @@ import { useQuery } from "@tanstack/react-query";
 import { Patient, getAllPatients } from "@/services/patientService";
 import { getPatientChronicCases } from "@/services/chronicCaseService";
 import { getNextOPNumber } from "@/services/consultationService";
+import { getClinicMembers, ClinicMember } from "@/services/authService";
 import { useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function StepAdministration({ caseData, updateCaseData, nextStep }: StepProps) {
+  const { user } = useAuthStore();
   const { data: allPatientsRes } = useQuery<{ success: boolean; data: Patient[] }>({
     queryKey: ["patients"],
     queryFn: getAllPatients,
+  });
+
+  const { data: membersRes } = useQuery<{ success: boolean; data: ClinicMember[] }>({
+    queryKey: ["clinicMembers"],
+    queryFn: getClinicMembers,
   });
 
   const { register, handleSubmit, reset, control, formState: { isSubmitting } } = useForm<ChronicCase>({
@@ -26,7 +34,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
       header: {
         opNumber: caseData.header?.opNumber || "",
         unit: caseData.header?.unit || "",
-        caseTakenBy: caseData.header?.caseTakenBy || "",
+        caseTakenBy: caseData.header?.caseTakenBy || user?.name || "",
       },
       demographics: {
         name: caseData.demographics?.name || "",
@@ -75,7 +83,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           header: {
             opNumber: latestCase.header?.opNumber || "",
             unit: latestCase.header?.unit || "",
-            caseTakenBy: latestCase.header?.caseTakenBy || "",
+            caseTakenBy: latestCase.header?.caseTakenBy || user?.name || "",
           },
           demographics: {
             name: latestCase.demographics?.name || "",
@@ -128,7 +136,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
               header: { 
                 opNumber: res.success ? res.data.opNumber : "", 
                 unit: "", 
-                caseTakenBy: "" 
+                caseTakenBy: user?.name || "" 
               },
               demographics: {
                 name: patientRecord.name || "",
@@ -145,7 +153,7 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
         }
       }
     }
-  }, [selectedPatientId, existingCases, memoPatients, reset, updateCaseData, caseData._id, caseData.patient]);
+  }, [selectedPatientId, existingCases, memoPatients, reset, updateCaseData, caseData._id, caseData.patient, user?.name]);
 
   const onSubmit = (data: ChronicCase) => {
     // Merge current form data into global state before proceeding
@@ -158,6 +166,12 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
       value: p._id,
       label: `${p.name} (${p.phone})`,
     })), [memoPatients]);
+
+  const doctorOptions = useMemo(() => 
+    (membersRes?.data || []).map((m: ClinicMember) => ({
+      value: m.name,
+      label: m.name,
+    })), [membersRes?.data]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="contents">
@@ -181,7 +195,12 @@ export default function StepAdministration({ caseData, updateCaseData, nextStep 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Input label="OP Number" {...register("header.opNumber")} placeholder="e.g. 2024/CR/001" />
             <Input label="Unit" {...register("header.unit")} placeholder="e.g. Unit I" />
-            <Input label="Case Taken By" {...register("header.caseTakenBy")} placeholder="Student/Physician Name" />
+            <Select 
+              label="Case Taken By" 
+              options={doctorOptions} 
+              placeholder="Select Member"
+              {...register("header.caseTakenBy")} 
+            />
           </div>
 
           <div className="pt-6 border-t border-slate-100">

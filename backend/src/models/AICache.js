@@ -18,7 +18,7 @@ const aiCacheSchema = new mongoose.Schema(
     },
     useCase: {
       type: String,
-      enum: ["generateNotes", "summarizeHistory", "analyzeChronicCase"],
+      enum: ["generateNotes", "summarizeHistory", "analyzeChronicCase", "extractLSMA"],
       required: true,
     }
   },

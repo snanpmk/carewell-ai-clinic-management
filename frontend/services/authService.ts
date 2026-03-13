@@ -74,7 +74,14 @@ export const updateClinicDetails = async (payload: {
   return data;
 };
 
-export const getClinicMembers = async () => {
+export interface ClinicMember {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export const getClinicMembers = async (): Promise<{ success: boolean; data: ClinicMember[] }> => {
   const { data } = await apiClient.get("/api/auth/clinic-members");
   return data;
 };

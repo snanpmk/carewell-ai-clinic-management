@@ -46,3 +46,27 @@ export const analyzeChronicCaseWithAI = async (caseData: Partial<ChronicCase>) =
   return response.data.data;
 };
 
+export interface LSMASymptom {
+  complaintType?: "Chief" | "Associated";
+  location?: {
+    system?: string;
+    organ?: string;
+    tissue?: string;
+    direction?: string;
+    extension?: string;
+    duration?: string;
+  };
+  sensation?: string;
+  modalities?: {
+    aggravation?: string;
+    amelioration?: string;
+    equivalent?: string;
+  };
+  accompaniments?: string;
+}
+
+export const extractLSMA = async (text: string): Promise<{ symptoms: LSMASymptom[] }> => {
+  const response = await apiClient.post("/api/ai/extract-lsma", { text });
+  return response.data.data;
+};
+

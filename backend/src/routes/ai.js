@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { generateNotes, summarizeHistory, analyzeChronicCaseController, getNextOPNumber } = require("../controllers/generateController");
+const { generateNotes, summarizeHistory, analyzeChronicCaseController, getNextOPNumber, extractLSMAController } = require("../controllers/generateController");
 const { protect } = require("../middleware/auth");
 
 // GET /api/ai/next-op-number - Generate next available OP number
@@ -14,5 +14,8 @@ router.post("/summarize-history", protect, summarizeHistory);
 
 // POST /api/ai/analyze-chronic-case - Analyze a chronic case
 router.post("/analyze-chronic-case", protect, analyzeChronicCaseController);
+
+// POST /api/ai/extract-lsma - Extract symptoms from text
+router.post("/extract-lsma", protect, extractLSMAController);
 
 module.exports = router;

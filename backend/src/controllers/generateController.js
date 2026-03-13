@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const AICache = require("../models/AICache");
-const { generateConsultationNotes, summarizePatientHistory, analyzeChronicCase, extractClinicalContext } = require("../services/aiService");
+const { generateConsultationNotes, summarizePatientHistory, analyzeChronicCase, extractClinicalContext, extractLSMA } = require("../services/aiService");
 
 /**
  * Helper to generate a stable hash for any object
@@ -173,6 +173,44 @@ const Consultation = require("../models/Consultation");
 const ChronicCase = require("../models/ChronicCase");
 
 /**
+ * POST /api/ai/extract-lsma
+ * Extracts symptom totality components (LSMA) from raw clinical text.
+ */
+const extractLSMAController = async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    if (!text || text.length < 10) {
+      return res.status(400).json({ success: false, error: "Text is too short for extraction." });
+    }
+
+    const inputHash = generateHash({ text });
+
+    // Check Cache
+    const cachedResponse = await AICache.findOne({ inputHash, useCase: "extractLSMA" });
+    if (cachedResponse) {
+      console.log("💾 Returning cached LSMA extraction");
+      return res.status(200).json({ success: true, data: cachedResponse.outputData });
+    }
+
+    const extraction = await extractLSMA(text);
+
+    // Save to Cache
+    await AICache.create({
+      inputHash,
+      inputData: { textLength: text.length },
+      outputData: extraction,
+      useCase: "extractLSMA"
+    }).catch(err => console.error("Cache save error:", err.message));
+
+    return res.status(200).json({ success: true, data: extraction });
+  } catch (error) {
+    console.error("extractLSMA error:", error.message);
+    return res.status(500).json({ success: false, error: "AI failed to extract symptoms." });
+  }
+};
+
+/**
  * GET /api/ai/next-op-number
  * Generates a unique, incremental OP number for the clinic.
  */
@@ -198,4 +236,4 @@ const getNextOPNumber = async (req, res) => {
   }
 };
 
-module.exports = { generateNotes, summarizeHistory, analyzeChronicCaseController, getNextOPNumber };
+module.exports = { generateNotes, summarizeHistory, analyzeChronicCaseController, extractLSMAController, getNextOPNumber };
