@@ -225,7 +225,7 @@ function AuthContent() {
            <span>© 2026 Carewell Systems</span>
            <div className="flex items-center gap-6">
              <Link href="/privacy" className="hover:text-white cursor-pointer transition-colors">Privacy</Link>
-             <Link href="/protocol" className="hover:text-white cursor-pointer transition-colors">Protocol</Link>
+             <Link href="/terms" className="hover:text-white cursor-pointer transition-colors">Terms</Link>
            </div>
         </div>
       </div>

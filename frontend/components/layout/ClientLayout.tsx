@@ -22,7 +22,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isPublicRoute = useMemo(() => {
-    const publicRoutes = ["/auth", "/privacy", "/protocol"];
+    const publicRoutes = ["/auth", "/privacy", "/terms"];
     return publicRoutes.includes(pathname);
   }, [pathname]);
 
@@ -34,7 +34,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         router.push("/");
       } else if (isAuthenticated && user?.role === "staff") {
         // Staff restricted routes
-        const clinicalPrefixes = ["/consultation", "/notes", "/ai-tools", "/symptoms", "/protocol"];
+        const clinicalPrefixes = ["/consultation", "/notes", "/ai-tools", "/symptoms", "/terms"];
         const isClinicalRoute = clinicalPrefixes.some(prefix => pathname?.startsWith(prefix));
         if (pathname === "/" || isClinicalRoute) {
           router.push("/patients");
@@ -77,7 +77,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const publicRoutes = ["/auth", "/privacy", "/protocol"];
+  const publicRoutes = ["/auth", "/privacy", "/terms"];
   if (!isAuthenticated || publicRoutes.includes(pathname)) {
      return <div className="flex-1 flex flex-col min-h-screen bg-white">{children}</div>;
   }
