@@ -161,6 +161,10 @@ function AuthContent() {
     }
   };
 
+  const handleGoogleError = () => {
+    toast.error("Google Sign-In failed. Please try again.");
+  };
+
   const isLoading = loginMutation.isPending || registerMutation.isPending || acceptInviteMutation.isPending || uploadMutation.isPending;
 
   return (
@@ -329,16 +333,17 @@ function AuthContent() {
                    Processing Request...
                 </div>
              ) : (
-                <div className="w-full hover:scale-[1.01] transition-transform">
+                <div className="w-full hover:scale-[1.01] transition-transform flex items-center justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
-                    onError={() => {}}
+                    onError={handleGoogleError}
                     useOneTap={false}
-                    theme="filled_blue"
+                    theme="outline"
                     shape="pill"
-                    width="100%"
+                    width="600"
                     text={isLogin ? "signin_with" : "signup_with"}
                     size="large"
+                    type="standard"
                   />
                 </div>
              )}
