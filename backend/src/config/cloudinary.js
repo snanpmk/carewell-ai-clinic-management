@@ -38,4 +38,26 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
-module.exports = { cloudinary, upload };
+/**
+ * Utility to delete an image from Cloudinary
+ * @param {string} url - The full Cloudinary URL
+ */
+const deleteImage = async (url) => {
+  if (!url || !url.includes("cloudinary.com")) return;
+
+  try {
+    // Extract public_id from the URL
+    // Format: https://res.cloudinary.com/cloud_name/image/upload/v12345/folder/filename.jpg
+    // We need: folder/filename
+    const parts = url.split("/");
+    const filenameWithExtension = parts.pop(); // filename.jpg
+    const folder = parts.pop(); // folder (e.g., users, patients)
+    const publicId = `carewell/${folder}/${filenameWithExtension.split(".")[0]}`;
+
+    await cloudinary.uploader.destroy(publicId);
+  } catch (error) {
+    console.error("Cloudinary Delete Error:", error);
+  }
+};
+
+module.exports = { cloudinary, upload, deleteImage };

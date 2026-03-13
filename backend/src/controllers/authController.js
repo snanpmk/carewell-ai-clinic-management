@@ -4,6 +4,7 @@ const Invitation = require("../models/Invitation");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const nodemailer = require("nodemailer");
+const { deleteImage } = require("../config/cloudinary");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -482,7 +483,14 @@ const updateUser = async (req, res) => {
     if (name) user.name = name;
     if (phone) user.phone = phone;
     if (licenseNumber) user.licenseNumber = licenseNumber;
-    if (profileImage) user.profileImage = profileImage;
+    
+    if (profileImage && profileImage !== user.profileImage) {
+      // Delete old image from Cloudinary
+      if (user.profileImage) {
+        await deleteImage(user.profileImage);
+      }
+      user.profileImage = profileImage;
+    }
 
     const updatedUser = await user.save();
     const populatedUser = await User.findById(updatedUser._id).populate("clinic");
